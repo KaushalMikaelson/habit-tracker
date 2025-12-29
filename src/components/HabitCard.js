@@ -1,10 +1,11 @@
-function HabitCard({ habit, toggleHabit, deleteHabit, today }) {
+function HabitCard({ habit, toggleHabit, deleteHabit, today, selectedDate }) {
 
     const completedDates = Array.isArray(habit.completedDates)
         ? habit.completedDates
         : [];
 
-    const isDoneToday = completedDates.includes(today);
+    const targetDate = selectedDate || today;
+    const isDoneToday = completedDates.includes(targetDate);
 
     return (
         <div>

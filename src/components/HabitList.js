@@ -1,5 +1,5 @@
 import HabitCard from "./HabitCard";
-function HabitList({habits, toggleHabit, deleteHabit, today}){
+function HabitList({habits, toggleHabit, deleteHabit, selectedDate,today}){
     return (
         <div>
          {habits.map((habit) =>(  // take each habit from habits array
@@ -8,6 +8,7 @@ function HabitList({habits, toggleHabit, deleteHabit, today}){
                     habit={habit} 
                     toggleHabit={toggleHabit}
                     deleteHabit={deleteHabit}
+                    selectedDate ={selectedDate}
                     today={today}
                     /> // passing habit as prop to HabitCard component
             ))}
