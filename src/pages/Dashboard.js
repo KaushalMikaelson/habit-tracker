@@ -22,10 +22,8 @@ function getTodayDate() {
 /* Fixed Habit Name Column                                   */
 /* ========================================================= */
 
-function HabitNameColumn({ habits, deleteHabit }) {
-  const HEADER_HEIGHT = 62; // 26 (weekday) + 36 (date)
+function HabitNameColumn({ habits }) {
   const ROW_HEIGHT = 38;
-  
 
   return (
     <div
@@ -36,24 +34,6 @@ function HabitNameColumn({ habits, deleteHabit }) {
         background: "#ffffff",
       }}
     >
-      {/* Header spacer (aligns with weekday + date rows) */}
-      <div
-        style={{
-          height: HEADER_HEIGHT,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "12px",
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          color: "#374151",
-          borderBottom: "1px solid #e5e7eb",
-        }}
-      >
-        HABITS
-      </div>
-
-      {/* Habit rows */}
       {habits.map((habit) => (
         <div
           key={habit.id}
@@ -72,6 +52,7 @@ function HabitNameColumn({ habits, deleteHabit }) {
     </div>
   );
 }
+
 
 
 
@@ -387,94 +368,92 @@ return (
   {/* ================= GRID HEADER (HABITS + DATES) ================= */}
 
 {/* ================= HEADERS ================= */}
-<div>
- 
-<div style={{ display: "flex" }}>
-  
-  {/* Habit column placeholder */}
-  <div style={{ width: "200px", flexShrink: 0 }} />
-
-  {/* Grid weekday row */}
+{/* HEADER BLOCK */}
+<div
+  style={{
+    display: "flex",
+    borderBottom: "1px solid #e5e7eb", // ✅ SINGLE BORDER
+    background: "#ffffff",
+  }}
+>
+  {/* HABITS (spans weekday + date) */}
   <div
     style={{
-      display: "grid",
-      gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
-      height: "26px",
-      fontSize: "11px",
-      color: "#6b7280",
-      borderBottom: "1px solid #e5e7eb",
-      width: "100%",
-    }}
-  >
-    {monthDates.map((date) => (
-      <div
-        key={date}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {new Date(date).toLocaleDateString("en-US", {
-          weekday: "short",
-        })}
-      </div>
-    ))}
-  </div>
-</div>
-
-
-  {/* DATE ROW */}
-  {/* DATE ROW (no overlap, no duplicate HABITS) */}
-<div style={{ display: "flex" }}>
-  
-  {/* Empty spacer for habit column alignment */}
-  <div
-    style={{
-      width: "200px",     // SAME as HabitNameColumn
+      width: "200px",
       flexShrink: 0,
-      borderBottom: "1px solid #e5e7eb",
-      background: "#ffffff",
-    }}
-  />
-
-  {/* Date grid */}
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
-      height: "36px",
-      borderBottom: "1px solid #e5e7eb",
-      width: "100%",
+      height: "62px", // 26 + 36
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "12px",
+      fontWeight: 700,
+      letterSpacing: "0.08em",
+      color: "#374151",
     }}
   >
-    {monthDates.map((date) => {
-      const isToday = date === today;
+    HABITS
+  </div>
 
-      return (
+  {/* Right header (weekday + date stacked) */}
+  <div style={{ width: "100%" }}>
+    {/* Weekday row */}
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
+        height: "26px",
+        fontSize: "11px",
+        color: "#6b7280",
+      }}
+    >
+      {monthDates.map((date) => (
         <div
           key={date}
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "12px",
-            fontWeight: isToday ? 700 : 400,
-            color: isToday ? "#1d4ed8" : "#111827",
-            background: isToday ? "#e3f2fd" : "transparent",
-            borderBottom: isToday
-              ? "2px solid #1d4ed8"
-              : "none",
           }}
         >
-          {date.slice(8, 10)}
+          {new Date(date).toLocaleDateString("en-US", {
+            weekday: "short",
+          })}
         </div>
-      );
-    })}
+      ))}
+    </div>
+
+    {/* Date row */}
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
+        height: "36px",
+      }}
+    >
+      {monthDates.map((date) => {
+        const isToday = date === today;
+
+        return (
+          <div
+            key={date}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: isToday ? 700 : 400,
+              color: isToday ? "#1d4ed8" : "#111827",
+              background: isToday ? "#e3f2fd" : "transparent",
+            }}
+          >
+            {date.slice(8, 10)}
+          </div>
+        );
+      })}
+    </div>
   </div>
 </div>
 
-</div>
 
 {/* ================= HABIT GRID ================= */}
 <div style={{ display: "flex" }}>
