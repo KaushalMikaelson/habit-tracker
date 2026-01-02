@@ -123,7 +123,7 @@ function Dashboard() {
   }
 
   /* Render                                                   */
-
+    
   return (
     <div>
       {/* ================= App Header ================= */}
@@ -187,7 +187,49 @@ function Dashboard() {
         addHabit={handleAddHabit}
       />
 
-      {/* ================= Habit Grid Card ================= */}
+
+{/* ================= Habit Section ================= */}
+
+    {habits.length === 0 ? (
+  /* -------- Empty State -------- */
+      <div
+        style={{
+          marginTop: "48px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "8px",
+          color: "#374151",
+        }}
+      >
+        <h2 style={{ fontSize: "20px", fontWeight: 700 }}>
+          No habits yet
+        </h2>
+        <p style={{ fontSize: "14px", color: "#6b7280" }}>
+          Click the “Add Habit” button to create your first habit!
+        </p>
+          <button
+          onClick={() => setShowModal(true)}
+          style={{
+            marginTop: "12px",
+            padding: "10px 18px",
+            borderRadius: "8px",
+            border: "none",
+            background: "#2563eb",
+            color: "white",
+            fontSize: "14px",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+>
+  + Add Your First Habit
+</button>
+
+      </div>
+    ) : (
+
+      /* ================= Habit Grid Card ================= */
+
       <div
         style={{
           marginTop: "24px",
@@ -198,6 +240,7 @@ function Dashboard() {
           overflow: "hidden",
         }}
       >
+
         {/* Month Toolbar */}
         <DashboardHeader
           monthLabel={monthLabel}
@@ -216,6 +259,8 @@ function Dashboard() {
           isFutureDate={isFutureDate}
         />
       </div>
+    )}
+
 
       {/* ================= Undo Snackbar ================= */}
       {showUndo && (

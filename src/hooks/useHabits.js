@@ -1,19 +1,15 @@
 import { useState, useEffect } from "react";
 
 export function useHabits(today) {
-  const [habits, setHabits] = useState([]);
+  const [habits, setHabits] = useState(() => {
+    const storedHabits = localStorage.getItem("habits"); // get habits from localStorage if any
+    return storedHabits ? JSON.parse(storedHabits) : []; // parse and return or empty array
+  });
 
   const [recentlyDeleted, setRecentlyDeleted] = useState(null);
   const [showUndo, setShowUndo] = useState(false);
 
-  /* ---------- Load from localStorage ---------- */
-  useEffect(() => {
-    const storedHabits = localStorage.getItem("habits");
-    if (storedHabits) {
-      setHabits(JSON.parse(storedHabits));
-    }
-  }, []);
-
+ 
   /* ---------- Save to localStorage ---------- */
   useEffect(() => {
     localStorage.setItem("habits", JSON.stringify(habits));
