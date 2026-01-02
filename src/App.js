@@ -1,14 +1,7 @@
+import AuthGate from "./components/AuthGate";
 
-import './App.css';
-import Dashboard from './pages/Dashboard';
 function App() {
-  return (
-    <div className="App">
-    
-        <Dashboard />
-      
-    </div>
-  );
+  return <AuthGate />;
 }
 
 export default App;
