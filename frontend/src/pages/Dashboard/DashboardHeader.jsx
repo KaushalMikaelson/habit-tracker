@@ -1,51 +1,84 @@
-function DashboardHeader({ monthLabel, goToPreviousMonth, goToNextMonth }) {
+function DashboardHeader({
+  monthLabel,
+  goToPreviousMonth,
+  goToNextMonth,
+}) {
   return (
-<div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      height: "48px",
-      background: "#fafafa",
-      borderBottom: "1px solid #e5e7eb",
-      fontSize: "16px",
-      fontWeight: 600,
-      color: "#111827",
-      
-    }}
-  >
-    <button
-      onClick={goToPreviousMonth}
+    <div
       style={{
-        border: "none",
-        background: "transparent",
-        fontSize: "18px",
-        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
         padding: "0 16px",
-        color: "#6b7280",
+        height: "52px",
+        background: "#f9fafb",
+        borderBottom: "1px solid #e5e7eb",
       }}
     >
-      ◀
-    </button>
+      {/* Previous Month */}
+      <button
+        onClick={goToPreviousMonth}
+        aria-label="Previous month"
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#ffffff",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+          fontSize: "16px",
+          cursor: "pointer",
+          color: "#374151",
+          transition: "background 0.15s ease",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.background = "#f3f4f6")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.background = "#ffffff")
+        }
+      >
+        ◀
+      </button>
 
-    <span style={{ minWidth: "180px", textAlign: "center" }}>
-      {monthLabel}
-    </span>
+      {/* Month Label */}
+      <div
+        style={{
+          fontSize: "15px",
+          fontWeight: 700,
+          color: "#111827",
+          letterSpacing: "0.02em",
+        }}
+      >
+        {monthLabel}
+      </div>
 
-    <button
-      onClick={goToNextMonth}
-      style={{
-        border: "none",
-        background: "transparent",
-        fontSize: "18px",
-        cursor: "pointer",
-        padding: "0 16px",
-        color: "#6b7280",
-      }}
-    >
-      ▶
-    </button>
-  </div>
+      {/* Next Month */}
+      <button
+        onClick={goToNextMonth}
+        aria-label="Next month"
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "8px",
+          border: "none",
+          background: "#ffffff",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+          fontSize: "16px",
+          cursor: "pointer",
+          color: "#374151",
+          transition: "background 0.15s ease",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.background = "#f3f4f6")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.background = "#ffffff")
+        }
+      >
+        ▶
+      </button>
+    </div>
   );
 }
 

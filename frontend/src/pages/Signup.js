@@ -1,33 +1,31 @@
 import React, { useState } from "react";
-import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 
-function Login() {
+function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+    const [message, setMessage] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const { login } = useAuth();
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setMessage("");
         setError("");
         setLoading(true);
 
         try {
-            const res = await api.post("/auth/login", { email, password });
-
-            localStorage.setItem("token", res.data.token);
-
-            login({
-                userId: res.data.userId,
-                email: res.data.email,
-                token: res.data.token,
+            await api.post("/auth/register", {
+                email,
+                password,
             });
+
+            setMessage("Signup successful. Please login.");
+            setEmail("");
+            setPassword("");
         } catch (err) {
-            setError("Invalid email or password");
+            console.error(err);
+            setError("Signup failed. Email may already exist.");
         } finally {
             setLoading(false);
         }
@@ -36,13 +34,14 @@ function Login() {
     return (
         <div style={styles.container}>
             <form style={styles.card} onSubmit={handleSubmit}>
-                <h2 style={styles.title}>Welcome Back</h2>
-                <p style={styles.subtitle}>Login to continue</p>
+                <h2 style={styles.title}>Create Account</h2>
+                <p style={styles.subtitle}>Sign up to get started</p>
 
+                {message && <div style={styles.success}>{message}</div>}
                 {error && <div style={styles.error}>{error}</div>}
 
                 <div style={styles.group}>
-                    <label>Email</label>
+                    <label style={styles.label}>Email</label>
                     <input
                         type="email"
                         placeholder="Enter your email"
@@ -54,35 +53,25 @@ function Login() {
                 </div>
 
                 <div style={styles.group}>
-                    <label>Password</label>
-                    <div style={styles.passwordBox}>
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Enter your password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                            style={styles.passwordInput}
-                        />
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            style={styles.eye}
-                            title={showPassword ? "Hide password" : "Show password"}
-                        >
-                            {showPassword ? "🙈" : "👁️"}
-                        </button>
-                    </div>
+                    <label style={styles.label}>Password</label>
+                    <input
+                        type="password"
+                        placeholder="Create a password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        style={styles.input}
+                    />
                 </div>
 
                 <button type="submit" style={styles.button} disabled={loading}>
-                    {loading ? "Logging in..." : "Login"}
+                    {loading ? "Signing up..." : "Sign Up"}
                 </button>
 
                 <p style={styles.footer}>
-                    Don&apos;t have an account?{" "}
-                    <a href="/signup" style={styles.link}>
-                        Sign up
+                    Already have an account?{" "}
+                    <a href="/login" style={styles.link}>
+                        Login
                     </a>
                 </p>
             </form>
@@ -90,7 +79,7 @@ function Login() {
     );
 }
 
-/* ---------- Styles ---------- */
+/* ---------- Inline Styles ---------- */
 
 const styles = {
     container: {
@@ -109,45 +98,48 @@ const styles = {
         borderRadius: "12px",
         boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
     },
-    title: { textAlign: "center" },
+    title: {
+        textAlign: "center",
+        marginBottom: "0.25rem",
+    },
     subtitle: {
         textAlign: "center",
         color: "#666",
         marginBottom: "1.5rem",
+    },
+    success: {
+        background: "#e6fffa",
+        color: "#065f46",
+        padding: "0.6rem",
+        borderRadius: "6px",
+        fontSize: "0.9rem",
+        marginBottom: "1rem",
+        textAlign: "center",
     },
     error: {
         background: "#ffe5e5",
         color: "#d8000c",
         padding: "0.6rem",
         borderRadius: "6px",
+        fontSize: "0.9rem",
         marginBottom: "1rem",
         textAlign: "center",
     },
-    group: { marginBottom: "1.25rem" },
+    group: {
+        marginBottom: "1.25rem",
+    },
+    label: {
+        display: "block",
+        fontSize: "0.9rem",
+        marginBottom: "0.4rem",
+        color: "#333",
+    },
     input: {
         width: "100%",
         padding: "0.65rem",
         borderRadius: "6px",
         border: "1px solid #ccc",
-    },
-    passwordBox: {
-        display: "flex",
-        alignItems: "center",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
-    },
-    passwordInput: {
-        flex: 1,
-        padding: "0.65rem",
-        border: "none",
-        outline: "none",
-    },
-    eye: {
-        background: "none",
-        border: "none",
-        cursor: "pointer",
-        padding: "0 0.75rem",
-        fontSize: "1rem",
+        fontSize: "0.95rem",
     },
     button: {
         width: "100%",
@@ -156,7 +148,9 @@ const styles = {
         color: "#fff",
         border: "none",
         borderRadius: "6px",
+        fontSize: "1rem",
         cursor: "pointer",
+        marginTop: "0.5rem",
     },
     footer: {
         textAlign: "center",
@@ -165,9 +159,9 @@ const styles = {
     },
     link: {
         color: "#667eea",
-        fontWeight: "bold",
         textDecoration: "none",
+        fontWeight: "bold",
     },
 };
 
-export default Login;
+export default Signup;
