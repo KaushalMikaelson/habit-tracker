@@ -4,7 +4,7 @@ import AddHabitModal from "../../components/AddHabitModal.jsx";
 import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
 
-import { useHabits } from "../../hooks/useHabits";
+import useHabits from "../../hooks/useHabits";
 
 import {
   getCurrentYearMonth,

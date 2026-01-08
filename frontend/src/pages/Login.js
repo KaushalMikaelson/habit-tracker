@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -18,13 +19,14 @@ function Login() {
 
         try {
             const res = await api.post("/auth/login", { email, password });
-
+            const decodedToken = jwtDecode(res.data.token);
+            console.log("DECODED TOKEN OBJECT:", decodedToken);
             localStorage.setItem("token", res.data.token);
 
             login({
-                userId: res.data.userId,
-                email: res.data.email,
-                token: res.data.token,
+                userId: decodedToken.id,
+                email: decodedToken.email,
+
             });
         } catch (err) {
             setError("Invalid email or password");

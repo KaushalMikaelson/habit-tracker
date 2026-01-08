@@ -122,8 +122,6 @@ function AddHabitModal({
                     <button
                         onClick={() => {
                             addHabit();
-                            setShowModal(false);
-                            setNewHabit("");
                         }}
                         disabled={isDisabled}
                         style={{

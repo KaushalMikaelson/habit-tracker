@@ -1,21 +1,31 @@
 const mongoose = require("mongoose");
+const HabitSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+  },
 
-const habitSchema = new mongoose.Schema({
-    title: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true,
-    },
-    completedDates: {
-        type: [String],
-        default: [],
-    },
-    userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true,
-    },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+
+  completedDates: {
+    type: [String],
+    default: [],
+  },
+
+  // 🆕 SOFT DELETE SUPPORT
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+
+  deletedAt: {
+    type: Date,
+    default: null,
+  },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Habit", habitSchema);
+module.exports = mongoose.model("Habit", HabitSchema);

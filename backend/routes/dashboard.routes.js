@@ -5,7 +5,7 @@ const authMiddleware = require("../middleware/auth.middleware");
 router.get("/", authMiddleware, (req, res) => {
     return res.json({
         message: "Dashboard access granted",
-        userId: req.userId,
+        userId: req.user.id,
         file: __filename,
         timestamp: Date.now()
     });

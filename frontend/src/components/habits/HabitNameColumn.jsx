@@ -4,7 +4,7 @@ function HabitNameColumn({ habits, deleteHabit }) {
   function handleDelete(habit) {
     const ok = window.confirm(`Delete "${habit.title}"?`);
     if (!ok) return;
-    deleteHabit(habit.id);
+    deleteHabit(habit._id);
   }
 
   return (
@@ -85,7 +85,7 @@ function HabitNameColumn({ habits, deleteHabit }) {
       >
         {habits.map((habit) => (
           <div
-            key={habit.id}
+            key={habit._id}
             className="habit-row"
             style={{
               height: ROW_HEIGHT,

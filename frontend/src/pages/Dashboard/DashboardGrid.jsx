@@ -104,7 +104,7 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
           {/* ================= HABIT GRID ROWS ================= */}
           {habits.map((habit) => (
             <div
-              key={habit.id}
+              key={habit._id}
               style={{
                 display: "grid",
                 gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
@@ -131,13 +131,16 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
                       borderLeft: isWeekStart
                         ? "2px solid #d1fae5"
                         : "none",
+                      pointerEvents: "none",
                     }}
                   >
                     <button
+                      type="button"
                       disabled={isFuture}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (isFuture) return;
-                        toggleHabit(habit.id, date);
+                        toggleHabit(habit._id, date);
                       }}
                       style={{
                         width: "22px",
@@ -153,6 +156,7 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
                         cursor: isFuture
                           ? "not-allowed"
                           : "pointer",
+                        pointerEvents: "auto",
                       }}
                     >
                       ✓

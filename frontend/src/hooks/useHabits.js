@@ -1,85 +1,146 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useAuth } from "../auth/AuthContext";
+import {
+  getHabits,
+  createHabit,
+  toggleHabit as toggleHabitApi,
+  deleteHabit as deleteHabitApi,
+  undoDelete as undoDeleteApi,
+} from "../api/habits";
 
-export function useHabits(today) {
-  const [habits, setHabits] = useState(() => {
-    const storedHabits = localStorage.getItem("habits"); // get habits from localStorage if any
-    return storedHabits ? JSON.parse(storedHabits) : []; // parse and return or empty array
-  });
+export default function useHabits() {
+  const { user } = useAuth();
+
+  const [habits, setHabits] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [recentlyDeleted, setRecentlyDeleted] = useState(null);
   const [showUndo, setShowUndo] = useState(false);
 
- 
-  /* ---------- Save to localStorage ---------- */
+  const undoTimerRef = useRef(null);
+
+  /* ---------- Fetch Habits (user-aware) ---------- */
   useEffect(() => {
-    localStorage.setItem("habits", JSON.stringify(habits));
-  }, [habits]);
+    if (!user) {
+      // 🔥 Clear habits on logout
+      setHabits([]);
+      setLoading(false);
+      return;
+    }
 
-  /* ---------- Toggle Habit ---------- */
-  function toggleHabit(id, date) {
-    setHabits((prevHabits) =>
-      prevHabits.map((habit) => {
-        if (habit.id !== id) return habit;
+    fetchHabits();
+  }, [user]);
 
-        const completedDates = Array.isArray(habit.completedDates)
-          ? habit.completedDates
-          : [];
-
-        const isDone = completedDates.includes(date);
-
-        return {
-          ...habit,
-          completedDates: isDone
-            ? completedDates.filter((d) => d !== date)
-            : [...completedDates, date],
-        };
-      })
-    );
-  }
+  const fetchHabits = async () => {
+    try {
+      setLoading(true);
+      const data = await getHabits();
+      setHabits(data);
+    } catch (err) {
+      console.error("Failed to fetch habits:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ---------- Add Habit ---------- */
-  function addHabit(title) {
-    if (!title.trim()) return;
+  const addHabit = async (title) => {
+    try {
+      const newHabit = await createHabit({ title });
+      setHabits((prev) => [newHabit, ...prev]);
+    } catch (err) {
+      console.error("Failed to add habit:", err);
+      alert("Failed to add habit. Please try again.");
+    }
+  };
 
-    setHabits((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        title,
-        createdAt: today,
-        completedDates: [],
-      },
-    ]);
-  }
+  /* ---------- Toggle Habit ---------- */
+  const toggleHabit = async (id, date) => {
+    // Optimistic update
+    const previousHabits = habits;
+    setHabits((prev) =>
+      prev.map((h) => {
+        if (h._id === id) {
+          const isCompleted = h.completedDates?.includes(date);
+          return {
+            ...h,
+            completedDates: isCompleted
+              ? h.completedDates.filter((d) => d !== date)
+              : [...(h.completedDates || []), date],
+          };
+        }
+        return h;
+      })
+    );
 
-  /* ---------- Delete Habit (with Undo) ---------- */
-  function deleteHabit(id) {
-    setHabits((prevHabits) => {
-      const habitToDelete = prevHabits.find((h) => h.id === id);
+    try {
+      const updatedHabit = await toggleHabitApi(id, date);
+      setHabits((prev) =>
+        prev.map((h) => (h._id === id ? updatedHabit : h))
+      );
+    } catch (err) {
+      console.error("Failed to toggle habit:", err);
+      // Rollback on error
+      setHabits(previousHabits);
+      alert("Failed to toggle habit. Please try again.");
+    }
+  };
 
-      setRecentlyDeleted(habitToDelete);
-      setShowUndo(true);
+  /* ---------- Delete Habit (Soft Delete + Undo) ---------- */
+  const deleteHabit = async (id) => {
+    const habitToDelete = habits.find((h) => h._id === id);
+    if (!habitToDelete) return;
 
-      setTimeout(() => {
+    // Optimistic UI update
+    setHabits((prev) => prev.filter((h) => h._id !== id));
+
+    setRecentlyDeleted(habitToDelete);
+    setShowUndo(true);
+
+    try {
+      await deleteHabitApi(id);
+
+      undoTimerRef.current = setTimeout(() => {
         setShowUndo(false);
         setRecentlyDeleted(null);
       }, 10000);
-
-      return prevHabits.filter((h) => h.id !== id);
-    });
-  }
+    } catch (err) {
+      console.error("Failed to delete habit:", err);
+      // Rollback on error
+      setHabits((prev) => [habitToDelete, ...prev]);
+      setRecentlyDeleted(null);
+      setShowUndo(false);
+      alert("Failed to delete habit. Please try again.");
+    }
+  };
 
   /* ---------- Undo Delete ---------- */
-  function undoDelete() {
+  const undoDelete = async () => {
     if (!recentlyDeleted) return;
 
+    // Restore in frontend immediately for better UX
     setHabits((prev) => [recentlyDeleted, ...prev]);
     setRecentlyDeleted(null);
     setShowUndo(false);
-  }
+
+    if (undoTimerRef.current) {
+      clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+
+    // Call backend to restore the habit in the database
+    try {
+      await undoDeleteApi(recentlyDeleted._id);
+    } catch (err) {
+      console.error("Failed to undo delete:", err);
+      // If backend fails, remove from frontend state
+      setHabits((prev) => prev.filter((h) => h._id !== recentlyDeleted._id));
+    }
+  };
 
   return {
     habits,
+    loading,
     addHabit,
     toggleHabit,
     deleteHabit,
