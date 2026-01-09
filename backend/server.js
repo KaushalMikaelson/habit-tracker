@@ -50,9 +50,9 @@ mongoose
   .catch((err) => logger.error("Mongo error:", err));
 
 // Routes - ✅ FIXED: Added /api prefix to match frontend
-app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/habits", habitsRoutes);
+app.use("/auth", authRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/habits", habitsRoutes);
 
 // Health check
 app.get("/", (req, res) => {
