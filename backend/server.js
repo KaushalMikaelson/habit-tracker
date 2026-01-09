@@ -2,6 +2,7 @@ const cors = require("cors");
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const logger = require("./utils/logger");
 
 const authRoutes = require("./routes/auth.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
@@ -9,48 +10,56 @@ const habitsRoutes = require("./routes/habits.routes");
 
 const app = express();
 
-// ✅ FIXED
+// ✅ PORT for Render / Local
 const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
 
-app.use(cors({
-   origin: "http://localhost:3000",
-   credentials: true,
-}));
+// ✅ UPDATED CORS (local-safe, production-ready)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000", // React (CRA)
+    ],
+    credentials: true,
+  })
+);
 
-// ✅ FIXED: Use fallback properly
+// ✅ MongoDB URI (Atlas OR local fallback)
 const MONGO_URI =
-   process.env.MONGO_URI || "mongodb://127.0.0.1:27017/habit-tracker";
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/habit-tracker";
 
 // MongoDB Connection
-mongoose.connect(MONGO_URI, { autoIndex: false })
-   .then(async () => {
-      console.log("MongoDB connected");
-      console.log("Connected DB name:", mongoose.connection.name);
+mongoose
+  .connect(MONGO_URI, { autoIndex: false })
+  .then(async () => {
+    logger.info("MongoDB connected");
+    logger.info("Connected DB name:", mongoose.connection.name);
 
-      // Drop the problematic unique index on title if it exists
-      try {
-         await mongoose.connection.db.collection('habits').dropIndex('title_1');
-         console.log("✅ Dropped unique title index");
-      } catch (err) {
-         // Index doesn't exist, which is fine
-         console.log("ℹ️ No title index to drop (this is good)");
-      }
-   })
-   .catch(err => console.error("Mongo error:", err));
+    // Drop old unique index if exists
+    try {
+      await mongoose.connection.db
+        .collection("habits")
+        .dropIndex("title_1");
+      logger.debug("✅ Dropped unique title index");
+    } catch (err) {
+      logger.debug("ℹ️ No title index to drop");
+    }
+  })
+  .catch((err) => logger.error("Mongo error:", err));
 
-// Routes
-app.use("/auth", authRoutes);
-app.use("/dashboard", dashboardRoutes);
-app.use("/habits", habitsRoutes);
+// Routes - ✅ FIXED: Added /api prefix to match frontend
+app.use("/api/auth", authRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/habits", habitsRoutes);
 
+// Health check
 app.get("/", (req, res) => {
-   res.send("Backend is running 🚀");
+  res.send("Backend is running 🚀");
 });
 
-// Start Server
+// Start server
 app.listen(PORT, () => {
-   console.log(`Server is running on http://localhost:${PORT}`);
+  logger.always(`Server running on port ${PORT}`);
 });
