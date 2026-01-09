@@ -1,70 +1,270 @@
-# Getting Started with Create React App
+# 🎯 Habit Tracker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack habit tracking application that helps users build and maintain positive habits through visual tracking and daily accountability.
 
-## Available Scripts
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)
+![React](https://img.shields.io/badge/react-18.2.0-61dafb.svg)
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+- **User Authentication**: Secure signup and login with JWT-based authentication
+- **Habit Management**: Create, track, and delete habits with ease
+- **Visual Calendar**: Interactive calendar view to track habit completion
+- **Daily Tracking**: Mark habits as complete for specific dates
+- **Soft Delete**: Undo accidental deletions with built-in recovery
+- **Responsive Design**: Works seamlessly across desktop and mobile devices
+- **Real-time Updates**: Instant feedback on all habit operations
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🛠️ Tech Stack
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Frontend
+- **React** 18.2.0 - UI library
+- **React Router** 7.11.0 - Client-side routing
+- **Axios** - HTTP client for API requests
+- **JWT Decode** - Token management
+- **React Testing Library** - Component testing
 
-### `npm test`
+### Backend
+- **Node.js** with **Express** 5.2.1 - Server framework
+- **MongoDB** with **Mongoose** 9.1.1 - Database and ODM
+- **JWT** - Authentication tokens
+- **Bcrypt** - Password hashing
+- **CORS** - Cross-origin resource sharing
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📋 Prerequisites
 
-### `npm run build`
+Before you begin, ensure you have the following installed:
+- **Node.js** (v14.0.0 or higher)
+- **npm** (v6.0.0 or higher)
+- **MongoDB** (v4.0 or higher) - Running locally or accessible remotely
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Clone the Repository
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone https://github.com/KaushalMikaelson/habit-tracker.git
+cd habit-tracker
+```
 
-### `npm run eject`
+### 2. Install Dependencies
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Install dependencies for both frontend and backend:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+# Install root dependencies
+npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# Install backend dependencies
+cd backend
+npm install
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Install frontend dependencies
+cd ../frontend
+npm install
+```
 
-## Learn More
+### 3. Environment Configuration
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Backend Configuration
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Create a `.env` file in the `backend` directory:
 
-### Code Splitting
+```bash
+cd backend
+cp .env.example .env
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Edit the `.env` file with your configuration:
 
-### Analyzing the Bundle Size
+```env
+# Server Configuration
+PORT=5000
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+# MongoDB Configuration
+MONGO_URI=mongodb://127.0.0.1:27017/habit-tracker
 
-### Making a Progressive Web App
+# JWT Secret (Change this to a secure random string)
+JWT_SECRET=your_super_secret_jwt_key_here
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Logging Configuration
+# Options: 'none', 'error', 'info', 'debug'
+LOG_LEVEL=info
+```
 
-### Advanced Configuration
+#### Frontend Configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Create a `.env` file in the `frontend` directory:
 
-### Deployment
+```env
+REACT_APP_API_URL=http://localhost:5000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 4. Start MongoDB
 
-### `npm run build` fails to minify
+Ensure MongoDB is running on your system:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+# On Windows
+mongod
+
+# On macOS/Linux
+sudo systemctl start mongod
+```
+
+### 5. Run the Application
+
+#### Development Mode
+
+Open two terminal windows:
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+node server.js
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend
+npm start
+```
+
+The application will be available at:
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
+
+## 📁 Project Structure
+
+```
+habit-tracker/
+├── backend/
+│   ├── controllers/        # Request handlers
+│   ├── middleware/         # Authentication middleware
+│   ├── models/            # Mongoose schemas
+│   │   ├── User.js
+│   │   └── Habit.js
+│   ├── routes/            # API routes
+│   │   ├── auth.routes.js
+│   │   ├── habits.routes.js
+│   │   └── dashboard.routes.js
+│   ├── utils/             # Utility functions
+│   ├── server.js          # Entry point
+│   ├── .env.example       # Environment template
+│   └── package.json
+│
+├── frontend/
+│   ├── public/            # Static files
+│   ├── src/
+│   │   ├── api/          # API client configuration
+│   │   ├── auth/         # Authentication context
+│   │   ├── components/   # Reusable components
+│   │   │   ├── habits/
+│   │   │   ├── AddHabitModal.jsx
+│   │   │   └── AuthGate.js
+│   │   ├── hooks/        # Custom React hooks
+│   │   ├── pages/        # Page components
+│   │   │   ├── Dashboard/
+│   │   │   ├── Login.js
+│   │   │   └── Signup.js
+│   │   ├── utils/        # Utility functions
+│   │   ├── App.js        # Root component
+│   │   └── index.js      # Entry point
+│   └── package.json
+│
+└── README.md
+```
+
+## 🔌 API Endpoints
+
+### Authentication
+- `POST /api/auth/signup` - Register a new user
+- `POST /api/auth/login` - Login user
+
+### Habits
+- `GET /api/habits` - Get all habits for authenticated user
+- `POST /api/habits` - Create a new habit
+- `PATCH /api/habits/:id/toggle` - Toggle habit completion for a date
+- `DELETE /api/habits/:id` - Soft delete a habit
+- `PATCH /api/habits/:id/undo` - Restore a deleted habit
+
+### Dashboard
+- `GET /api/dashboard` - Get dashboard data
+
+## 🧪 Testing
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+### Run Tests in Watch Mode
+
+```bash
+npm test -- --watch
+```
+
+## 🔒 Security Features
+
+- **Password Hashing**: Bcrypt with salt rounds for secure password storage
+- **JWT Authentication**: Stateless authentication with secure tokens
+- **Protected Routes**: Middleware-based route protection
+- **Input Validation**: Server-side validation for all inputs
+- **CORS Configuration**: Controlled cross-origin access
+
+## 🎨 Key Features Explained
+
+### Soft Delete with Undo
+Habits are never permanently deleted immediately. Instead, they're marked as deleted and can be restored within the session, preventing accidental data loss.
+
+### Date-Specific Tracking
+Each habit maintains an array of completed dates, allowing users to track their progress over time and mark habits as complete for any specific date.
+
+### Configurable Logging
+The backend includes a flexible logging system with multiple levels (none, error, info, debug) to help with development and debugging. See `backend/LOGGING.md` for details.
+
+## 🐛 Troubleshooting
+
+### MongoDB Connection Issues
+- Ensure MongoDB is running: `mongod --version`
+- Check the connection string in `.env`
+- Verify MongoDB is accessible at the specified port
+
+### Port Already in Use
+If port 5000 or 3000 is already in use:
+```bash
+# Find and kill the process (Windows)
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+
+# Change the port in .env (backend) or package.json (frontend)
+```
+
+### JWT Authentication Errors
+- Ensure `JWT_SECRET` is set in backend `.env`
+- Clear browser localStorage and try logging in again
+- Check that the token is being sent in request headers
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 👤 Author
+
+**Kaushal Mikaelson**
+- GitHub: [@KaushalMikaelson](https://github.com/KaushalMikaelson)
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/KaushalMikaelson/habit-tracker/issues).
+
+## ⭐ Show Your Support
+
+Give a ⭐️ if this project helped you!
+
+---
+
+**Built with ❤️ using React and Node.js**
