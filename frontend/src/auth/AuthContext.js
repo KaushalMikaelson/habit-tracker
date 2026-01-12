@@ -1,15 +1,26 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode";
 
-const AuthContext = createContext(null); // If someone uses auth without provider → we detect it
+const AuthContext = createContext(null);
 
 function AuthProvider({ children }) {
-    const [loading, setLoading] = useState(true); // to manage loading state during login/logout
-    const [user, setUser] = useState(null); // null means no user is logged in, Object means user is logged in
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
 
-    const login = (userData) => {  //this will call API to login
+    // ✅ LOGIN — now accepts JWT token
+    const login = (token) => {
+        localStorage.setItem("token", token);
+
+        const decoded = jwtDecode(token);
+
+        const userData = {
+            userId: decoded.id,
+            email: decoded.email,
+        };
+
         localStorage.setItem("authUser", JSON.stringify(userData));
-        setUser(userData); // after successful login, set the user data
-    }
+        setUser(userData);
+    };
 
     const logout = () => {
         console.log("🔥 LOGOUT FUNCTION CALLED");
@@ -17,26 +28,28 @@ function AuthProvider({ children }) {
         localStorage.removeItem("authUser");
         localStorage.removeItem("token");
 
-        console.log("🧪 token after removal:", localStorage.getItem("token"));
-
         setUser(null);
-
-        // ❌ TEMPORARILY COMMENT THIS
-        // window.location.href = "/login";
     };
 
-
+    // ✅ Restore auth on refresh
     useEffect(() => {
-        // simulate auth check (later this will be backend / storage)
+        const storedToken = localStorage.getItem("token");
         const storedUser = localStorage.getItem("authUser");
-        if (storedUser) {
-            setUser(JSON.parse(storedUser));
+
+        if (storedToken && storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch {
+                localStorage.removeItem("authUser");
+                localStorage.removeItem("token");
+                setUser(null);
+            }
         }
-        setLoading(false); // auth check is done
+
+        setLoading(false);
     }, []);
 
-
-    const isAuthenticated = !!user; // true if user is logged in, false otherwise
+    const isAuthenticated = !!user;
 
     return (
         <AuthContext.Provider
@@ -49,16 +62,16 @@ function AuthProvider({ children }) {
             }}
         >
             {children}
-        </AuthContext.Provider>  // exposes auth globally. //we wrap children with AuthContext provider so that all children can access auth state
-    )
+        </AuthContext.Provider>
+    );
 }
 
-function useAuth() { // custom hook to use auth context - makes it easier and safe to access auth state in components
-    const context = useContext(AuthContext); // get the context value 
+function useAuth() {
+    const context = useContext(AuthContext);
     if (context === null) {
-        throw new Error("useAuth must be used within an AuthProvider"); // if context is null, it means we are not within AuthProvider
+        throw new Error("useAuth must be used within an AuthProvider");
     }
-    return context; // return the context value
+    return context;
 }
 
 export { AuthProvider, useAuth };

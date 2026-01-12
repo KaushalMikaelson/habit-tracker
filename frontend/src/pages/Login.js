@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
-import { jwtDecode } from "jwt-decode";
 
 function Login() {
     const [email, setEmail] = useState("");
