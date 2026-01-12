@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import { jwtDecode } from "jwt-decode";
@@ -12,43 +12,59 @@ function Login() {
 
     const { login } = useAuth();
 
+    // ✅ Prefill last used email
+    useEffect(() => {
+        const savedEmail = localStorage.getItem("lastLoggedInEmail");
+        if (savedEmail) setEmail(savedEmail);
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (loading) return;
+
         setError("");
         setLoading(true);
 
         try {
             const res = await api.post("/auth/login", { email, password });
-            const decodedToken = jwtDecode(res.data.token);
-            console.log("DECODED TOKEN OBJECT:", decodedToken);
-            localStorage.setItem("token", res.data.token);
 
-            login({
-                userId: decodedToken.id,
-                email: decodedToken.email,
+            localStorage.setItem("lastLoggedInEmail", email);
 
-            });
+            login(res.data.token);
         } catch (err) {
-            setError("Invalid email or password");
+            if (!err.response) {
+                setError("Server unavailable. Please try again later.");
+            } else if (err.response.status === 401) {
+                setError("Invalid email or password.");
+            } else {
+                setError("Something went wrong. Please try again.");
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div style={styles.container}>
+        <div style={styles.page}>
+            {/* Decorative blurred shapes */}
+            <div style={styles.blobOne} />
+            <div style={styles.blobTwo} />
+
             <form style={styles.card} onSubmit={handleSubmit}>
-                <h2 style={styles.title}>Welcome Back</h2>
-                <p style={styles.subtitle}>Login to continue</p>
+                <h2 style={styles.title}>Welcome Back 👋</h2>
+                <p style={styles.subtitle}>
+                    Log in to continue tracking your habits
+                </p>
 
                 {error && <div style={styles.error}>{error}</div>}
 
                 <div style={styles.group}>
-                    <label>Email</label>
+                    <label style={styles.label}>Email</label>
                     <input
                         type="email"
-                        placeholder="Enter your email"
+                        placeholder="you@example.com"
                         value={email}
+                        disabled={loading}
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         style={styles.input}
@@ -56,12 +72,13 @@ function Login() {
                 </div>
 
                 <div style={styles.group}>
-                    <label>Password</label>
+                    <label style={styles.label}>Password</label>
                     <div style={styles.passwordBox}>
                         <input
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter your password"
                             value={password}
+                            disabled={loading}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                             style={styles.passwordInput}
@@ -92,82 +109,148 @@ function Login() {
     );
 }
 
-/* ---------- Styles ---------- */
+/* ================= STYLES ================= */
 
 const styles = {
-    container: {
+    page: {
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #667eea, #764ba2)",
-        fontFamily: "Arial, sans-serif",
+        position: "relative",
+        overflow: "hidden",
+        background:
+            "linear-gradient(135deg, #0f172a, #1e293b, #020617)",
+        fontFamily: "Inter, system-ui, sans-serif",
     },
+
+    blobOne: {
+        position: "absolute",
+        width: "420px",
+        height: "420px",
+        background: "radial-gradient(circle, #6366f1, transparent 70%)",
+        top: "-120px",
+        left: "-120px",
+        filter: "blur(40px)",
+    },
+
+    blobTwo: {
+        position: "absolute",
+        width: "380px",
+        height: "380px",
+        background: "radial-gradient(circle, #22d3ee, transparent 70%)",
+        bottom: "-120px",
+        right: "-120px",
+        filter: "blur(40px)",
+    },
+
     card: {
-        background: "#fff",
-        padding: "2.5rem",
+        position: "relative",
+        zIndex: 1,
         width: "100%",
-        maxWidth: "380px",
-        borderRadius: "12px",
-        boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+        maxWidth: "400px",
+        padding: "2.75rem",
+        borderRadius: "16px",
+        background: "rgba(255, 255, 255, 0.08)",
+        backdropFilter: "blur(14px)",
+        boxShadow: "0 25px 50px rgba(0,0,0,0.35)",
+        color: "#f9fafb",
     },
-    title: { textAlign: "center" },
+
+    title: {
+        textAlign: "center",
+        fontSize: "1.6rem",
+        fontWeight: 700,
+        marginBottom: "0.25rem",
+    },
+
     subtitle: {
         textAlign: "center",
-        color: "#666",
-        marginBottom: "1.5rem",
+        fontSize: "0.9rem",
+        color: "#cbd5f5",
+        marginBottom: "1.75rem",
     },
+
     error: {
-        background: "#ffe5e5",
-        color: "#d8000c",
+        background: "rgba(239,68,68,0.15)",
+        color: "#fecaca",
         padding: "0.6rem",
-        borderRadius: "6px",
+        borderRadius: "8px",
         marginBottom: "1rem",
         textAlign: "center",
+        fontSize: "0.85rem",
     },
-    group: { marginBottom: "1.25rem" },
+
+    group: {
+        marginBottom: "1.25rem",
+    },
+
+    label: {
+        fontSize: "0.85rem",
+        marginBottom: "0.35rem",
+        display: "block",
+        color: "#e5e7eb",
+    },
+
     input: {
         width: "100%",
-        padding: "0.65rem",
-        borderRadius: "6px",
-        border: "1px solid #ccc",
+        padding: "0.7rem",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.25)",
+        background: "rgba(255,255,255,0.12)",
+        color: "#fff",
+        outline: "none",
     },
+
     passwordBox: {
         display: "flex",
         alignItems: "center",
-        border: "1px solid #ccc",
-        borderRadius: "6px",
+        borderRadius: "8px",
+        border: "1px solid rgba(255,255,255,0.25)",
+        background: "rgba(255,255,255,0.12)",
     },
+
     passwordInput: {
         flex: 1,
-        padding: "0.65rem",
+        padding: "0.7rem",
         border: "none",
+        background: "transparent",
+        color: "#fff",
         outline: "none",
     },
+
     eye: {
         background: "none",
         border: "none",
         cursor: "pointer",
         padding: "0 0.75rem",
         fontSize: "1rem",
+        color: "#e5e7eb",
     },
+
     button: {
         width: "100%",
-        padding: "0.75rem",
-        background: "#667eea",
-        color: "#fff",
+        padding: "0.8rem",
+        marginTop: "0.5rem",
+        background: "linear-gradient(135deg, #6366f1, #22d3ee)",
+        color: "#020617",
+        fontWeight: 700,
         border: "none",
-        borderRadius: "6px",
+        borderRadius: "10px",
         cursor: "pointer",
+        opacity: 1,
     },
+
     footer: {
         textAlign: "center",
-        marginTop: "1rem",
-        fontSize: "0.9rem",
+        marginTop: "1.25rem",
+        fontSize: "0.85rem",
+        color: "#e5e7eb",
     },
+
     link: {
-        color: "#667eea",
-        fontWeight: "bold",
+        color: "#67e8f9",
+        fontWeight: 600,
         textDecoration: "none",
     },
 };
