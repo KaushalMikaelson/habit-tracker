@@ -3,6 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import AddHabitModal from "../../components/AddHabitModal.jsx";
 import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
+import KpiRing from "../../components/kpi/KpiRing.jsx";
+import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 
 import useHabits from "../../hooks/useHabits";
 
@@ -98,6 +100,7 @@ function Dashboard() {
   /* ================= Render ================= */
 
   return (
+
     <div
       style={{
         minHeight: "100vh",
@@ -138,6 +141,8 @@ function Dashboard() {
           </div>
         </div>
 
+
+
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -154,6 +159,10 @@ function Dashboard() {
           + Add Habit
         </button>
       </div>
+
+      {/* ================= KPI ROW ================= */}
+      <KpiRingRow />
+
 
       {/* ================= Modal ================= */}
       <AddHabitModal
@@ -237,7 +246,10 @@ function Dashboard() {
         </div>
       )}
     </div>
+
   );
+
+
 }
 
 export default Dashboard;
