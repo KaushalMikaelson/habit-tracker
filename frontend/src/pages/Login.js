@@ -30,7 +30,7 @@ function Login() {
 
             localStorage.setItem("lastLoggedInEmail", email);
 
-            login(res.data.token);
+            login(res.data);
         } catch (err) {
             if (!err.response) {
                 setError("Server unavailable. Please try again later.");
@@ -67,6 +67,7 @@ function Login() {
                         disabled={loading}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        autoComplete="email"
                         style={styles.input}
                     />
                 </div>
@@ -81,6 +82,7 @@ function Login() {
                             disabled={loading}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            autoComplete="current-password"
                             style={styles.passwordInput}
                         />
                         <button

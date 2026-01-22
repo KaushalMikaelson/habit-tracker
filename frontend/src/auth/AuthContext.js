@@ -6,7 +6,13 @@ function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true); // to manage loading state during login/logout
     const [user, setUser] = useState(null); // null means no user is logged in, Object means user is logged in
 
-    const login = (userData) => {  //this will call API to login
+    const login = (authData) => {  //this will call API to login
+        // authData = { token, user: { id, email } }
+        const userData = {
+            token: authData.token,
+            email: authData.user.email,
+            id: authData.user.id
+        };
         localStorage.setItem("authUser", JSON.stringify(userData));
         setUser(userData); // after successful login, set the user data
     }

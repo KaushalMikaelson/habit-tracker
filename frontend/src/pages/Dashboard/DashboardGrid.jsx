@@ -1,55 +1,39 @@
-import HabitNameColumn from "../../components/habits/HabitNameColumn";
+// DashboardGrid.jsx
+// ONLY responsible for the habit calendar grid
 
-function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gridScrollRef, isFutureDate }) {
+const DAY_COLUMN_WIDTH = 34; // px
+
+function DashboardGrid({
+  habits,
+  monthDates,
+  today,
+  toggleHabit,
+  gridScrollRef,
+  isFutureDate,
+}) {
   return (
-
-    <div style={{ display: "flex" }}>
-
-      {/* ================= FIXED HABIT COLUMN ================= */}
-      <div>
-        {/* HABITS header (spans weekday + date height) */}
-        <div
-          style={{
-            width: "200px",
-            height: "62px", // 26 + 36
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "12px",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            color: "#374151",
-            borderBottom: "1px solid #e5e7eb",
-            background: "#ffffff",
-          }}
-        >
-          HABITS
-        </div>
-
-        {/* Habit names */}
-        <HabitNameColumn habits={habits} deleteHabit={deleteHabit} />
-      </div>
-
-      {/* ================= SHARED SCROLL CONTAINER ================= */}
+    <div style={{ background: "#ffffff" }}>
+      {/* ================= SCROLLABLE DATE GRID ================= */}
       <div
         ref={gridScrollRef}
         style={{
           overflowX: "auto",
           width: "100%",
+          
         }}
       >
-        <div style={{ minWidth: `${monthDates.length * 34}px` }}>
-
-          {/* ================= WEEKDAY ROW ================= */}
+        {/* WIDTH ENFORCER */}
+        <div style={{ minWidth: `${monthDates.length * DAY_COLUMN_WIDTH}px` }}>
+          {/* WEEKDAY ROW */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
+              gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "26px",
               fontSize: "11px",
               color: "#6b7280",
               borderBottom: "1px solid #e5e7eb",
-              background: "#ffffff",
+              
             }}
           >
             {monthDates.map((date) => (
@@ -68,15 +52,13 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
             ))}
           </div>
 
-          {/* ================= DATE ROW ================= */}
+          {/* DATE ROW */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
-
+              gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "36px",
               borderBottom: "1px solid #e5e7eb",
-              background: "#ffffff",
             }}
           >
             {monthDates.map((date) => {
@@ -101,24 +83,25 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
             })}
           </div>
 
-          {/* ================= HABIT GRID ROWS ================= */}
+          {/* HABIT ROWS */}
           {habits.map((habit) => (
             <div
               key={habit._id}
               style={{
                 display: "grid",
-                gridTemplateColumns: `repeat(${monthDates.length}, 34px)`,
+                gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
                 height: "38px",
                 borderBottom: "1px solid #f1f5f9",
               }}
             >
               {monthDates.map((date) => {
-                const isCompleted = habit.completedDates?.includes(date);
+                const isCompleted =
+                  habit.completedDates?.includes(date);
                 const isFuture = isFutureDate(date);
-                const isWeekStart = new Date(date).getDay() === 1;
-                const isWeekend = [0, 6].includes(
-                  new Date(date).getDay()
-                );
+                const isWeekStart =
+                  new Date(date).getDay() === 1;
+                const isWeekend =
+                  [0, 6].includes(new Date(date).getDay());
 
                 return (
                   <div
@@ -135,13 +118,11 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
                     }}
                   >
                     <button
-                      type="button"
                       disabled={isFuture}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (isFuture) return;
-                        toggleHabit(habit._id, date);
-                      }}
+                      onClick={() =>
+                        !isFuture &&
+                        toggleHabit(habit._id, date)
+                      }
                       style={{
                         width: "22px",
                         height: "22px",
@@ -152,7 +133,7 @@ function DashboardGrid({ habits, monthDates, today, toggleHabit, deleteHabit, gr
                           : isCompleted
                             ? "#22c55e"
                             : "#e5e7eb",
-                        color: "white",
+                        color: "#ffffff",
                         cursor: isFuture
                           ? "not-allowed"
                           : "pointer",
