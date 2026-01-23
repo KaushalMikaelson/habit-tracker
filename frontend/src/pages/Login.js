@@ -241,14 +241,12 @@ const styles = {
         cursor: "pointer",
         opacity: 1,
     },
-
     footer: {
         textAlign: "center",
         marginTop: "1.25rem",
         fontSize: "0.85rem",
         color: "#e5e7eb",
     },
-
     link: {
         color: "#67e8f9",
         fontWeight: 600,
