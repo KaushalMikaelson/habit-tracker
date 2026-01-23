@@ -2,8 +2,11 @@ function HabitNameColumn({ habits, deleteHabit }) {
   const HEADER_HEIGHT = 115; // must match calendar header height
   const ROW_HEIGHT = 38;
 
+  // 🔒 HARD SAFETY
+  const safeHabits = Array.isArray(habits) ? habits : [];
+
   function handleDelete(habit) {
-    const ok = window.confirm(`Delete "${habit.name}"?`);
+    const ok = window.confirm(`Delete "${habit.title}"?`);
     if (!ok) return;
     deleteHabit(habit._id);
   }
@@ -70,44 +73,57 @@ function HabitNameColumn({ habits, deleteHabit }) {
         </div>
 
         {/* ================= HABIT ROWS ================= */}
-        {habits.map((habit) => (
+        {safeHabits.length === 0 ? (
           <div
-            key={habit._id}
-            className="habit-row"
             style={{
-              height: ROW_HEIGHT,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "0 12px",
+              padding: "16px",
+              textAlign: "center",
               fontSize: "13px",
-              borderBottom: "1px solid #f1f5f9",
+              color: "#6b7280",
             }}
           >
-            {/* Habit name */}
-            <span
+            No habits yet
+          </div>
+        ) : (
+          safeHabits.map((habit) => (
+            <div
+              key={habit._id}
+              className="habit-row"
               style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                color: "#111827",
+                height: ROW_HEIGHT,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0 12px",
+                fontSize: "13px",
+                borderBottom: "1px solid #f1f5f9",
               }}
             >
-              {habit.title}
-            </span>
-
-            {/* Delete (optional but nice UX) */}
-            <div className="trash-wrapper">
-              <button
-                className="trash-btn"
-                onClick={() => handleDelete(habit)}
-                title="Delete habit"
+              {/* Habit name */}
+              <span
+                style={{
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  color: "#111827",
+                }}
               >
-                ✕
-              </button>
+                {habit.title}
+              </span>
+
+              {/* Delete */}
+              <div className="trash-wrapper">
+                <button
+                  className="trash-btn"
+                  onClick={() => handleDelete(habit)}
+                  title="Delete habit"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </>
   );

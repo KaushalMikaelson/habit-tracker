@@ -1,6 +1,3 @@
-// DashboardGrid.jsx
-// ONLY responsible for the habit calendar grid
-
 const DAY_COLUMN_WIDTH = 34; // px
 
 function DashboardGrid({
@@ -11,6 +8,10 @@ function DashboardGrid({
   gridScrollRef,
   isFutureDate,
 }) {
+  // 🔒 HARD SAFETY
+  const safeHabits = Array.isArray(habits) ? habits : [];
+  const safeMonthDates = Array.isArray(monthDates) ? monthDates : [];
+
   return (
     <div style={{ background: "#ffffff" }}>
       {/* ================= SCROLLABLE DATE GRID ================= */}
@@ -19,24 +20,26 @@ function DashboardGrid({
         style={{
           overflowX: "auto",
           width: "100%",
-          
         }}
       >
         {/* WIDTH ENFORCER */}
-        <div style={{ minWidth: `${monthDates.length * DAY_COLUMN_WIDTH}px` }}>
+        <div
+          style={{
+            minWidth: `${safeMonthDates.length * DAY_COLUMN_WIDTH}px`,
+          }}
+        >
           {/* WEEKDAY ROW */}
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
+              gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "26px",
               fontSize: "11px",
               color: "#6b7280",
               borderBottom: "1px solid #e5e7eb",
-              
             }}
           >
-            {monthDates.map((date) => (
+            {safeMonthDates.map((date) => (
               <div
                 key={date}
                 style={{
@@ -56,12 +59,12 @@ function DashboardGrid({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
+              gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "36px",
               borderBottom: "1px solid #e5e7eb",
             }}
           >
-            {monthDates.map((date) => {
+            {safeMonthDates.map((date) => {
               const isToday = date === today;
 
               return (
@@ -84,19 +87,24 @@ function DashboardGrid({
           </div>
 
           {/* HABIT ROWS */}
-          {habits.map((habit) => (
+          {safeHabits.map((habit) => (
             <div
               key={habit._id}
               style={{
                 display: "grid",
-                gridTemplateColumns: `repeat(${monthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
+                gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
                 height: "38px",
                 borderBottom: "1px solid #f1f5f9",
               }}
             >
-              {monthDates.map((date) => {
-                const isCompleted =
-                  habit.completedDates?.includes(date);
+              {safeMonthDates.map((date) => {
+                const completedDates = Array.isArray(
+                  habit.completedDates
+                )
+                  ? habit.completedDates
+                  : [];
+
+                const isCompleted = completedDates.includes(date);
                 const isFuture = isFutureDate(date);
                 const isWeekStart =
                   new Date(date).getDay() === 1;
@@ -131,8 +139,8 @@ function DashboardGrid({
                         background: isFuture
                           ? "#f3f4f6"
                           : isCompleted
-                            ? "#22c55e"
-                            : "#e5e7eb",
+                          ? "#22c55e"
+                          : "#e5e7eb",
                         color: "#ffffff",
                         cursor: isFuture
                           ? "not-allowed"
