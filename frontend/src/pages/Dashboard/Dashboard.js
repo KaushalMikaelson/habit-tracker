@@ -15,7 +15,7 @@ import {
   RIGHT_COLUMN_WIDTH,
 } from "./DashboardLayout.constants";
 
-import { testDayjs, calculateKPIs } from "../../components/kpi/calculations";
+import {  calculateKPIs } from "../../components/kpi/calculations";
 
 
 
@@ -29,7 +29,7 @@ import {
 /* ================= Constants ================= */
 
 const KPI_ROW_HEIGHT = 170;
-console.log("DAYJS TEST:", testDayjs());
+
 
 /* ================= Helpers ================= */
 
@@ -51,7 +51,8 @@ function Dashboard() {
     showUndo,
   } = useHabits(today);
 
-  const kpis = calculateKPIs(habits);
+ const kpis = calculateKPIs(Array.isArray(habits) ? habits : []);
+
 
 
   const [newHabit, setNewHabit] = useState("");
