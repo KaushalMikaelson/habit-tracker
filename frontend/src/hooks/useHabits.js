@@ -11,6 +11,7 @@ import {
 export default function useHabits() {
   const { user } = useAuth();
 
+  // 🔥 ALWAYS keep habits as an array
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,22 +23,26 @@ export default function useHabits() {
   /* ---------- Fetch Habits (user-aware) ---------- */
   useEffect(() => {
     if (!user) {
-      // 🔥 Clear habits on logout
+      // User logged out → reset state safely
       setHabits([]);
       setLoading(false);
       return;
     }
 
     fetchHabits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const fetchHabits = async () => {
     try {
       setLoading(true);
       const data = await getHabits();
-      setHabits(data);
+
+      // ✅ HARD GUARANTEE: habits is ALWAYS an array
+      setHabits(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to fetch habits:", err);
+      setHabits([]); // 🔥 prevents render crash
     } finally {
       setLoading(false);
     }
@@ -47,7 +52,11 @@ export default function useHabits() {
   const addHabit = async (title) => {
     try {
       const newHabit = await createHabit({ title });
-      setHabits((prev) => [newHabit, ...prev]);
+
+      // Defensive append
+      setHabits((prev) =>
+        Array.isArray(prev) ? [newHabit, ...prev] : [newHabit]
+      );
     } catch (err) {
       console.error("Failed to add habit:", err);
       alert("Failed to add habit. Please try again.");
@@ -56,38 +65,49 @@ export default function useHabits() {
 
   /* ---------- Toggle Habit ---------- */
   const toggleHabit = async (id, date) => {
-    // Optimistic update
     const previousHabits = habits;
+
+    // Optimistic update (safe)
     setHabits((prev) =>
-      prev.map((h) => {
-        if (h._id === id) {
-          const isCompleted = h.completedDates?.includes(date);
-          return {
-            ...h,
-            completedDates: isCompleted
-              ? h.completedDates.filter((d) => d !== date)
-              : [...(h.completedDates || []), date],
-          };
-        }
-        return h;
-      })
+      Array.isArray(prev)
+        ? prev.map((h) => {
+            if (h._id === id) {
+              const completedDates = Array.isArray(h.completedDates)
+                ? h.completedDates
+                : [];
+
+              const isCompleted = completedDates.includes(date);
+
+              return {
+                ...h,
+                completedDates: isCompleted
+                  ? completedDates.filter((d) => d !== date)
+                  : [...completedDates, date],
+              };
+            }
+            return h;
+          })
+        : []
     );
 
     try {
       const updatedHabit = await toggleHabitApi(id, date);
       setHabits((prev) =>
-        prev.map((h) => (h._id === id ? updatedHabit : h))
+        Array.isArray(prev)
+          ? prev.map((h) => (h._id === id ? updatedHabit : h))
+          : []
       );
     } catch (err) {
       console.error("Failed to toggle habit:", err);
-      // Rollback on error
-      setHabits(previousHabits);
+      setHabits(previousHabits); // rollback
       alert("Failed to toggle habit. Please try again.");
     }
   };
 
   /* ---------- Delete Habit (Soft Delete + Undo) ---------- */
   const deleteHabit = async (id) => {
+    if (!Array.isArray(habits)) return;
+
     const habitToDelete = habits.find((h) => h._id === id);
     if (!habitToDelete) return;
 
@@ -106,7 +126,6 @@ export default function useHabits() {
       }, 10000);
     } catch (err) {
       console.error("Failed to delete habit:", err);
-      // Rollback on error
       setHabits((prev) => [habitToDelete, ...prev]);
       setRecentlyDeleted(null);
       setShowUndo(false);
@@ -118,8 +137,11 @@ export default function useHabits() {
   const undoDelete = async () => {
     if (!recentlyDeleted) return;
 
-    // Restore in frontend immediately for better UX
-    setHabits((prev) => [recentlyDeleted, ...prev]);
+    // Restore immediately for UX
+    setHabits((prev) =>
+      Array.isArray(prev) ? [recentlyDeleted, ...prev] : [recentlyDeleted]
+    );
+
     setRecentlyDeleted(null);
     setShowUndo(false);
 
@@ -128,18 +150,18 @@ export default function useHabits() {
       undoTimerRef.current = null;
     }
 
-    // Call backend to restore the habit in the database
     try {
       await undoDeleteApi(recentlyDeleted._id);
     } catch (err) {
       console.error("Failed to undo delete:", err);
-      // If backend fails, remove from frontend state
-      setHabits((prev) => prev.filter((h) => h._id !== recentlyDeleted._id));
+      setHabits((prev) =>
+        prev.filter((h) => h._id !== recentlyDeleted._id)
+      );
     }
   };
 
   return {
-    habits,
+    habits,   // ✅ ALWAYS array
     loading,
     addHabit,
     toggleHabit,
