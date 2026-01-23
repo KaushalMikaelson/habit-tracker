@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
+
 
 const AuthContext = createContext(null);
 
@@ -7,15 +7,15 @@ function AuthProvider({ children }) {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
 
-    // ✅ LOGIN — now accepts JWT token
-    const login = (token) => {
-        localStorage.setItem("token", token);
+    // ✅ LOGIN (single source of truth)
+    const login = (authData) => {
+        // authData = { token, user: { id, email } }
 
-        const decoded = jwtDecode(token);
+        localStorage.setItem("token", authData.token);
 
         const userData = {
-            userId: decoded.id,
-            email: decoded.email,
+            id: authData.user.id,
+            email: authData.user.email,
         };
 
         localStorage.setItem("authUser", JSON.stringify(userData));
@@ -23,11 +23,8 @@ function AuthProvider({ children }) {
     };
 
     const logout = () => {
-        console.log("🔥 LOGOUT FUNCTION CALLED");
-
         localStorage.removeItem("authUser");
         localStorage.removeItem("token");
-
         setUser(null);
     };
 
@@ -49,13 +46,11 @@ function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
-    const isAuthenticated = !!user;
-
     return (
         <AuthContext.Provider
             value={{
                 user,
-                isAuthenticated,
+                isAuthenticated: !!user,
                 login,
                 logout,
                 loading,
@@ -68,7 +63,7 @@ function AuthProvider({ children }) {
 
 function useAuth() {
     const context = useContext(AuthContext);
-    if (context === null) {
+    if (!context) {
         throw new Error("useAuth must be used within an AuthProvider");
     }
     return context;

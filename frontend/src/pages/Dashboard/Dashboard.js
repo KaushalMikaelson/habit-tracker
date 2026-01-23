@@ -3,14 +3,33 @@ import { useState, useEffect, useRef } from "react";
 import AddHabitModal from "../../components/AddHabitModal.jsx";
 import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
+import DashboardLayout from "./DashboardLayout.js";
 
+import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
+import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
+
+import HabitNameColumn from "../../components/habits/HabitNameColumn.jsx";
 import useHabits from "../../hooks/useHabits";
+import {
+  LEFT_COLUMN_WIDTH,
+  RIGHT_COLUMN_WIDTH,
+} from "./DashboardLayout.constants";
+
+import { testDayjs, calculateKPIs } from "../../components/kpi/calculations";
+
+
+
 
 import {
   getCurrentYearMonth,
   getMonthDates,
   getMonthLabel,
 } from "../../utils/dateUtils";
+
+/* ================= Constants ================= */
+
+const KPI_ROW_HEIGHT = 170;
+console.log("DAYJS TEST:", testDayjs());
 
 /* ================= Helpers ================= */
 
@@ -31,6 +50,9 @@ function Dashboard() {
     undoDelete,
     showUndo,
   } = useHabits(today);
+
+  const kpis = calculateKPIs(habits);
+
 
   const [newHabit, setNewHabit] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -101,9 +123,7 @@ function Dashboard() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#ffffff",     // system white
-        margin: 0,
-        padding: 0,               // ✅ NO OUTER GAP
+        background: "#a2c6deff",
       }}
     >
       {/* ================= Top Header ================= */}
@@ -113,27 +133,16 @@ function Dashboard() {
           justifyContent: "space-between",
           alignItems: "center",
           height: "56px",
-          padding: "0 16px",       // minimal horizontal padding
+          padding: "0 16px",
           borderBottom: "1px solid #e5e7eb",
           background: "#ffffff",
         }}
       >
         <div>
-          <div
-            style={{
-              fontSize: "16px",
-              fontWeight: 700,
-              color: "#111827",
-            }}
-          >
+          <div style={{ fontSize: "16px", fontWeight: 700 }}>
             Habit Tracker
           </div>
-          <div
-            style={{
-              fontSize: "12px",
-              color: "#6b7280",
-            }}
-          >
+          <div style={{ fontSize: "12px", color: "#6b7280" }}>
             Track your consistency
           </div>
         </div>
@@ -166,41 +175,105 @@ function Dashboard() {
 
       {/* ================= Content ================= */}
       {habits.length === 0 ? (
-        <div
-          style={{
-            marginTop: "48px",
-            textAlign: "center",
-          }}
-        >
-          <h2 style={{ fontSize: "18px", fontWeight: 700 }}>
-            No habits yet
-          </h2>
-          <p style={{ fontSize: "13px", color: "#6b7280" }}>
+        <div style={{ marginTop: "48px", textAlign: "center" }}>
+          <h2>No habits yet</h2>
+          <p style={{ color: "#6b7280" }}>
             Click “Add Habit” to get started
           </p>
         </div>
       ) : (
-        <div
-          style={{
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
-          <DashboardHeader
-            monthLabel={monthLabel}
-            goToPreviousMonth={goToPreviousMonth}
-            goToNextMonth={goToNextMonth}
-          />
+        <DashboardLayout>
+          {/* ================= LEFT COLUMN ================= */}
+          <div
+            style={{
+              width: LEFT_COLUMN_WIDTH,
+              minWidth: LEFT_COLUMN_WIDTH,
+              display: "flex",
+              flexDirection: "column",
+              gap: "40px",
+            }}
+          >
+            {/* KPI INTRO */}
+            <div style={{ height: KPI_ROW_HEIGHT }}>
+              <KpiIntroBox />
+            </div>
 
-          <DashboardGrid
-            habits={habits}
-            monthDates={monthDates}
-            today={today}
-            toggleHabit={toggleHabit}
-            deleteHabit={deleteHabit}
-            gridScrollRef={gridScrollRef}
-            isFutureDate={isFutureDate}
-          />
-        </div>
+            {/* HABITS COLUMN */}
+            <HabitNameColumn
+              habits={habits}
+              deleteHabit={deleteHabit}
+            />
+          </div>
+
+          {/* ================= CENTER COLUMN ================= */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              minWidth: 0, // 🔥 CRITICAL: prevents overflow
+            }}
+          >
+          
+          {/* KPI RING Row */}
+            <div
+              style={{
+                height: KPI_ROW_HEIGHT,
+                background:
+                  "linear-gradient(180deg, rgba(15,23,42,0.85), rgba(2,6,23,0.85))",
+                borderRadius: "16px",
+                padding: "12px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <KpiRingRow kpis={kpis} />
+
+            </div>
+           
+
+            
+
+
+
+            {/* CALENDAR */}
+            <div
+              style={{
+                background: "#ffffff",
+                borderRadius: "12px",
+                overflow: "hidden",
+                minWidth: 0,
+              }}
+            >
+              <DashboardHeader
+                monthLabel={monthLabel}
+                goToPreviousMonth={goToPreviousMonth}
+                goToNextMonth={goToNextMonth}
+              />
+
+              <DashboardGrid
+                habits={habits}
+                monthDates={monthDates}
+                today={today}
+                toggleHabit={toggleHabit}
+                deleteHabit={deleteHabit}
+                gridScrollRef={gridScrollRef}
+                isFutureDate={isFutureDate}
+              />
+            </div>
+          </div>
+
+          {/* ================= RIGHT COLUMN ================= */}
+          <div
+            style={{
+              width: RIGHT_COLUMN_WIDTH,
+              minWidth: RIGHT_COLUMN_WIDTH,
+            }}
+          >
+            RIGHT COLUMN
+          </div>
+        </DashboardLayout>
+
       )}
 
       {/* ================= Undo Snackbar ================= */}
