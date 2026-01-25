@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-
+import dayjs from "dayjs";
 import AddHabitModal from "../../components/AddHabitModal.jsx";
 import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
@@ -15,8 +15,8 @@ import {
   RIGHT_COLUMN_WIDTH,
 } from "./DashboardLayout.constants";
 
-import {  calculateKPIs } from "../../components/kpi/calculations";
-
+import { calculateKPIs } from "../../components/kpi/calculations";
+import TopHabits from "../../components/stats/TopHabits";
 
 
 
@@ -51,21 +51,32 @@ function Dashboard() {
     showUndo,
   } = useHabits(today);
 
- const kpis = calculateKPIs(Array.isArray(habits) ? habits : []);
 
 
 
-  const [newHabit, setNewHabit] = useState("");
-  const [showModal, setShowModal] = useState(false);
+const [newHabit, setNewHabit] = useState("");
+const [showModal, setShowModal] = useState(false);
 
-  const initialYearMonth = getCurrentYearMonth();
-  const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
-  const [currentMonth, setCurrentMonth] = useState(initialYearMonth.month);
+const initialYearMonth = getCurrentYearMonth();
+const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
+const [currentMonth, setCurrentMonth] = useState(initialYearMonth.month);
 
-  const monthDates = getMonthDates(currentYear, currentMonth);
-  const monthLabel = getMonthLabel(currentYear, currentMonth);
+const monthDates = getMonthDates(currentYear, currentMonth);
+const monthLabel = getMonthLabel(currentYear, currentMonth);
 
-  const gridScrollRef = useRef(null);
+const gridScrollRef = useRef(null);
+
+
+const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
+const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
+
+
+
+const kpis = calculateKPIs(
+  Array.isArray(habits) ? habits : [],
+  selectedMonth
+);
+
 
   /* ---------- Auto-scroll to Today ---------- */
   useEffect(() => {
@@ -215,8 +226,8 @@ function Dashboard() {
               minWidth: 0, // 🔥 CRITICAL: prevents overflow
             }}
           >
-          
-          {/* KPI RING Row */}
+
+            {/* KPI RING Row */}
             <div
               style={{
                 height: KPI_ROW_HEIGHT,
@@ -228,14 +239,9 @@ function Dashboard() {
                 alignItems: "center",
               }}
             >
-              <KpiRingRow kpis={kpis} />
+              <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
 
             </div>
-           
-
-            
-
-
 
             {/* CALENDAR */}
             <div
@@ -269,9 +275,17 @@ function Dashboard() {
             style={{
               width: RIGHT_COLUMN_WIDTH,
               minWidth: RIGHT_COLUMN_WIDTH,
+              display: "flex",
+              flexDirection: "column",
+              alignSelf: "flex-start",
             }}
           >
-            RIGHT COLUMN
+            <TopHabits
+              habits={habits}
+              currentYear={currentYear}
+              currentMonth={currentMonth}
+              height={KPI_ROW_HEIGHT}
+            />
           </div>
         </DashboardLayout>
 
