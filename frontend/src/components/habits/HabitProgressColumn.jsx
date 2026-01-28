@@ -78,14 +78,14 @@ function HabitProgressColumn({ habits }) {
       <div
         style={{
           padding: "12px",
-          fontSize: "12px",
+          fontSize: "15px",
           fontWeight: 800,
           letterSpacing: "0.14em",
           borderBottom: "1px solid rgba(255,255,255,0.08)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "51px",
+          height: "55px",
           color: "#93c5fd",
         }}
       >
