@@ -2,7 +2,11 @@ function DashboardHeader({
   monthLabel,
   goToPreviousMonth,
   goToNextMonth,
+  theme,
+  setTheme,
 }) {
+  const isDark = theme === "dark";
+
   return (
     <div
       style={{
@@ -11,75 +15,82 @@ function DashboardHeader({
         justifyContent: "space-between",
         padding: "0 16px",
         height: "52px",
-        background: "#f9fafb",
-        borderBottom: "1px solid #e5e7eb",
+        background: isDark
+          ? "linear-gradient(180deg, #020617, #020617cc)"
+          : "#f9fafb",
+        borderBottom: isDark
+          ? "1px solid rgba(255,255,255,0.08)"
+          : "1px solid #e5e7eb",
       }}
     >
-      {/* Previous Month */}
+      {/* Left */}
       <button
         onClick={goToPreviousMonth}
-        aria-label="Previous month"
-        style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#ffffff",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-          fontSize: "16px",
-          cursor: "pointer",
-          color: "#374151",
-          transition: "background 0.15s ease",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.background = "#f3f4f6")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.background = "#ffffff")
-        }
+        style={navBtnStyle(isDark)}
       >
         ◀
       </button>
 
-      {/* Month Label */}
+      {/* Center */}
       <div
         style={{
-          fontSize: "15px",
-          fontWeight: 700,
-          color: "#111827",
-          letterSpacing: "0.02em",
+          fontSize: "14px",
+          fontWeight: 800,
+          letterSpacing: "0.08em",
+          color: isDark ? "#93c5fd" : "#111827",
         }}
       >
-        {monthLabel}
+        {monthLabel.toUpperCase()}
       </div>
 
-      {/* Next Month */}
-      <button
-        onClick={goToNextMonth}
-        aria-label="Next month"
-        style={{
-          width: "36px",
-          height: "36px",
-          borderRadius: "8px",
-          border: "none",
-          background: "#ffffff",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-          fontSize: "16px",
-          cursor: "pointer",
-          color: "#374151",
-          transition: "background 0.15s ease",
-        }}
-        onMouseEnter={(e) =>
-          (e.currentTarget.style.background = "#f3f4f6")
-        }
-        onMouseLeave={(e) =>
-          (e.currentTarget.style.background = "#ffffff")
-        }
-      >
-        ▶
-      </button>
+      {/* Right */}
+      <div style={{ display: "flex", gap: "8px" }}>
+        {/* THEME TOGGLE */}
+        <button
+          onClick={() =>
+            setTheme(isDark ? "light" : "dark")
+          }
+          style={{
+            padding: "6px 10px",
+            fontSize: "11px",
+            borderRadius: "999px",
+            border: isDark
+              ? "1px solid rgba(255,255,255,0.2)"
+              : "1px solid #d1d5db",
+            background: isDark ? "#020617" : "#ffffff",
+            color: isDark ? "#e5e7eb" : "#111827",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          {isDark ? "Light" : "Dark"}
+        </button>
+
+        <button
+          onClick={goToNextMonth}
+          style={navBtnStyle(isDark)}
+        >
+          ▶
+        </button>
+      </div>
     </div>
   );
+}
+
+function navBtnStyle(isDark) {
+  return {
+    width: "36px",
+    height: "36px",
+    borderRadius: "8px",
+    border: isDark
+      ? "1px solid rgba(255,255,255,0.12)"
+      : "1px solid #e5e7eb",
+    background: isDark
+      ? "rgba(255,255,255,0.04)"
+      : "#ffffff",
+    color: isDark ? "#e5e7eb" : "#374151",
+    cursor: "pointer",
+  };
 }
 
 export default DashboardHeader;

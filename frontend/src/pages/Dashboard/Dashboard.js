@@ -9,6 +9,7 @@ import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
 
 import HabitNameColumn from "../../components/habits/HabitNameColumn.jsx";
+import HabitProgressColumn from "../../components/habits/HabitProgressColumn.jsx";
 import useHabits from "../../hooks/useHabits";
 import {
   LEFT_COLUMN_WIDTH,
@@ -54,28 +55,29 @@ function Dashboard() {
 
 
 
-const [newHabit, setNewHabit] = useState("");
-const [showModal, setShowModal] = useState(false);
+  const [newHabit, setNewHabit] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
-const initialYearMonth = getCurrentYearMonth();
-const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
-const [currentMonth, setCurrentMonth] = useState(initialYearMonth.month);
+  const initialYearMonth = getCurrentYearMonth();
+  const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
+  const [currentMonth, setCurrentMonth] = useState(initialYearMonth.month);
 
-const monthDates = getMonthDates(currentYear, currentMonth);
-const monthLabel = getMonthLabel(currentYear, currentMonth);
+  const monthDates = getMonthDates(currentYear, currentMonth);
+  const monthLabel = getMonthLabel(currentYear, currentMonth);
 
-const gridScrollRef = useRef(null);
-
-
-const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
-const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
+  const gridScrollRef = useRef(null);
 
 
+  const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
+  const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
 
-const kpis = calculateKPIs(
-  Array.isArray(habits) ? habits : [],
-  selectedMonth
-);
+
+  const [theme, setTheme] = useState("dark"); // "dark" | "light"
+
+  const kpis = calculateKPIs(
+    Array.isArray(habits) ? habits : [],
+    selectedMonth
+  );
 
 
   /* ---------- Auto-scroll to Today ---------- */
@@ -253,20 +255,23 @@ const kpis = calculateKPIs(
               }}
             >
               <DashboardHeader
-                monthLabel={monthLabel}
-                goToPreviousMonth={goToPreviousMonth}
-                goToNextMonth={goToNextMonth}
-              />
+  monthLabel={monthLabel}
+  goToPreviousMonth={goToPreviousMonth}
+  goToNextMonth={goToNextMonth}
+  theme={theme}
+  setTheme={setTheme}
+/>
 
-              <DashboardGrid
-                habits={habits}
-                monthDates={monthDates}
-                today={today}
-                toggleHabit={toggleHabit}
-                deleteHabit={deleteHabit}
-                gridScrollRef={gridScrollRef}
-                isFutureDate={isFutureDate}
-              />
+<DashboardGrid
+  habits={habits}
+  monthDates={monthDates}
+  today={today}
+  toggleHabit={toggleHabit}
+  gridScrollRef={gridScrollRef}
+  isFutureDate={isFutureDate}
+  theme={theme}
+/>
+
             </div>
           </div>
 
@@ -277,6 +282,7 @@ const kpis = calculateKPIs(
               minWidth: RIGHT_COLUMN_WIDTH,
               display: "flex",
               flexDirection: "column",
+              gap: "16px",
               alignSelf: "flex-start",
             }}
           >
@@ -286,7 +292,11 @@ const kpis = calculateKPIs(
               currentMonth={currentMonth}
               height={KPI_ROW_HEIGHT}
             />
+
+            {/* 👇 PROGRESS BARS BELOW TOP HABITS */}
+            <HabitProgressColumn habits={habits} />
           </div>
+
         </DashboardLayout>
 
       )}

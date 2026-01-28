@@ -7,13 +7,27 @@ function DashboardGrid({
   toggleHabit,
   gridScrollRef,
   isFutureDate,
+  theme, // ✅ RECEIVE THEME
 }) {
-  // 🔒 HARD SAFETY
+  const isDark = theme === "dark";
+
   const safeHabits = Array.isArray(habits) ? habits : [];
   const safeMonthDates = Array.isArray(monthDates) ? monthDates : [];
 
   return (
-    <div style={{ background: "#ffffff" }}>
+    <div
+      style={{
+        background: isDark
+          ? "linear-gradient(180deg, #020617, #020617cc)"
+          : "#ffffff",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: isDark
+          ? "inset 0 0 0 1px rgba(255,255,255,0.04)"
+          : "0 1px 2px rgba(0,0,0,0.06)",
+        border: isDark ? "none" : "1px solid #e5e7eb",
+      }}
+    >
       {/* ================= SCROLLABLE DATE GRID ================= */}
       <div
         ref={gridScrollRef}
@@ -35,8 +49,10 @@ function DashboardGrid({
               gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "26px",
               fontSize: "11px",
-              color: "#6b7280",
-              borderBottom: "1px solid #e5e7eb",
+              color: isDark ? "#9ca3af" : "#6b7280",
+              borderBottom: isDark
+                ? "1px solid rgba(255,255,255,0.08)"
+                : "1px solid #e5e7eb",
             }}
           >
             {safeMonthDates.map((date) => (
@@ -61,7 +77,9 @@ function DashboardGrid({
               display: "grid",
               gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
               height: "36px",
-              borderBottom: "1px solid #e5e7eb",
+              borderBottom: isDark
+                ? "1px solid rgba(255,255,255,0.08)"
+                : "1px solid #e5e7eb",
             }}
           >
             {safeMonthDates.map((date) => {
@@ -76,8 +94,18 @@ function DashboardGrid({
                     justifyContent: "center",
                     fontSize: "12px",
                     fontWeight: isToday ? 700 : 400,
-                    color: isToday ? "#1d4ed8" : "#111827",
-                    background: isToday ? "#e3f2fd" : "transparent",
+                    color: isToday
+                      ? isDark
+                        ? "#93c5fd"
+                        : "#2563eb"
+                      : isDark
+                      ? "#e5e7eb"
+                      : "#111827",
+                    background: isToday
+                      ? isDark
+                        ? "rgba(147,197,253,0.12)"
+                        : "#eff6ff"
+                      : "transparent",
                   }}
                 >
                   {date.slice(8, 10)}
@@ -94,7 +122,9 @@ function DashboardGrid({
                 display: "grid",
                 gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
                 height: "38px",
-                borderBottom: "1px solid #f1f5f9",
+                borderBottom: isDark
+                  ? "1px solid rgba(255,255,255,0.05)"
+                  : "1px solid #f1f5f9",
               }}
             >
               {safeMonthDates.map((date) => {
@@ -118,9 +148,15 @@ function DashboardGrid({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      background: isWeekend ? "#f8fafc" : "transparent",
+                      background: isWeekend
+                        ? isDark
+                          ? "rgba(255,255,255,0.03)"
+                          : "#f8fafc"
+                        : "transparent",
                       borderLeft: isWeekStart
-                        ? "2px solid #d1fae5"
+                        ? isDark
+                          ? "2px solid rgba(34,197,94,0.35)"
+                          : "2px solid #bbf7d0"
                         : "none",
                       pointerEvents: "none",
                     }}
@@ -137,15 +173,20 @@ function DashboardGrid({
                         borderRadius: "6px",
                         border: "none",
                         background: isFuture
-                          ? "#f3f4f6"
+                          ? isDark
+                            ? "rgba(255,255,255,0.08)"
+                            : "#e5e7eb"
                           : isCompleted
                           ? "#22c55e"
+                          : isDark
+                          ? "rgba(255,255,255,0.18)"
                           : "#e5e7eb",
-                        color: "#ffffff",
+                        color: isDark ? "#020617" : "#ffffff",
                         cursor: isFuture
                           ? "not-allowed"
                           : "pointer",
                         pointerEvents: "auto",
+                        fontWeight: 700,
                       }}
                     >
                       ✓

@@ -2,7 +2,6 @@ function HabitNameColumn({ habits, deleteHabit }) {
   const HEADER_HEIGHT = 115; // must match calendar header height
   const ROW_HEIGHT = 38;
 
-  // 🔒 HARD SAFETY
   const safeHabits = Array.isArray(habits) ? habits : [];
 
   function handleDelete(habit) {
@@ -21,7 +20,7 @@ function HabitNameColumn({ habits, deleteHabit }) {
           }
 
           .habit-row:hover {
-            background: #f8fafc;
+            background: rgba(255,255,255,0.06);
           }
 
           .trash-wrapper {
@@ -51,9 +50,11 @@ function HabitNameColumn({ habits, deleteHabit }) {
 
       <div
         style={{
-          background: "#ffffff",
-          borderRadius: "12px",
+          background: "linear-gradient(180deg, #020617, #020617cc)",
+          borderRadius: "16px",
           overflow: "hidden",
+          color: "#e5e7eb",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
         }}
       >
         {/* ================= HEADER ================= */}
@@ -63,10 +64,11 @@ function HabitNameColumn({ habits, deleteHabit }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "15px",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            borderBottom: "1px solid #e5e7eb",
+            fontSize: "12px",
+            fontWeight: 800,
+            letterSpacing: "0.14em",
+            color: "#93c5fd",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
           }}
         >
           DAILY HABITS
@@ -78,8 +80,8 @@ function HabitNameColumn({ habits, deleteHabit }) {
             style={{
               padding: "16px",
               textAlign: "center",
-              fontSize: "13px",
-              color: "#6b7280",
+              fontSize: "12px",
+              color: "#9ca3af",
             }}
           >
             No habits yet
@@ -96,7 +98,7 @@ function HabitNameColumn({ habits, deleteHabit }) {
                 justifyContent: "space-between",
                 padding: "0 12px",
                 fontSize: "13px",
-                borderBottom: "1px solid #f1f5f9",
+                borderBottom: "1px solid rgba(255,255,255,0.05)",
               }}
             >
               {/* Habit name */}
@@ -105,7 +107,11 @@ function HabitNameColumn({ habits, deleteHabit }) {
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  color: "#111827",
+                  color: "#e5e7eb",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%", 
                 }}
               >
                 {habit.title}
