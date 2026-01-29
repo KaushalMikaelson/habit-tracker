@@ -7,20 +7,27 @@ function HabitProgressColumn({ habits }) {
 
   /* ---------- Helpers ---------- */
 
-  function getProgressData(habit) {
-    const todayStr = dayjs().format("YYYY-MM-DD");
-    const currentMonth = todayStr.slice(0, 7);
-
-    const completedDates = Array.isArray(habit.completedDates)
-      ? habit.completedDates
-      : [];
-
-    const completedThisMonth = completedDates.filter(
-      (d) => d.startsWith(currentMonth) && d <= todayStr
+  function normalizeDates(habit) {
+    return new Set(
+      (habit.completedDates || []).map(d =>
+        dayjs(d).format("YYYY-MM-DD")
+      )
     );
+  }
 
-    const completed = completedThisMonth.length;
-    const total = dayjs().date();
+  function getProgressData(habit) {
+    const today = dayjs();
+    const currentMonth = today.format("YYYY-MM");
+    const total = today.date();
+
+    const completedSet = normalizeDates(habit);
+
+    let completed = 0;
+    for (let i = 1; i <= total; i++) {
+      const date = `${currentMonth}-${String(i).padStart(2, "0")}`;
+      if (completedSet.has(date)) completed++;
+    }
+
     const percent =
       total === 0 ? 0 : Math.round((completed / total) * 100);
 
@@ -28,14 +35,12 @@ function HabitProgressColumn({ habits }) {
   }
 
   function getCurrentStreak(habit) {
-    const completedDates = Array.isArray(habit.completedDates)
-      ? habit.completedDates
-      : [];
+    const completedSet = normalizeDates(habit);
 
     let streak = 0;
     let cursor = dayjs();
 
-    while (completedDates.includes(cursor.format("YYYY-MM-DD"))) {
+    while (completedSet.has(cursor.format("YYYY-MM-DD"))) {
       streak++;
       cursor = cursor.subtract(1, "day");
     }
@@ -43,20 +48,20 @@ function HabitProgressColumn({ habits }) {
     return streak;
   }
 
-  /* ---------- Build + Sort ---------- */
+  /* ---------- Build (NO SORTING) ---------- */
 
-  const enrichedHabits = safeHabits
-    .map((habit) => {
-      const progress = getProgressData(habit);
-      const streak = getCurrentStreak(habit);
+  const enrichedHabits = safeHabits.map((habit) => {
+    const progress = getProgressData(habit);
+    const streak = getCurrentStreak(habit);
 
-      return {
-        ...habit,
-        ...progress,
-        streak,
-      };
-    })
-    .sort((a, b) => b.percent - a.percent);
+    return {
+      ...habit,
+      ...progress,
+      streak,
+    };
+  });
+
+  /* ---------- UI ---------- */
 
   return (
     <div
@@ -65,8 +70,6 @@ function HabitProgressColumn({ habits }) {
         top: "16px",
         width: "100%",
         minWidth: 0,
-
-        /* 🔥 MATCH TOP HABITS CARD */
         background: "linear-gradient(180deg, #020617, #020617cc)",
         borderRadius: "16px",
         overflow: "hidden",
@@ -126,15 +129,12 @@ function HabitProgressColumn({ habits }) {
             fontSize: "12px",
           }}
         >
-          {/* RANK */}
           <div style={{ width: "18px" }}>{index + 1}</div>
 
-          {/* COMPLETED */}
           <div style={{ width: "42px" }}>
             {habit.completed}/{habit.total}
           </div>
 
-          {/* BAR */}
           <div
             style={{
               flex: 1,
@@ -154,12 +154,10 @@ function HabitProgressColumn({ habits }) {
             />
           </div>
 
-          {/* % */}
           <div style={{ width: "36px", textAlign: "right" }}>
             {habit.percent}%
           </div>
 
-          {/* STREAK 🔥 */}
           <div style={{ width: "36px", textAlign: "right" }}>
             {habit.streak > 0 ? `🔥${habit.streak}` : "—"}
           </div>
