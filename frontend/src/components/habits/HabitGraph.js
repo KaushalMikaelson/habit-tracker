@@ -299,5 +299,4 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
     </div>
   );
 }
-
 export default HabitGraphs;
