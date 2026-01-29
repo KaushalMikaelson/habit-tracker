@@ -20,7 +20,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
 
       <KpiRing
         value={kpis.daily}
-        label="Daily"
+        label="Today"
         color="#22c55e"
         disabled={!isCurrentMonth}
       />

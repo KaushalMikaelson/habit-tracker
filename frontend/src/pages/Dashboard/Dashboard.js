@@ -15,6 +15,7 @@ import {
   LEFT_COLUMN_WIDTH,
   RIGHT_COLUMN_WIDTH,
 } from "./DashboardLayout.constants";
+import HabitGraphs from "../../components/habits/HabitGraph";
 
 import { calculateKPIs } from "../../components/kpi/calculations";
 import TopHabits from "../../components/stats/TopHabits";
@@ -255,24 +256,34 @@ function Dashboard() {
               }}
             >
               <DashboardHeader
-  monthLabel={monthLabel}
-  goToPreviousMonth={goToPreviousMonth}
-  goToNextMonth={goToNextMonth}
-  theme={theme}
-  setTheme={setTheme}
-/>
+                monthLabel={monthLabel}
+                goToPreviousMonth={goToPreviousMonth}
+                goToNextMonth={goToNextMonth}
+                theme={theme}
+                setTheme={setTheme}
+              />
 
-<DashboardGrid
-  habits={habits}
-  monthDates={monthDates}
-  today={today}
-  toggleHabit={toggleHabit}
-  gridScrollRef={gridScrollRef}
-  isFutureDate={isFutureDate}
-  theme={theme}
-/>
+              <DashboardGrid
+                habits={habits}
+                monthDates={monthDates}
+                today={today}
+                toggleHabit={toggleHabit}
+                gridScrollRef={gridScrollRef}
+                isFutureDate={isFutureDate}
+                theme={theme}
+              />
 
             </div>
+
+            {/* HABIT GRAPHS */}
+            <HabitGraphs
+              habits={habits}
+              month={selectedMonth}
+              isCurrentMonth={isCurrentMonth}
+            />
+
+
+
           </div>
 
           {/* ================= RIGHT COLUMN ================= */}
