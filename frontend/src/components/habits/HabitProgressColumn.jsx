@@ -65,18 +65,18 @@ function HabitProgressColumn({ habits }) {
 
   return (
     <div
-      style={{
-        position: "sticky",
-        top: "16px",
-        width: "100%",
-        minWidth: 0,
-        background: "linear-gradient(180deg, #020617, #020617cc)",
-        borderRadius: "16px",
-        overflow: "hidden",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
-        color: "#e5e7eb",
-      }}
-    >
+  style={{
+    position: "relative", // ← important
+    width: "100%",
+    minWidth: 0,
+    background: "linear-gradient(180deg, #020617, #020617cc)",
+    borderRadius: "16px",
+    overflow: "hidden",
+    boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+    color: "#e5e7eb",
+  }}
+>
+
       {/* HEADER */}
       <div
         style={{

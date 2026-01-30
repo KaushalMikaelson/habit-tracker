@@ -20,6 +20,8 @@ import HabitGraphs from "../../components/habits/HabitGraph";
 import { calculateKPIs } from "../../components/kpi/calculations";
 import TopHabits from "../../components/stats/TopHabits";
 
+import TodoNotes from "../../components/Todo/TodoNotes";
+
 
 
 import {
@@ -249,11 +251,12 @@ function Dashboard() {
             {/* CALENDAR */}
             <div
               style={{
-                background: "#ffffff",
+                background: "transparent",
                 borderRadius: "12px",
                 overflow: "hidden",
                 minWidth: 0,
               }}
+
             >
               <DashboardHeader
                 monthLabel={monthLabel}
@@ -273,14 +276,16 @@ function Dashboard() {
                 theme={theme}
               />
 
+              {/* HABIT GRAPHS */}
+              <HabitGraphs
+                habits={habits}
+                month={selectedMonth}
+                isCurrentMonth={isCurrentMonth}
+              />
+
+
             </div>
 
-            {/* HABIT GRAPHS */}
-            <HabitGraphs
-              habits={habits}
-              month={selectedMonth}
-              isCurrentMonth={isCurrentMonth}
-            />
 
 
 
@@ -306,6 +311,10 @@ function Dashboard() {
 
             {/* 👇 PROGRESS BARS BELOW TOP HABITS */}
             <HabitProgressColumn habits={habits} />
+
+            <div style={{ height: "15px" }} />
+
+            <TodoNotes />
           </div>
 
         </DashboardLayout>
