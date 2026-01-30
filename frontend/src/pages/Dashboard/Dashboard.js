@@ -21,7 +21,7 @@ import { calculateKPIs } from "../../components/kpi/calculations";
 import TopHabits from "../../components/stats/TopHabits";
 
 import TodoNotes from "../../components/Todo/TodoNotes";
-
+import HabitSummaryCard from "../../components/habits/HabitSummaryCard";
 
 
 import {
@@ -220,6 +220,14 @@ function Dashboard() {
               habits={habits}
               deleteHabit={deleteHabit}
             />
+
+            <HabitSummaryCard
+              habits={habits}
+              month={selectedMonth} // dayjs object
+            />
+
+
+
           </div>
 
           {/* ================= CENTER COLUMN ================= */}
