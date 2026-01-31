@@ -138,14 +138,14 @@ function Dashboard() {
 
   return (
     <div
-  style={{
-    minHeight: "100vh",
-    background: "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)"
+      style={{
+        minHeight: "100vh",
+        background: "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)"
 
 
 
-  }}
->
+      }}
+    >
 
       {/* ================= Top Header ================= */}
       <div
@@ -155,8 +155,11 @@ function Dashboard() {
           alignItems: "center",
           height: "56px",
           padding: "0 16px",
-          borderBottom: "1px solid #e5e7eb",
-          background: "#ffffff",
+          background: "rgba(30, 41, 59, 0.75)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
+
+
         }}
       >
         <div>
@@ -222,14 +225,14 @@ function Dashboard() {
               habits={habits}
               onToggle={toggleHabit}
             />
-          <div style={{ marginTop: "-62px" }}></div>
+            <div style={{ marginTop: "-62px" }}></div>
             {/* HABITS COLUMN */}
             <HabitNameColumn
               habits={habits}
               deleteHabit={deleteHabit}
             />
 
-            
+
 
 
 
@@ -261,13 +264,13 @@ function Dashboard() {
               <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
 
             </div>
-              <div style={{ marginTop: "-40px" }}></div>
+            <div style={{ marginTop: "-40px" }}></div>
             {/* HABIT GRAPHS */}
-              <HabitGraphs
-                habits={habits}
-                month={selectedMonth}
-                isCurrentMonth={isCurrentMonth}
-              />
+            <HabitGraphs
+              habits={habits}
+              month={selectedMonth}
+              isCurrentMonth={isCurrentMonth}
+            />
 
             {/* CALENDAR */}
             <div
@@ -329,7 +332,7 @@ function Dashboard() {
 
             <div style={{ height: "15px" }} />
 
-            
+
           </div>
 
         </DashboardLayout>
