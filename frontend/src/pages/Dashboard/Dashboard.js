@@ -23,7 +23,6 @@ import TopHabits from "../../components/stats/TopHabits";
 import TodoNotes from "../../components/Todo/TodoNotes";
 import TodayFocus from "../../components/Todo/TodayFocus";
 
-
 import {
   getCurrentYearMonth,
   getMonthDates,
@@ -33,7 +32,6 @@ import {
 /* ================= Constants ================= */
 
 const KPI_ROW_HEIGHT = 170;
-
 
 /* ================= Helpers ================= */
 
@@ -55,9 +53,6 @@ function Dashboard() {
     showUndo,
   } = useHabits(today);
 
-
-
-
   const [newHabit, setNewHabit] = useState("");
   const [showModal, setShowModal] = useState(false);
 
@@ -69,23 +64,22 @@ function Dashboard() {
   const monthLabel = getMonthLabel(currentYear, currentMonth);
 
   const gridScrollRef = useRef(null);
-
+  const hasAutoScrolledRef = useRef(false); // ✅ FIX
 
   const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
   const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
 
-
-  const [theme, setTheme] = useState("dark"); // "dark" | "light"
+  const [theme, setTheme] = useState("dark");
 
   const kpis = calculateKPIs(
     Array.isArray(habits) ? habits : [],
     selectedMonth
   );
 
-
-  /* ---------- Auto-scroll to Today ---------- */
+  /* ---------- Auto-scroll to Today (ONCE) ---------- */
   useEffect(() => {
     if (!gridScrollRef.current) return;
+    if (hasAutoScrolledRef.current) return;
 
     const todayIndex = monthDates.findIndex((d) => d === today);
     if (todayIndex === -1) return;
@@ -95,7 +89,14 @@ function Dashboard() {
       left: Math.max(todayIndex * columnWidth - 6 * columnWidth, 0),
       behavior: "smooth",
     });
+
+    hasAutoScrolledRef.current = true;
   }, [monthDates, today]);
+
+  /* ---------- Reset auto-scroll when month changes ---------- */
+  useEffect(() => {
+    hasAutoScrolledRef.current = false;
+  }, [currentMonth, currentYear]);
 
   function isFutureDate(date) {
     return date > today;
@@ -113,11 +114,11 @@ function Dashboard() {
 
   function goToNextMonth() {
     const now = new Date();
-    const isCurrentMonth =
+    const isCurrent =
       currentYear === now.getFullYear() &&
       currentMonth === now.getMonth();
 
-    if (isCurrentMonth) return;
+    if (isCurrent) return;
 
     if (currentMonth === 11) {
       setCurrentYear((y) => y + 1);
@@ -140,13 +141,10 @@ function Dashboard() {
     <div
       style={{
         minHeight: "100vh",
-        background: "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)"
-
-
-
+        background:
+          "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)",
       }}
     >
-
       {/* ================= Top Header ================= */}
       <div
         style={{
@@ -158,8 +156,6 @@ function Dashboard() {
           background: "rgba(30, 41, 59, 0.75)",
           backdropFilter: "blur(10px)",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
-
-
         }}
       >
         <div>
@@ -207,7 +203,7 @@ function Dashboard() {
         </div>
       ) : (
         <DashboardLayout>
-          {/* ================= LEFT COLUMN ================= */}
+          {/* LEFT COLUMN */}
           <div
             style={{
               width: LEFT_COLUMN_WIDTH,
@@ -217,39 +213,29 @@ function Dashboard() {
               gap: "40px",
             }}
           >
-            {/* KPI INTRO */}
             <div style={{ height: KPI_ROW_HEIGHT }}>
               <KpiIntroBox />
             </div>
-            <TodayFocus
-              habits={habits}
-              onToggle={toggleHabit}
-            />
-            <div style={{ marginTop: "-62px" }}></div>
-            {/* HABITS COLUMN */}
+
+            <TodayFocus habits={habits} onToggle={toggleHabit} />
+
+            <div style={{ marginTop: "-62px" }} />
+
             <HabitNameColumn
               habits={habits}
               deleteHabit={deleteHabit}
             />
-
-
-
-
-
-
           </div>
 
-          {/* ================= CENTER COLUMN ================= */}
+          {/* CENTER COLUMN */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               gap: "16px",
-              minWidth: 0, // 🔥 CRITICAL: prevents overflow
+              minWidth: 0,
             }}
           >
-
-            {/* KPI RING Row */}
             <div
               style={{
                 height: KPI_ROW_HEIGHT,
@@ -261,18 +247,20 @@ function Dashboard() {
                 alignItems: "center",
               }}
             >
-              <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
-
+              <KpiRingRow
+                kpis={kpis}
+                isCurrentMonth={isCurrentMonth}
+              />
             </div>
-            <div style={{ marginTop: "-40px" }}></div>
-            {/* HABIT GRAPHS */}
+
+            <div style={{ marginTop: "-40px" }} />
+
             <HabitGraphs
               habits={habits}
               month={selectedMonth}
               isCurrentMonth={isCurrentMonth}
             />
 
-            {/* CALENDAR */}
             <div
               style={{
                 background: "transparent",
@@ -280,7 +268,6 @@ function Dashboard() {
                 overflow: "hidden",
                 minWidth: 0,
               }}
-
             >
               <DashboardHeader
                 monthLabel={monthLabel}
@@ -299,15 +286,10 @@ function Dashboard() {
                 isFutureDate={isFutureDate}
                 theme={theme}
               />
-
             </div>
-
-
-
-
           </div>
 
-          {/* ================= RIGHT COLUMN ================= */}
+          {/* RIGHT COLUMN */}
           <div
             style={{
               width: RIGHT_COLUMN_WIDTH,
@@ -327,16 +309,11 @@ function Dashboard() {
 
             <TodoNotes />
 
-            {/* 👇 PROGRESS BARS BELOW TOP HABITS */}
             <HabitProgressColumn habits={habits} />
 
             <div style={{ height: "15px" }} />
-
-
           </div>
-
         </DashboardLayout>
-
       )}
 
       {/* ================= Undo Snackbar ================= */}
