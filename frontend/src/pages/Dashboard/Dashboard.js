@@ -21,7 +21,7 @@ import { calculateKPIs } from "../../components/kpi/calculations";
 import TopHabits from "../../components/stats/TopHabits";
 
 import TodoNotes from "../../components/Todo/TodoNotes";
-import HabitSummaryCard from "../../components/habits/HabitSummaryCard";
+import TodayFocus from "../../components/Todo/TodayFocus";
 
 
 import {
@@ -221,10 +221,11 @@ function Dashboard() {
               deleteHabit={deleteHabit}
             />
 
-            <HabitSummaryCard
+            <TodayFocus
               habits={habits}
-              month={selectedMonth} // dayjs object
+              onToggle={toggleHabit}
             />
+
 
 
 
