@@ -34,7 +34,7 @@ export default function TodoNotes() {
         <div style={styles.container}>
             {/* Header */}
             <div style={styles.header}>
-                <h3 style={styles.title}>📝 TODAY</h3>
+                <h3 style={styles.title}>📝 REMINDERS</h3>
                 <span style={styles.counter}>
                     {items.filter((i) => !i.done).length} left
                 </span>
@@ -45,7 +45,7 @@ export default function TodoNotes() {
                 <input
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder="Add a task or note..."
+                    placeholder="Add a reminder..."
                     style={styles.input}
                     onKeyDown={(e) => e.key === "Enter" && addItem()}
                 />
@@ -99,7 +99,7 @@ export default function TodoNotes() {
 
 const styles = {
     container: {
-        height: "387px",
+        height: "378px",
         borderRadius: "18px",
         padding: "16px",
         background: "linear-gradient(180deg, #020617, #020617cc)",

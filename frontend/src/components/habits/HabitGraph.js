@@ -137,7 +137,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
     >
       {/* HEADER */}
       <div style={{
-        fontSize: "14px",
+        fontSize: "16px",
         fontWeight: 800,
         letterSpacing: "0.14em",
         color: "#93c5fd",
@@ -176,7 +176,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
         <svg
           viewBox={`0 0 ${width} ${height}`}
           width="100%"
-          height="320"
+          height="300"
           shapeRendering="geometricPrecision"
         >
           <defs>

@@ -138,11 +138,15 @@ function Dashboard() {
 
   return (
     <div
-      style={{
-        minHeight: "100vh",
-        background: "#a2c6deff",
-      }}
-    >
+  style={{
+    minHeight: "100vh",
+    background: "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)"
+
+
+
+  }}
+>
+
       {/* ================= Top Header ================= */}
       <div
         style={{
@@ -214,17 +218,18 @@ function Dashboard() {
             <div style={{ height: KPI_ROW_HEIGHT }}>
               <KpiIntroBox />
             </div>
-
+            <TodayFocus
+              habits={habits}
+              onToggle={toggleHabit}
+            />
+          <div style={{ marginTop: "-62px" }}></div>
             {/* HABITS COLUMN */}
             <HabitNameColumn
               habits={habits}
               deleteHabit={deleteHabit}
             />
 
-            <TodayFocus
-              habits={habits}
-              onToggle={toggleHabit}
-            />
+            
 
 
 
@@ -256,6 +261,13 @@ function Dashboard() {
               <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
 
             </div>
+              <div style={{ marginTop: "-40px" }}></div>
+            {/* HABIT GRAPHS */}
+              <HabitGraphs
+                habits={habits}
+                month={selectedMonth}
+                isCurrentMonth={isCurrentMonth}
+              />
 
             {/* CALENDAR */}
             <div
@@ -285,14 +297,6 @@ function Dashboard() {
                 theme={theme}
               />
 
-              {/* HABIT GRAPHS */}
-              <HabitGraphs
-                habits={habits}
-                month={selectedMonth}
-                isCurrentMonth={isCurrentMonth}
-              />
-
-
             </div>
 
 
@@ -318,12 +322,14 @@ function Dashboard() {
               height={KPI_ROW_HEIGHT}
             />
 
+            <TodoNotes />
+
             {/* 👇 PROGRESS BARS BELOW TOP HABITS */}
             <HabitProgressColumn habits={habits} />
 
             <div style={{ height: "15px" }} />
 
-            <TodoNotes />
+            
           </div>
 
         </DashboardLayout>
