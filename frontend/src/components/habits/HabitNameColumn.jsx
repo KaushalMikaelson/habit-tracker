@@ -1,8 +1,13 @@
-function HabitNameColumn({ habits, deleteHabit }) {
-  const HEADER_HEIGHT = 115; // must match calendar header height
+import { useState } from "react";
+
+function HabitNameColumn({ habits, deleteHabit, editHabit }) {
+  const HEADER_HEIGHT = 115;
   const ROW_HEIGHT = 38;
 
   const safeHabits = Array.isArray(habits) ? habits : [];
+
+  const [editingId, setEditingId] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   function handleDelete(habit) {
     const ok = window.confirm(`Delete "${habit.title}"?`);
@@ -10,9 +15,29 @@ function HabitNameColumn({ habits, deleteHabit }) {
     deleteHabit(habit._id);
   }
 
+  function startEdit(habit) {
+    setEditingId(habit._id);
+    setEditValue(habit.title);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditValue("");
+  }
+
+  function saveEdit(habit) {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === habit.title) {
+      cancelEdit();
+      return;
+    }
+    editHabit(habit._id, trimmed);
+    cancelEdit();
+  }
+
   return (
     <>
-      {/* Scoped styles */}
+      {/* ================= Scoped Styles ================= */}
       <style>
         {`
           .habit-row {
@@ -23,27 +48,49 @@ function HabitNameColumn({ habits, deleteHabit }) {
             background: rgba(255,255,255,0.06);
           }
 
-          .trash-wrapper {
+          .action-wrapper {
+            display: flex;
+            gap: 6px;
             opacity: 0;
             transition: opacity 0.15s ease;
           }
 
-          .habit-row:hover .trash-wrapper {
+          .habit-row:hover .action-wrapper {
             opacity: 1;
           }
 
-          .trash-btn {
+          .icon-btn {
             width: 22px;
             height: 22px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
-            background: #ef4444;
-            color: white;
             font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+          }
+
+          .edit-btn {
+            background: #22c55e;
+            color: #020617;
+            font-weight: 700;
+          }
+
+          .trash-btn {
+            background: #ef4444;
+            color: white;
+          }
+
+          .edit-input {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 4px 6px;
+            color: #e5e7eb;
+            font-size: 13px;
+            outline: none;
           }
         `}
       </style>
@@ -87,48 +134,90 @@ function HabitNameColumn({ habits, deleteHabit }) {
             No habits yet
           </div>
         ) : (
-          safeHabits.map((habit) => (
-            <div
-              key={habit._id}
-              className="habit-row"
-              style={{
-                height: ROW_HEIGHT,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "0 12px",
-                fontSize: "13px",
-                borderBottom: "1px solid rgba(255,255,255,0.05)",
-              }}
-            >
-              {/* Habit name */}
-              <span
+          safeHabits.map((habit) => {
+            const isEditing = editingId === habit._id;
+
+            return (
+              <div
+                key={habit._id}
+                className="habit-row"
                 style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  color: "#e5e7eb",
+                  height: ROW_HEIGHT,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%", 
+                  justifyContent: "space-between",
+                  padding: "0 12px",
+                  fontSize: "13px",
+                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  gap: "8px",
                 }}
               >
-                {habit.title}
-              </span>
+                {/* Name / Input */}
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                  {isEditing ? (
+                    <input
+                      className="edit-input"
+                      autoFocus
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveEdit(habit);
+                        if (e.key === "Escape") cancelEdit();
+                      }}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        display: "block",
+                      }}
+                    >
+                      {habit.title}
+                    </span>
+                  )}
+                </div>
 
-              {/* Delete */}
-              <div className="trash-wrapper">
-                <button
-                  className="trash-btn"
-                  onClick={() => handleDelete(habit)}
-                  title="Delete habit"
-                >
-                  ✕
-                </button>
+                {/* Actions */}
+                {isEditing ? (
+                  <div className="action-wrapper" style={{ opacity: 1 }}>
+                    <button
+                      className="icon-btn edit-btn"
+                      title="Save"
+                      onClick={() => saveEdit(habit)}
+                    >
+                      ✓
+                    </button>
+                    <button
+                      className="icon-btn trash-btn"
+                      title="Cancel"
+                      onClick={cancelEdit}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="action-wrapper">
+                    <button
+                      className="icon-btn edit-btn"
+                      title="Edit habit"
+                      onClick={() => startEdit(habit)}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      className="icon-btn trash-btn"
+                      title="Delete habit"
+                      onClick={() => handleDelete(habit)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </>

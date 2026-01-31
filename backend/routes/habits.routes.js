@@ -99,6 +99,45 @@ router.patch("/:id/toggle", async (req, res) => {
   }
 });
 
+// ✏️ Update habit title
+router.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title } = req.body;
+
+    logger.debug("✏️ Update habit request:", id, title);
+
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const habit = await Habit.findOneAndUpdate(
+      {
+        _id: id,
+        userId: req.user.id,
+        isDeleted: false,
+      },
+      {
+        title: title.trim(),
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!habit) {
+      return res.status(404).json({ message: "Habit not found" });
+    }
+
+    logger.info("✅ Habit updated:", habit.title);
+    res.json(habit);
+  } catch (error) {
+    logger.error("❌ Error updating habit:", error);
+    res.status(500).json({ message: "Failed to update habit" });
+  }
+});
+
+
 // Soft delete habit
 router.delete("/:id", async (req, res) => {
   try {

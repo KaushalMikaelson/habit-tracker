@@ -51,6 +51,7 @@ function Dashboard() {
     deleteHabit,
     undoDelete,
     showUndo,
+    editHabit,
   } = useHabits(today);
 
   const [newHabit, setNewHabit] = useState("");
@@ -224,7 +225,9 @@ function Dashboard() {
             <HabitNameColumn
               habits={habits}
               deleteHabit={deleteHabit}
+              editHabit={editHabit}
             />
+
           </div>
 
           {/* CENTER COLUMN */}
