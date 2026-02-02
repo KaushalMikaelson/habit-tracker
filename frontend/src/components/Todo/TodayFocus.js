@@ -1,9 +1,60 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TodayFocus() {
-  const [items, setItems] = useState([]);
-  const [text, setText] = useState("");
+  /* ===============================
+     DATE KEYS
+  ================================ */
+  const todayDate = new Date();
+  const todayKey = todayDate.toISOString().split("T")[0];
 
+  const yesterdayDate = new Date(todayDate);
+  yesterdayDate.setDate(todayDate.getDate() - 1);
+  const yesterdayKey = yesterdayDate.toISOString().split("T")[0];
+
+  const TODAY_STORAGE = `today-focus-${todayKey}`;
+  const YESTERDAY_STORAGE = `today-focus-${yesterdayKey}`;
+
+  /* ===============================
+     STATE (SAFE INIT)
+  ================================ */
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(TODAY_STORAGE);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [text, setText] = useState("");
+  const [hasCarryFromYesterday, setHasCarryFromYesterday] = useState(false);
+
+  /* ===============================
+     CHECK IF YESTERDAY HAS UNFINISHED
+  ================================ */
+  useEffect(() => {
+    try {
+      const yesterdayItems = JSON.parse(
+        localStorage.getItem(YESTERDAY_STORAGE) || "[]"
+      );
+      setHasCarryFromYesterday(
+        yesterdayItems.some((item) => !item.done)
+      );
+    } catch {
+      setHasCarryFromYesterday(false);
+    }
+  }, [YESTERDAY_STORAGE]);
+
+  /* ===============================
+     SAVE TODAY (ONLY ON CHANGE)
+  ================================ */
+  useEffect(() => {
+    localStorage.setItem(TODAY_STORAGE, JSON.stringify(items));
+  }, [items, TODAY_STORAGE]);
+
+  /* ===============================
+     ACTIONS
+  ================================ */
   function addItem() {
     if (!text.trim()) return;
 
@@ -15,6 +66,7 @@ export default function TodayFocus() {
         done: false,
       },
     ]);
+
     setText("");
   }
 
@@ -30,6 +82,39 @@ export default function TodayFocus() {
     setItems(items.filter((item) => item.id !== id));
   }
 
+  /* ===============================
+     MANUAL CARRY FROM YESTERDAY
+  ================================ */
+  function carryFromYesterday() {
+    try {
+      const yesterdayItems = JSON.parse(
+        localStorage.getItem(YESTERDAY_STORAGE) || "[]"
+      );
+
+      const unfinished = yesterdayItems.filter((item) => !item.done);
+      if (unfinished.length === 0) return;
+
+      const existingTexts = new Set(items.map((i) => i.text));
+
+      const carried = unfinished
+        .filter((item) => !existingTexts.has(item.text))
+        .map((item) => ({
+          ...item,
+          id: Date.now() + Math.random(),
+        }));
+
+      if (carried.length > 0) {
+        setItems([...items, ...carried]);
+        setHasCarryFromYesterday(false); // hide button after carry
+      }
+    } catch {
+      // fail silently
+    }
+  }
+
+  /* ===============================
+     UI
+  ================================ */
   return (
     <div style={styles.container}>
       {/* Header */}
@@ -47,6 +132,17 @@ export default function TodayFocus() {
           {items.filter((i) => !i.done).length} pending
         </span>
       </div>
+
+      {/* Carry Button (ONLY IF NEEDED) */}
+      {hasCarryFromYesterday && (
+        <button
+          onClick={carryFromYesterday}
+          style={styles.carryBtn}
+          title="Carry unfinished tasks from yesterday"
+        >
+          Carry unfinished from yesterday
+        </button>
+      )}
 
       {/* Input */}
       <div style={styles.inputRow}>
@@ -119,8 +215,8 @@ const styles = {
   header: {
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "flex-start", // ⬅️ important for multi-line title
-    marginBottom: "12px",
+    alignItems: "flex-start",
+    marginBottom: "10px",
   },
 
   titleWrap: {
@@ -132,7 +228,6 @@ const styles = {
   titleIcon: {
     fontSize: "16px",
     marginTop: "2px",
-    flexShrink: 0,
   },
 
   titleText: {
@@ -161,6 +256,20 @@ const styles = {
     marginTop: "2px",
   },
 
+  /* 🔴 RED BUTTON */
+  carryBtn: {
+    marginBottom: "10px",
+    padding: "6px 10px",
+    fontSize: "11px",
+    borderRadius: "8px",
+    border: "none",
+    background: "linear-gradient(135deg, #ef4444, #b91c1c)",
+    color: "#ffffff",
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(239,68,68,0.45)",
+    alignSelf: "flex-start",
+  },
+
   inputRow: {
     display: "flex",
     gap: "8px",
@@ -170,27 +279,22 @@ const styles = {
 
   input: {
     flex: 1,
-    minWidth: 0,
     background: "#020617",
     border: "1px solid #1e293b",
     borderRadius: "10px",
     padding: "8px 10px",
     color: "#e5e7eb",
-    outline: "none",
     fontSize: "13px",
   },
 
   addBtn: {
     width: "36px",
-    minWidth: "36px",
-    flexShrink: 0,
     borderRadius: "10px",
     border: "none",
     background: "#22c55e",
     color: "#020617",
     fontSize: "18px",
     cursor: "pointer",
-    boxShadow: "0 0 10px rgba(34,197,94,0.5)",
   },
 
   list: {
