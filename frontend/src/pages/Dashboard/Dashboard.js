@@ -312,7 +312,10 @@ function Dashboard() {
 
             <TodoNotes />
 
-            <HabitProgressColumn habits={habits} />
+            <HabitProgressColumn
+              habits={habits}
+              currentMonth={selectedMonth}
+            />
 
             <div style={{ height: "15px" }} />
           </div>

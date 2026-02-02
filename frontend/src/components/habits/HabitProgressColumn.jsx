@@ -1,44 +1,71 @@
 import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 
-function HabitProgressColumn({ habits }) {
+function HabitProgressColumn({ habits, currentMonth }) {
   const ROW_HEIGHT = 38;
 
   const safeHabits = Array.isArray(habits) ? habits : [];
+
+  /* ---------- FORCE DATE AWARE RE-RENDER ---------- */
+  // Keeps current month progress updating daily
+  const [today, setToday] = useState(dayjs());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setToday(dayjs());
+    }, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  /* ---------- MONTH CONTEXT ---------- */
+  // currentMonth is expected to be a dayjs object (selectedMonth)
+  const month = dayjs.isDayjs(currentMonth)
+    ? currentMonth
+    : dayjs(currentMonth);
+
+  const currentMonthStr = month.format("YYYY-MM");
+
+  const totalDaysSoFar = month.isSame(today, "month")
+    ? today.date()           // current month → up to today
+    : month.daysInMonth();   // past month → full month
 
   /* ---------- Helpers ---------- */
 
   function normalizeDates(habit) {
     return new Set(
-      (habit.completedDates || []).map(d =>
+      (habit.completedDates || []).map((d) =>
         dayjs(d).format("YYYY-MM-DD")
       )
     );
   }
 
   function getProgressData(habit) {
-    const today = dayjs();
-    const currentMonth = today.format("YYYY-MM");
-    const total = today.date();
-
     const completedSet = normalizeDates(habit);
 
     let completed = 0;
-    for (let i = 1; i <= total; i++) {
-      const date = `${currentMonth}-${String(i).padStart(2, "0")}`;
+    for (let i = 1; i <= totalDaysSoFar; i++) {
+      const date = `${currentMonthStr}-${String(i).padStart(2, "0")}`;
       if (completedSet.has(date)) completed++;
     }
 
     const percent =
-      total === 0 ? 0 : Math.round((completed / total) * 100);
+      totalDaysSoFar === 0
+        ? 0
+        : Math.round((completed / totalDaysSoFar) * 100);
 
-    return { completed, total, percent };
+    return {
+      completed,
+      total: totalDaysSoFar,
+      percent,
+    };
   }
 
   function getCurrentStreak(habit) {
     const completedSet = normalizeDates(habit);
 
     let streak = 0;
-    let cursor = dayjs();
+    let cursor = today;
 
     while (completedSet.has(cursor.format("YYYY-MM-DD"))) {
       streak++;
@@ -65,18 +92,17 @@ function HabitProgressColumn({ habits }) {
 
   return (
     <div
-  style={{
-    position: "relative", // ← important
-    width: "100%",
-    minWidth: 0,
-    background: "linear-gradient(180deg, #020617, #020617cc)",
-    borderRadius: "16px",
-    overflow: "hidden",
-    boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
-    color: "#e5e7eb",
-  }}
->
-
+      style={{
+        position: "relative",
+        width: "100%",
+        minWidth: 0,
+        background: "linear-gradient(180deg, #020617, #020617cc)",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+        color: "#e5e7eb",
+      }}
+    >
       {/* HEADER */}
       <div
         style={{
