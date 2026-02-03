@@ -7,6 +7,7 @@ import {
   deleteHabit as deleteHabitApi,
   undoDelete as undoDeleteApi,
   updateHabit as updateHabitApi,
+  reorderHabits as reorderHabitsApi, // ✅ NEW (ONLY addition)
 } from "../api/habits";
 
 export default function useHabits() {
@@ -49,7 +50,7 @@ export default function useHabits() {
     try {
       const newHabit = await createHabit({ title });
       setHabits((prev) =>
-        Array.isArray(prev) ? [newHabit, ...prev] : [newHabit]
+        Array.isArray(prev) ? [...prev, newHabit] : [newHabit]
       );
     } catch (err) {
       console.error("Failed to add habit:", err);
@@ -82,7 +83,7 @@ export default function useHabits() {
       );
     } catch (err) {
       console.error("Failed to edit habit:", err);
-      setHabits(snapshot); // rollback
+      setHabits(snapshot);
       alert("Failed to update habit.");
     }
   };
@@ -145,7 +146,7 @@ export default function useHabits() {
       }, 10000);
     } catch (err) {
       setHabits((prev) =>
-        Array.isArray(prev) ? [habitToDelete, ...prev] : [habitToDelete]
+        Array.isArray(prev) ? [...prev, habitToDelete] : [habitToDelete]
       );
       setRecentlyDeleted(null);
       setShowUndo(false);
@@ -157,7 +158,7 @@ export default function useHabits() {
     if (!recentlyDeleted) return;
 
     setHabits((prev) =>
-      Array.isArray(prev) ? [recentlyDeleted, ...prev] : [recentlyDeleted]
+      Array.isArray(prev) ? [...prev, recentlyDeleted] : [recentlyDeleted]
     );
 
     setRecentlyDeleted(null);
@@ -177,6 +178,25 @@ export default function useHabits() {
     }
   };
 
+  /* ---------- ✅ Persist Drag Reorder (ONLY NEW LOGIC) ---------- */
+  const reorderHabits = async (newHabits) => {
+    if (!Array.isArray(newHabits)) return;
+
+    // optimistic UI (existing behavior preserved)
+    setHabits(newHabits);
+
+    try {
+      await reorderHabitsApi(
+        newHabits.map((h, index) => ({
+          _id: h._id,
+          order: index,
+        }))
+      );
+    } catch (err) {
+      console.error("Failed to persist habit order", err);
+    }
+  };
+
   return {
     habits,
     loading,
@@ -186,5 +206,6 @@ export default function useHabits() {
     deleteHabit,
     undoDelete,
     showUndo,
+    reorderHabits,
   };
 }

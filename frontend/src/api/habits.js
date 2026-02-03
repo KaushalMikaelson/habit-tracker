@@ -35,3 +35,9 @@ export const updateHabit = async (id, payload) => {
   const response = await api.put(`/habits/${id}`, payload);
   return response.data;
 };
+
+// ✅ NEW: persist habit order
+export const reorderHabits = async (orderPayload) => {
+  const response = await api.post("/habits/reorder", orderPayload);
+  return response.data;
+};

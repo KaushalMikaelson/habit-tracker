@@ -1,4 +1,39 @@
 import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+/* ================= Draggable Row ================= */
+
+function SortableHabitRow({ habit, children }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: habit._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+    cursor: "grab",
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ================= Habit Column ================= */
 
 function HabitNameColumn({ habits, deleteHabit, editHabit }) {
   const HEADER_HEIGHT = 115;
@@ -138,84 +173,81 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
             const isEditing = editingId === habit._id;
 
             return (
-              <div
-                key={habit._id}
-                className="habit-row"
-                style={{
-                  height: ROW_HEIGHT,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "0 12px",
-                  fontSize: "13px",
-                  borderBottom: "1px solid rgba(255,255,255,0.05)",
-                  gap: "8px",
-                }}
-              >
-                {/* Name / Input */}
-                <div style={{ flex: 1, overflow: "hidden" }}>
+              <SortableHabitRow key={habit._id} habit={habit}>
+                <div
+                  className="habit-row"
+                  style={{
+                    height: ROW_HEIGHT,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0 12px",
+                    fontSize: "13px",
+                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    gap: "8px",
+                  }}
+                >
+                  {/* Name / Input */}
+                  <div style={{ flex: 1, overflow: "hidden" }}>
+                    {isEditing ? (
+                      <input
+                        className="edit-input"
+                        autoFocus
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveEdit(habit);
+                          if (e.key === "Escape") cancelEdit();
+                        }}
+                      />
+                    ) : (
+                      <span
+                        style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "block",
+                        }}
+                      >
+                        {habit.title}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Actions */}
                   {isEditing ? (
-                    <input
-                      className="edit-input"
-                      autoFocus
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") saveEdit(habit);
-                        if (e.key === "Escape") cancelEdit();
-                      }}
-                    />
+                    <div className="action-wrapper" style={{ opacity: 1 }}>
+                      <button
+                        className="icon-btn edit-btn"
+                        onClick={() => saveEdit(habit)}
+                      >
+                        ✓
+                      </button>
+                      <button
+                        className="icon-btn trash-btn"
+                        onClick={cancelEdit}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ) : (
-                    <span
-                      style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "block",
-                      }}
-                    >
-                      {habit.title}
-                    </span>
+                    <div className="action-wrapper">
+                      <button
+                        className="icon-btn edit-btn"
+                        onClick={() => startEdit(habit)}
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className="icon-btn trash-btn"
+                        onClick={() => handleDelete(habit)}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   )}
                 </div>
-
-                {/* Actions */}
-                {isEditing ? (
-                  <div className="action-wrapper" style={{ opacity: 1 }}>
-                    <button
-                      className="icon-btn edit-btn"
-                      title="Save"
-                      onClick={() => saveEdit(habit)}
-                    >
-                      ✓
-                    </button>
-                    <button
-                      className="icon-btn trash-btn"
-                      title="Cancel"
-                      onClick={cancelEdit}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ) : (
-                  <div className="action-wrapper">
-                    <button
-                      className="icon-btn edit-btn"
-                      title="Edit habit"
-                      onClick={() => startEdit(habit)}
-                    >
-                      ✎
-                    </button>
-                    <button
-                      className="icon-btn trash-btn"
-                      title="Delete habit"
-                      onClick={() => handleDelete(habit)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
-              </div>
+              </SortableHabitRow>
             );
           })
         )}

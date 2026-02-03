@@ -9,15 +9,22 @@ logger.debug("✅ habits.routes.js LOADED");
 // 🔐 Protect all habit routes
 router.use(authMiddleware);
 
+// ===============================
 // Get all habits for logged-in user
+// ===============================
 router.get("/", async (req, res) => {
   try {
     const habits = await Habit.find({
       userId: req.user.id,
       isDeleted: false,
-    }).sort({ createdAt: -1 });
+    }).sort({ order: 1 }); // 👈 SORT BY ORDER
+    // ⚠️ unchanged for now
 
-    logger.debug("📋 Returning habits:", habits.map(h => ({ id: h._id, title: h.title })));
+    logger.debug(
+      "📋 Returning habits:",
+      habits.map((h) => ({ id: h._id, title: h.title }))
+    );
+
     res.json(habits);
   } catch (error) {
     logger.error(error);
@@ -25,7 +32,9 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ===============================
 // Create a new habit for logged-in user
+// ===============================
 router.post("/", async (req, res) => {
   try {
     logger.debug("📝 Create habit request received");
@@ -38,10 +47,17 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ message: "Title is required" });
     }
 
+    // ✅ STEP 2: count existing (non-deleted) habits
+    const count = await Habit.countDocuments({
+      userId: req.user.id,
+      isDeleted: false,
+    });
+
     const habit = await Habit.create({
       title,
       userId: req.user.id,
       completedDates: [],
+      order: count, // 👈 NEW (append at end)
     });
 
     logger.info("✅ Habit created:", title);
@@ -52,11 +68,16 @@ router.post("/", async (req, res) => {
     logger.error("Error message:", error.message);
     logger.error("Error code:", error.code);
     logger.debug("Full error:", JSON.stringify(error, null, 2));
-    res.status(500).json({ message: "Failed to create habit", error: error.message });
+
+    res
+      .status(500)
+      .json({ message: "Failed to create habit", error: error.message });
   }
 });
 
+// ===============================
 // Toggle habit completion for a specific date
+// ===============================
 router.patch("/:id/toggle", async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,16 +96,10 @@ router.patch("/:id/toggle", async (req, res) => {
       isDeleted: false,
     });
 
-    logger.debug("Found habit:", habit ? "YES" : "NO");
-    if (habit) {
-      logger.debug("Habit userId:", habit.userId);
-    }
-
     if (!habit) {
       return res.status(404).json({ message: "Habit not found" });
     }
 
-    // Use the date from the request body, not today's date
     if (habit.completedDates.includes(date)) {
       habit.completedDates.pull(date);
     } else {
@@ -99,13 +114,13 @@ router.patch("/:id/toggle", async (req, res) => {
   }
 });
 
-// ✏️ Update habit title
+// ===============================
+// Update habit title
+// ===============================
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { title } = req.body;
-
-    logger.debug("✏️ Update habit request:", id, title);
 
     if (!title || !title.trim()) {
       return res.status(400).json({ message: "Title is required" });
@@ -120,16 +135,13 @@ router.put("/:id", async (req, res) => {
       {
         title: title.trim(),
       },
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     if (!habit) {
       return res.status(404).json({ message: "Habit not found" });
     }
 
-    logger.info("✅ Habit updated:", habit.title);
     res.json(habit);
   } catch (error) {
     logger.error("❌ Error updating habit:", error);
@@ -137,13 +149,12 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-
+// ===============================
 // Soft delete habit
+// ===============================
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    logger.debug("🗑️ Delete request for habit ID:", id);
-    logger.debug("User ID:", req.user.id);
 
     const habit = await Habit.findOne({
       _id: id,
@@ -152,7 +163,6 @@ router.delete("/:id", async (req, res) => {
     });
 
     if (!habit) {
-      logger.debug("❌ Habit not found or already deleted");
       return res.status(404).json({ message: "Habit not found" });
     }
 
@@ -160,7 +170,6 @@ router.delete("/:id", async (req, res) => {
     habit.deletedAt = new Date();
     await habit.save();
 
-    logger.info("✅ Habit deleted:", habit.title);
     res.json({ message: "Habit deleted (soft)" });
   } catch (error) {
     logger.error("❌ Error deleting habit:", error);
@@ -168,7 +177,9 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// ===============================
 // Undo delete
+// ===============================
 router.patch("/:id/undo", async (req, res) => {
   try {
     const { id } = req.params;
@@ -180,7 +191,9 @@ router.patch("/:id/undo", async (req, res) => {
     });
 
     if (!habit) {
-      return res.status(404).json({ message: "Habit not found or not deleted" });
+      return res
+        .status(404)
+        .json({ message: "Habit not found or not deleted" });
     }
 
     habit.isDeleted = false;
@@ -193,5 +206,39 @@ router.patch("/:id/undo", async (req, res) => {
     res.status(500).json({ message: "Failed to restore habit" });
   }
 });
+
+
+// ===============================
+// Reorder habits (persist order)
+// ===============================
+router.post("/reorder", async (req, res) => {
+  try {
+    const updates = req.body;
+    // expected: [{ _id, order }]
+
+    if (!Array.isArray(updates)) {
+      return res.status(400).json({ message: "Invalid payload" });
+    }
+
+    const bulkOps = updates.map((h) => ({
+      updateOne: {
+        filter: {
+          _id: h._id,
+          userId: req.user.id,
+          isDeleted: false,
+        },
+        update: { order: h.order },
+      },
+    }));
+
+    await Habit.bulkWrite(bulkOps);
+
+    res.json({ success: true });
+  } catch (error) {
+    logger.error("❌ Failed to reorder habits:", error);
+    res.status(500).json({ message: "Failed to reorder habits" });
+  }
+});
+
 
 module.exports = router;
