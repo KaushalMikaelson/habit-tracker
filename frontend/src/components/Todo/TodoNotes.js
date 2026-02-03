@@ -1,9 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function TodoNotes() {
-    const [items, setItems] = useState([]);
+    /* ===============================
+       STATE (PERSISTENT)
+    ================================ */
+    const [items, setItems] = useState(() => {
+        try {
+            const saved = localStorage.getItem("todo-notes");
+            return saved ? JSON.parse(saved) : [];
+        } catch {
+            return [];
+        }
+    });
+
     const [text, setText] = useState("");
 
+    /* ===============================
+       SAVE TO LOCAL STORAGE
+    ================================ */
+    useEffect(() => {
+        localStorage.setItem("todo-notes", JSON.stringify(items));
+    }, [items]);
+
+    /* ===============================
+       ACTIONS
+    ================================ */
     function addItem() {
         if (!text.trim()) return;
 
@@ -30,6 +51,9 @@ export default function TodoNotes() {
         setItems(items.filter((item) => item.id !== id));
     }
 
+    /* ===============================
+       UI
+    ================================ */
     return (
         <div style={styles.container}>
             {/* Header */}
@@ -94,7 +118,7 @@ export default function TodoNotes() {
 }
 
 /* ===============================
-   STYLES
+   STYLES (UNCHANGED)
 ================================ */
 
 const styles = {
