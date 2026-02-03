@@ -86,31 +86,44 @@ export default function TodayFocus() {
      MANUAL CARRY FROM YESTERDAY
   ================================ */
   function carryFromYesterday() {
-    try {
-      const yesterdayItems = JSON.parse(
-        localStorage.getItem(YESTERDAY_STORAGE) || "[]"
-      );
+  try {
+    const yesterdayItems = JSON.parse(
+      localStorage.getItem(YESTERDAY_STORAGE) || "[]"
+    );
 
-      const unfinished = yesterdayItems.filter((item) => !item.done);
-      if (unfinished.length === 0) return;
+    const unfinished = yesterdayItems.filter((item) => !item.done);
+    if (unfinished.length === 0) return;
 
-      const existingTexts = new Set(items.map((i) => i.text));
+    const existingTexts = new Set(items.map((i) => i.text));
 
-      const carried = unfinished
-        .filter((item) => !existingTexts.has(item.text))
-        .map((item) => ({
-          ...item,
-          id: Date.now() + Math.random(),
-        }));
+    const carried = unfinished
+      .filter((item) => !existingTexts.has(item.text))
+      .map((item) => ({
+        ...item,
+        id: Date.now() + Math.random(),
+        done: false,
+      }));
 
-      if (carried.length > 0) {
-        setItems([...items, ...carried]);
-        setHasCarryFromYesterday(false); // hide button after carry
-      }
-    } catch {
-      // fail silently
+    if (carried.length > 0) {
+      setItems([...items, ...carried]);
     }
+
+    /* ✅ MARK YESTERDAY AS RESOLVED */
+    const updatedYesterday = yesterdayItems.map((item) =>
+      item.done ? item : { ...item, done: true }
+    );
+
+    localStorage.setItem(
+      YESTERDAY_STORAGE,
+      JSON.stringify(updatedYesterday)
+    );
+
+    setHasCarryFromYesterday(false);
+  } catch {
+    // fail silently
   }
+}
+
 
   /* ===============================
      UI
@@ -319,6 +332,7 @@ const styles = {
 
   checkbox: {
     cursor: "pointer",
+    accentColor: "#22c55e"
   },
 
   itemText: {
