@@ -3,7 +3,8 @@ import { useAuth } from "../auth/AuthContext";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LandingPage from "../pages/LandingPage";
 
 function AuthGate() {
   const { isAuthenticated, logout, loading, user } = useAuth();
@@ -41,7 +42,7 @@ function AuthGate() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="/" element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
     );
