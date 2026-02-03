@@ -1,10 +1,8 @@
-export default function AuthLayout({ children }) {
+export default function AuthLayout({ children, center = false }) {
   return (
     <div
       style={{
         minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
         position: "relative",
         overflow: "hidden",
         background:
@@ -13,7 +11,7 @@ export default function AuthLayout({ children }) {
         fontFamily: "Inter, system-ui, sans-serif",
       }}
     >
-      {/* TOP LEFT BLUR GLOW */}
+      {/* TOP LEFT GLOW */}
       <div
         style={{
           position: "absolute",
@@ -26,7 +24,7 @@ export default function AuthLayout({ children }) {
         }}
       />
 
-      {/* BOTTOM RIGHT BLUR GLOW */}
+      {/* BOTTOM RIGHT GLOW */}
       <div
         style={{
           position: "absolute",
@@ -39,10 +37,13 @@ export default function AuthLayout({ children }) {
         }}
       />
 
-      {/* PAGE CONTENT */}
+      {/* CONTENT */}
       <div
         style={{
-          width: "100%",
+          minHeight: "100vh",
+          display: center ? "flex" : "block",
+          justifyContent: center ? "center" : undefined,
+          alignItems: center ? "center" : undefined,
           position: "relative",
           zIndex: 1,
         }}
