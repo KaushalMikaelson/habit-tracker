@@ -3,7 +3,7 @@ import { useAuth } from "../auth/AuthContext";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 
 function AuthGate() {
@@ -12,6 +12,7 @@ function AuthGate() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showFooter, setShowFooter] = useState(true);
   const lastScrollY = useRef(0);
+  const navigate = useNavigate();
 
   /* ================= Scroll logic ================= */
   useEffect(() => {
@@ -38,13 +39,14 @@ function AuthGate() {
 
   if (!isAuthenticated) {
     return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/" element={<LandingPage />} />
-        </Routes>
-      </BrowserRouter>
+
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<LandingPage />} />
+      </Routes>
+
     );
   }
 
@@ -167,7 +169,11 @@ function AuthGate() {
                 Cancel
               </button>
               <button
-                onClick={logout}
+                onClick={() => {
+                  setShowConfirm(false);   // close modal
+                  logout();                // clear auth
+                  navigate("/", { replace: true }); // go to landing
+                }}
                 style={{
                   padding: "8px 16px",
                   borderRadius: "8px",
@@ -179,6 +185,7 @@ function AuthGate() {
               >
                 Logout
               </button>
+
             </div>
           </div>
         </>

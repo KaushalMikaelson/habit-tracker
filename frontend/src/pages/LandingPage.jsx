@@ -541,6 +541,7 @@ export default function LandingPage() {
             opacity: 0,
             transform: "translateY(40px)",
             transition: "opacity 0.8s ease, transform 0.8s ease",
+            
           }}
         >
           <div
