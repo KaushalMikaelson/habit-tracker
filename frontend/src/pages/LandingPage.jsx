@@ -3,6 +3,8 @@ import AuthLayout from "../layouts/AuthLayout";
 import HeroImage from "../Photos/hero.png";
 import Graph from "../Photos/Graph.png";
 import Top from "../Photos/Top.png";
+import KPI from "../Photos/KPI.png"
+import { Link } from "react-router-dom";
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -12,6 +14,9 @@ export default function LandingPage() {
       {/* ================= HEADER ================= */}
       <div
         style={{
+          background:
+            "linear-gradient(180deg, rgba(2,6,23,0.95), rgba(2,6,23,1))",
+          borderTop: ".5px solid rgba(255,255,255,0.06)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
@@ -56,143 +61,263 @@ export default function LandingPage() {
       {/* ================= HERO SECTION ================= */}
       <section
         style={{
-          position: "relative",
-          minHeight: "80vh",
+          width: "100%",
+          padding: "3.5rem 1rem 7rem",
           display: "flex",
-          alignItems: "center",
           justifyContent: "center",
-          textAlign: "center",
-          overflow: "hidden",
         }}
       >
-        {/* BACKGROUND IMAGE */}
+        {/* HERO CARD WRAPPER */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `url(${HeroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            filter: "blur(0px)",
-            transform: "scale(1.05)",
-          }}
-        />
-
-        {/* DARK OVERLAY */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(135deg, rgba(2,6,23,0.85), rgba(15,23,42,0.85))",
-          }}
-        />
-
-        {/* CONTENT */}
-        <div
-          style={{
+            maxWidth: "1400px",
+            width: "100%",
             position: "relative",
-            zIndex: 1,
-            padding: "2rem",
-            maxWidth: "900px",
+            perspective: "1400px",
           }}
         >
-          <h1
+          {/* GLOW */}
+          <div
+            id="hero-glow"
             style={{
-              fontSize: "3.2rem",
-              fontWeight: 700,
+              position: "absolute",
+              inset: "-16px",
+              borderRadius: "36px",
+              background:
+                "linear-gradient(135deg, rgba(56,189,248,0.4), rgba(34,197,94,0.4))",
+              filter: "blur(40px)",
+              opacity: 0.45,
+              transition: "opacity 0.4s ease",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* IMAGE CARD */}
+          <div
+            style={{
+              position: "relative",
+              minHeight: "420px",
+              borderRadius: "28px",
+              padding: "5rem 3.5rem",
+              backgroundImage: `
+          linear-gradient(
+            180deg,
+            rgba(2,6,23,0.35),
+            rgba(2,6,23,0.75)
+          ),
+          url(${HeroImage})
+        `,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              border: "1px solid rgba(255,255,255,0.14)",
+              boxShadow: "0 40px 90px rgba(0,0,0,0.55)",
               color: "#f9fafb",
-              marginBottom: "1rem",
-            }}
-          >
-            Track Your Habits Everyday.
-          </h1>
+              textAlign: "center",
 
-          <p
-            style={{
-              fontSize: "1.25rem",
-              lineHeight: 1.6,
-              color: "#cbd5f5",
-              marginBottom: "2.8rem",
+              /* animation */
+              transform: "scale(1)",
+              transition:
+                "transform 0.45s ease, box-shadow 0.45s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.03)";
+              e.currentTarget.style.boxShadow =
+                "0 55px 120px rgba(0,0,0,0.7)";
+              document.getElementById("hero-glow").style.opacity = "0.75";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 40px 90px rgba(0,0,0,0.55)";
+              document.getElementById("hero-glow").style.opacity = "0.45";
             }}
           >
-            Every day, it gets a little easier.
-            <br />
-            Consistency is the key to success.
-          </p>
+            {/* CONTENT ON IMAGE */}
+            <div
+              style={{
+                position: "relative",
+                zIndex: 1,
+                maxWidth: "800px",
+                margin: "0 auto",
+              }}
+            >
+              <h1
+                style={{
+                  fontSize: "3.2rem",
+                  fontWeight: 800,
+                  marginBottom: "1.2rem",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Track Your Habits Everyday.
+              </h1>
 
-          <button
-            onClick={() => navigate("/signup")}
-            style={{
-              padding: "0.95rem 2.8rem",
-              fontSize: "1rem",
-              borderRadius: "999px",
-              border: "none",
-              cursor: "pointer",
-              background: "#22c55e",
-              color: "#022c22",
-              fontWeight: 700,
-            }}
-          >
-            Get Started
-          </button>
+              <p
+                style={{
+                  fontSize: "1.3rem",
+                  lineHeight: 1.7,
+                  color: "#cbd5f5",
+                  marginBottom: "3rem",
+                }}
+              >
+                Every day, it gets a little easier.
+                <br />
+                Consistency is the key to success.
+              </p>
+
+              <button
+                onClick={() => navigate("/signup")}
+                style={{
+                  padding: "1rem 3.2rem",
+                  fontSize: "1rem",
+                  borderRadius: "999px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "#22c55e",
+                  color: "#022c22",
+                  fontWeight: 700,
+                  boxShadow: "0 20px 45px rgba(34,197,94,0.4)",
+                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.06)";
+                  e.currentTarget.style.boxShadow =
+                    "0 26px 60px rgba(34,197,94,0.55)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow =
+                    "0 20px 45px rgba(34,197,94,0.4)";
+                }}
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
         </div>
       </section>
-
 
       {/* ================= VALUE PROPOSITION ================= */}
       {/* ================= STRIPE VALUE SECTION ================= */}
       <section
         style={{
           width: "100%",
-          padding: "6rem 2rem",
-          background: "linear-gradient(135deg, #0f766e, #0891b2)",
+          padding: "7rem 2rem",
+          display: "flex",
+          justifyContent: "center",
         }}
       >
+        {/* WRAPPER (perspective + glow container) */}
         <div
           style={{
-            maxWidth: "1100px",
-            margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-            gap: "3rem",
-            textAlign: "center",
-            color: "#ecfeff",
+            maxWidth: "1300px",
+            width: "100%",
+            position: "relative",
+            perspective: "1400px",
           }}
         >
-          <div>
-            <div style={{ fontSize: "2.2rem", marginBottom: "1rem" }}>💧</div>
-            <h3 style={{ marginBottom: "0.6rem", fontSize: "1.2rem" }}>
-              Do it every day
-            </h3>
-            <p style={{ fontSize: "0.95rem", lineHeight: 1.6, opacity: 0.95 }}>
-              Build discipline by showing up daily. Small actions create powerful
-              habits.
-            </p>
-          </div>
+          {/* GLOW */}
+          <div
+            id="kpi-glow"
+            style={{
+              position: "absolute",
+              inset: "-14px",
+              borderRadius: "32px",
+              background:
+                "linear-gradient(135deg, rgba(56,189,248,0.35), rgba(34,197,94,0.35))",
+              filter: "blur(34px)",
+              opacity: 0.45,
+              transition: "opacity 0.35s ease",
+              pointerEvents: "none",
+            }}
+          />
 
-          <div>
-            <div style={{ fontSize: "2.2rem", marginBottom: "1rem" }}>🔗</div>
-            <h3 style={{ marginBottom: "0.6rem", fontSize: "1.2rem" }}>
-              Don’t break the chain
-            </h3>
-            <p style={{ fontSize: "0.95rem", lineHeight: 1.6, opacity: 0.95 }}>
-              Maintain streaks and stay motivated with visual accountability.
-            </p>
-          </div>
+          {/* CARD */}
+          <div
+            style={{
+              minHeight: "200px",
+              borderRadius: "26px",
+              padding: "5rem 3rem",
+              backgroundImage: `
+          linear-gradient(
+            180deg,
+            rgba(0,0,0,0.30),
+            rgba(0,0,0,0.45)
+          ),
+          url(${KPI})
+        `,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              border: "1px solid rgba(255,255,255,0.14)",
+              boxShadow: "0 34px 80px rgba(0,0,0,0.45)",
+              position: "relative",
+              zIndex: 1,
 
-          <div>
-            <div style={{ fontSize: "2.2rem", marginBottom: "1rem" }}>📊</div>
-            <h3 style={{ marginBottom: "0.6rem", fontSize: "1.2rem" }}>
-              Visualize progress
-            </h3>
-            <p style={{ fontSize: "0.95rem", lineHeight: 1.6, opacity: 0.95 }}>
-              Get a clear overview of habits, streaks, and long-term growth.
-            </p>
+              /* 🔑 Correct hinge behavior */
+              transformOrigin: "bottom center",
+              transform: "rotateX(0deg)",
+              transition:
+                "transform 0.45s ease, box-shadow 0.45s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform =
+                "rotateX(10deg) scale(1.02)";
+              e.currentTarget.style.boxShadow =
+                "0 45px 95px rgba(0,0,0,0.6)";
+              document.getElementById("kpi-glow").style.opacity = "0.7";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform =
+                "rotateX(0deg) scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 34px 80px rgba(0,0,0,0.45)";
+              document.getElementById("kpi-glow").style.opacity = "0.45";
+            }}
+          >
+            {/* CONTENT */}
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                gap: "3.5rem",
+                textAlign: "center",
+                color: "#ecfeff",
+              }}
+            >
+              <div>
+                <div style={{ fontSize: "2.4rem", marginBottom: "1rem" }}>💧</div>
+                <h3 style={{ marginBottom: "0.7rem", fontSize: "1.25rem" }}>
+                  Do it every day
+                </h3>
+                <p style={{ fontSize: "1rem", lineHeight: 1.65, opacity: 0.95 }}>
+                  Build discipline by showing up daily. Small actions create powerful
+                  habits.
+                </p>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "2.4rem", marginBottom: "1rem" }}>🔗</div>
+                <h3 style={{ marginBottom: "0.7rem", fontSize: "1.25rem" }}>
+                  Don’t break the chain
+                </h3>
+                <p style={{ fontSize: "1rem", lineHeight: 1.65, opacity: 0.95 }}>
+                  Maintain streaks and stay motivated with visual accountability.
+                </p>
+              </div>
+
+              <div>
+                <div style={{ fontSize: "2.4rem", marginBottom: "1rem" }}>📊</div>
+                <h3 style={{ marginBottom: "0.7rem", fontSize: "1.25rem" }}>
+                  Visualize progress
+                </h3>
+                <p style={{ fontSize: "1rem", lineHeight: 1.65, opacity: 0.95 }}>
+                  Get a clear overview of habits, streaks, and long-term growth.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-
 
       {/* ================= PRODUCT PREVIEW PLACEHOLDER ================= */}
       <section
@@ -267,9 +392,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-
-
 
       {/* ================= FINAL CTA ================= */}
       <section
@@ -357,6 +479,207 @@ export default function LandingPage() {
           />
         </div>
       </section>
+
+
+      {/* ================= FOOTER ================= */}
+      {/* ================= FOOTER ================= */}
+      <>
+        {/* Responsive + animation styles */}
+        <style>
+          {`
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 3rem;
+      }
+
+      @media (max-width: 900px) {
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+      }
+
+      .footer-link {
+        color: #cbd5f5;
+        text-decoration: none;
+        font-size: 0.95rem;
+      }
+
+      .footer-link:hover {
+        color: #ffffff;
+      }
+    `}
+        </style>
+
+        <footer
+          ref={(el) => {
+            if (!el) return;
+            const observer = new IntersectionObserver(
+              ([entry]) => {
+                if (entry.isIntersecting) {
+                  entry.target.style.opacity = "1";
+                  entry.target.style.transform = "translateY(0)";
+                }
+              },
+              { threshold: 0.15 }
+            );
+            observer.observe(el);
+          }}
+          style={{
+            width: "100%",
+            padding: "5rem 2rem 3rem",
+            background:
+              "linear-gradient(180deg, rgba(2,6,23,0.95), rgba(2,6,23,1))",
+            borderTop: "1px solid rgba(255,255,255,0.06)",
+            opacity: 0,
+            transform: "translateY(40px)",
+            transition: "opacity 0.8s ease, transform 0.8s ease",
+          }}
+        >
+          <div
+            className="footer-grid"
+            style={{
+              maxWidth: "1400px",
+              margin: "0 auto",
+              color: "#cbd5f5",
+            }}
+          >
+            {/* BRAND */}
+            <div>
+              <h3 style={{ color: "#f9fafb", marginBottom: "1rem" }}>
+                Habit Tracker
+              </h3>
+              <p style={{ maxWidth: "280px", lineHeight: 1.6 }}>
+                Build consistency, stay accountable, and create habits that actually
+                stick — one day at a time.
+              </p>
+
+              {/* SOCIAL ICONS */}
+              <div style={{ display: "flex", gap: "1rem", marginTop: "1.5rem" }}>
+                <a
+                  href="https://github.com/KaushalMikaelson"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ fontSize: "1.4rem", textDecoration: "none" }}
+                >
+                  Github
+                </a>
+                <a
+                  href="www.linkedin.com/in/kaushal-kumar-370293281"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ fontSize: "1.4rem", textDecoration: "none" }}
+                >
+                  LinkedIn
+                </a>
+              </div>
+            </div>
+
+            {/* PRODUCT */}
+            <div>
+              <h4 style={{ color: "#f9fafb", marginBottom: "1rem" }}>
+                Product
+              </h4>
+              <ul style={{ listStyle: "none", padding: 0, lineHeight: 2 }}>
+                <li>
+                  <Link className="footer-link" to="/features">
+                    Features
+                  </Link>
+                </li>
+                <li>
+                  <Link className="footer-link" to="/calendar">
+                    Habit Calendar
+                  </Link>
+                </li>
+                <li>
+                  <Link className="footer-link" to="/streaks">
+                    Streak Tracking
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* COMPANY */}
+            <div>
+              <h4 style={{ color: "#f9fafb", marginBottom: "1rem" }}>
+                Company
+              </h4>
+              <ul style={{ listStyle: "none", padding: 0, lineHeight: 2 }}>
+                <li>
+                  <Link className="footer-link" to="/about">
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link className="footer-link" to="/privacy">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link className="footer-link" to="/terms">
+                    Terms of Service
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* CTA */}
+            <div>
+              <h4 style={{ color: "#f9fafb", marginBottom: "1rem" }}>
+                Get Started
+              </h4>
+              <p style={{ marginBottom: "1.5rem" }}>
+                Start building better habits today.
+              </p>
+              <button
+                onClick={() => navigate("/signup")}
+                style={{
+                  padding: "0.8rem 2.2rem",
+                  borderRadius: "999px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "#22c55e",
+                  color: "#022c22",
+                  fontWeight: 700,
+                  boxShadow: "0 15px 35px rgba(34,197,94,0.35)",
+                  transition: "transform 0.25s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.05)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              >
+                Sign up free
+              </button>
+            </div>
+          </div>
+
+          {/* BOTTOM BAR */}
+          <div
+            style={{
+              marginTop: "4rem",
+              paddingTop: "2rem",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
+              textAlign: "center",
+              color: "#9ca3af",
+              fontSize: "0.85rem",
+            }}
+          >
+            © {new Date().getFullYear()} Habit Tracker. All rights reserved.
+          </div>
+        </footer>
+      </>
+
+
 
     </AuthLayout>
   );
