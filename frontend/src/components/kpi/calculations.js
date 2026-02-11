@@ -3,15 +3,16 @@ import isBetween from "dayjs/plugin/isBetween";
 
 dayjs.extend(isBetween);
 
-/**
- * Default KPI fallback
- */
 function defaultKPIs() {
   return {
     daily: 0,
+    dailyDelta: 0,
     weekly: 0,
+    weeklyDelta: 0,
     monthly: 0,
+    monthlyDelta: 0,
     momentum: 0,
+    momentumDelta: 0,
 
     dailyDirection: "neutral",
     weeklyDirection: "neutral",
@@ -20,45 +21,38 @@ function defaultKPIs() {
   };
 }
 
-/**
- * Helper: direction from delta
- */
 function getDirection(delta) {
   if (delta > 0) return "up";
   if (delta < 0) return "down";
   return "neutral";
 }
 
-/**
- * Calculates KPIs
- *
- * DAILY    → % habits completed TODAY
- * WEEKLY   → % habits completed THIS WEEK so far
- * MONTHLY  → avg daily consistency UP TO TODAY
- * MOMENTUM → fair comparison vs previous month (same day range)
- */
 export function calculateKPIs(habits, selectedMonth) {
   if (!Array.isArray(habits) || !selectedMonth) {
     return defaultKPIs();
   }
 
+  const todayStr = dayjs().format("YYYY-MM-DD");
+  const yesterdayStr = dayjs()
+    .subtract(1, "day")
+    .format("YYYY-MM-DD");
+
   const today = dayjs().startOf("day");
-  const yesterday = today.subtract(1, "day");
   const isCurrentMonth = selectedMonth.isSame(today, "month");
 
-  // 📅 Week boundaries (current)
-  const weekStart = today.startOf("week");
-  const weekEnd = today.endOf("week");
+  const weekStart =
+    today.day() === 0
+      ? today.subtract(6, "day").startOf("day")
+      : today.startOf("week").add(1, "day");
+
   const daysElapsedThisWeek =
     today.diff(weekStart, "day") + 1;
 
-  // 📅 Last week boundaries (same day range)
-  const prevWeekStart = weekStart.subtract(1, "week");
+  const prevWeekStart = weekStart.subtract(7, "day");
   const prevWeekEnd = prevWeekStart
     .add(daysElapsedThisWeek - 1, "day")
     .endOf("day");
 
-  // 📅 Month boundaries
   const monthStart = selectedMonth.startOf("month").startOf("day");
   const monthEnd = selectedMonth.endOf("month").endOf("day");
   const daysInMonth = selectedMonth.daysInMonth();
@@ -67,7 +61,6 @@ export function calculateKPIs(habits, selectedMonth) {
     ? today.date()
     : daysInMonth;
 
-  // 📅 Previous month comparison
   const prevMonthStart = selectedMonth
     .subtract(1, "month")
     .startOf("month")
@@ -82,10 +75,8 @@ export function calculateKPIs(habits, selectedMonth) {
 
   let todayCompleted = 0;
   let yesterdayCompleted = 0;
-
   let weeklyCompleted = 0;
   let prevWeekCompleted = 0;
-
   let monthlyCompleted = 0;
   let prevMonthCompleted = 0;
 
@@ -94,35 +85,33 @@ export function calculateKPIs(habits, selectedMonth) {
       ? habit.completedDates
       : [];
 
+    /* ================= DAILY (FIXED SAFELY) ================= */
+
+    if (completedDates.includes(todayStr)) {
+      todayCompleted++;
+    }
+
+    if (completedDates.includes(yesterdayStr)) {
+      yesterdayCompleted++;
+    }
+
+    /* ================= OTHER KPIs ================= */
+
     completedDates.forEach((date) => {
       const d = dayjs(date).startOf("day");
 
-      // 🟢 DAILY
-      if (isCurrentMonth && d.isSame(today, "day")) {
-        todayCompleted++;
-      }
-
-      // 🟡 YESTERDAY
-      if (isCurrentMonth && d.isSame(yesterday, "day")) {
-        yesterdayCompleted++;
-      }
-
-      // 🟢 THIS WEEK (so far)
       if (
-        isCurrentMonth &&
-        d.isBetween(weekStart, weekEnd, "day", "[]")
+        d.isBetween(weekStart, today.endOf("day"), "day", "[]")
       ) {
         weeklyCompleted++;
       }
 
-      // 🟡 LAST WEEK (same day range)
       if (
         d.isBetween(prevWeekStart, prevWeekEnd, "day", "[]")
       ) {
         prevWeekCompleted++;
       }
 
-      // 🟢 THIS MONTH (up to today)
       if (
         d.isBetween(
           monthStart,
@@ -134,7 +123,6 @@ export function calculateKPIs(habits, selectedMonth) {
         monthlyCompleted++;
       }
 
-      // 🟡 PREVIOUS MONTH (same range)
       if (
         d.isBetween(
           prevMonthStart,
@@ -148,31 +136,35 @@ export function calculateKPIs(habits, selectedMonth) {
     });
   });
 
-  /* ================= KPI VALUES ================= */
+  /* ================= DAILY ================= */
 
-  const daily = isCurrentMonth
-    ? Math.round((todayCompleted / totalHabits) * 100)
-    : 0;
+  const daily = Math.round(
+    (todayCompleted / totalHabits) * 100
+  );
 
-  const yesterdayDaily = isCurrentMonth
-    ? Math.round((yesterdayCompleted / totalHabits) * 100)
-    : 0;
+  const yesterdayDaily = Math.round(
+    (yesterdayCompleted / totalHabits) * 100
+  );
 
-  const weekly = isCurrentMonth
-    ? Math.round(
-        (weeklyCompleted /
-          (totalHabits * daysElapsedThisWeek)) *
-          100
-      )
-    : 0;
+  const dailyDelta = daily - yesterdayDaily;
 
-  const prevWeekly = isCurrentMonth
-    ? Math.round(
-        (prevWeekCompleted /
-          (totalHabits * daysElapsedThisWeek)) *
-          100
-      )
-    : 0;
+  /* ================= WEEKLY ================= */
+
+  const weekly = Math.round(
+    (weeklyCompleted /
+      (totalHabits * daysElapsedThisWeek)) *
+      100
+  );
+
+  const prevWeekly = Math.round(
+    (prevWeekCompleted /
+      (totalHabits * daysElapsedThisWeek)) *
+      100
+  );
+
+  const weeklyDelta = weekly - prevWeekly;
+
+  /* ================= MONTHLY ================= */
 
   const currentMonthRate =
     monthlyCompleted / (totalHabits * daysElapsedInMonth);
@@ -181,25 +173,28 @@ export function calculateKPIs(habits, selectedMonth) {
     prevMonthCompleted / (totalHabits * daysElapsedInMonth);
 
   const monthly = Math.round(currentMonthRate * 100);
+  const prevMonthly = Math.round(prevMonthRate * 100);
 
-  const momentum = Math.round(
-    (currentMonthRate - prevMonthRate) * 100
-  );
+  const monthlyDelta = monthly - prevMonthly;
 
-  /* ================= DIRECTIONS ================= */
+  /* ================= MOMENTUM ================= */
+
+  const momentum = monthly;
+  const momentumDelta = monthlyDelta;
 
   return {
     daily,
+    dailyDelta,
     weekly,
+    weeklyDelta,
     monthly,
+    monthlyDelta,
     momentum,
+    momentumDelta,
 
-    // ✅ Correct comparisons
-    dailyDirection: getDirection(daily - yesterdayDaily),
-    weeklyDirection: getDirection(weekly - prevWeekly),
-
-    // unchanged semantics
-    monthlyDirection: getDirection(monthly),
-    momentumDirection: getDirection(momentum),
+    dailyDirection: getDirection(dailyDelta),
+    weeklyDirection: getDirection(weeklyDelta),
+    monthlyDirection: getDirection(monthlyDelta),
+    momentumDirection: getDirection(momentumDelta),
   };
 }
