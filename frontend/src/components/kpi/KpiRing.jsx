@@ -2,7 +2,8 @@ function KpiRing({
   value = 0,             // percentage (0–100)
   label = "Momentum",    // text below ring
   color = "#38bdf8",     // ring color
-  disabled = false,      // ⬅️ NEW
+  disabled = false,      // disabled state
+  direction = "neutral", // ⬅️ NEW (up | down | neutral)
 }) {
   /**
    * SVG math explanation:
@@ -20,13 +21,20 @@ function KpiRing({
     ? circumference
     : circumference - (safeValue / 100) * circumference;
 
+  // ⬅️ Arrow symbol
+  const arrow =
+    direction === "up"
+      ? "▲"
+      : direction === "down"
+      ? "▼"
+      : "—";
+
   return (
     <div
       style={{
         width: "160px",
         height: "160px",
 
-        // premium glass card
         background:
           "linear-gradient(180deg, rgba(30,41,59,0.85), rgba(15,23,42,0.85))",
 
@@ -42,7 +50,6 @@ function KpiRing({
         color: "#e5e7eb",
         boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
 
-        // ⬅️ DISABLED STYLES
         opacity: disabled ? 0.35 : 1,
         filter: disabled ? "grayscale(100%)" : "none",
         transition: "opacity 0.3s ease",
@@ -95,10 +102,13 @@ function KpiRing({
           />
         </svg>
 
-        {/* CENTER VALUE */}
+        {/* CENTER VALUE + ARROW */}
         <div
           style={{
             position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
             fontSize: "22px",
             fontWeight: 800,
             letterSpacing: "-0.02em",
@@ -106,7 +116,8 @@ function KpiRing({
             lineHeight: 1,
           }}
         >
-          {disabled ? "—" : `${safeValue}%`}
+          {disabled ? "—" : arrow}
+          {!disabled && `${safeValue}%`}
         </div>
       </div>
 

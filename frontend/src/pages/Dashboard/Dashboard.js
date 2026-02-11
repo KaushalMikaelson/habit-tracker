@@ -50,6 +50,40 @@ function getTodayDate() {
   return new Date().toISOString().split("T")[0];
 }
 
+
+
+
+/* ================= Skeleton Loader ================= */
+
+function DashboardSkeleton() {
+  return (
+    <div style={{ padding: "32px" }}>
+      <div
+        style={{
+          height: "170px",
+          background: "#1f2937",
+          borderRadius: "16px",
+          marginBottom: "24px",
+          animation: "pulse 1.5s infinite",
+        }}
+      />
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            height: "48px",
+            background: "#111827",
+            borderRadius: "8px",
+            marginBottom: "12px",
+            animation: "pulse 1.5s infinite",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+
 /* ================= Dashboard ================= */
 
 function Dashboard() {
@@ -58,6 +92,7 @@ function Dashboard() {
   const {
     habits,
     reorderHabits, // ✅ CORRECT
+    loading,
     addHabit,
     toggleHabit,
     deleteHabit,
@@ -161,6 +196,9 @@ function Dashboard() {
     );
   }
 
+
+  
+
   /* ================= Render ================= */
 
   return (
@@ -218,7 +256,11 @@ function Dashboard() {
         addHabit={handleAddHabit}
       />
 
-      {habits.length === 0 ? (
+
+      
+      {loading ? (
+        <DashboardSkeleton />
+      ) : habits.length === 0 ? (
         <div style={{ marginTop: "48px", textAlign: "center" }}>
           <h2>No habits yet</h2>
           <p style={{ color: "#6b7280" }}>

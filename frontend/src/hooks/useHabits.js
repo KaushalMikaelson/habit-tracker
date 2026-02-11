@@ -35,6 +35,7 @@ export default function useHabits() {
   const fetchHabits = async () => {
     try {
       setLoading(true);
+      
       const data = await getHabits();
       setHabits(Array.isArray(data) ? data : []);
     } catch (err) {

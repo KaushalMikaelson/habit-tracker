@@ -12,28 +12,36 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
         width: "100%",
       }}
     >
+      {/* MOMENTUM */}
       <KpiRing
         value={kpis.momentum}
+        direction={kpis.momentumDirection}
         label="Momentum"
         color="#38bdf8"
       />
 
+      {/* DAILY */}
       <KpiRing
         value={kpis.daily}
+        direction={kpis.dailyDirection}
         label="Today"
         color="#22c55e"
         disabled={!isCurrentMonth}
       />
 
+      {/* WEEKLY */}
       <KpiRing
         value={kpis.weekly}
+        direction={kpis.weeklyDirection}
         label="Weekly"
         color="#a855f7"
         disabled={!isCurrentMonth}
       />
 
+      {/* MONTHLY */}
       <KpiRing
         value={kpis.monthly}
+        direction={kpis.monthlyDirection}
         label="Monthly"
         color="#facc15"
       />
