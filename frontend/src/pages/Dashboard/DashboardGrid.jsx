@@ -34,8 +34,12 @@ function DashboardGrid({
         style={{
           overflowX: "auto",
           width: "100%",
+          scrollbarWidth: "none",        // Firefox
+          msOverflowStyle: "none",       // IE/Edge
         }}
+        className="hide-scrollbar"
       >
+
         {/* WIDTH ENFORCER */}
         <div
           style={{
@@ -99,8 +103,8 @@ function DashboardGrid({
                         ? "#93c5fd"
                         : "#2563eb"
                       : isDark
-                      ? "#e5e7eb"
-                      : "#111827",
+                        ? "#e5e7eb"
+                        : "#111827",
                     background: isToday
                       ? isDark
                         ? "rgba(147,197,253,0.12)"
@@ -177,10 +181,10 @@ function DashboardGrid({
                             ? "rgba(255,255,255,0.08)"
                             : "#e5e7eb"
                           : isCompleted
-                          ? "#22c55e"
-                          : isDark
-                          ? "rgba(255,255,255,0.18)"
-                          : "#e5e7eb",
+                            ? "#22c55e"
+                            : isDark
+                              ? "rgba(255,255,255,0.18)"
+                              : "#e5e7eb",
                         color: isDark ? "#020617" : "#ffffff",
                         cursor: isFuture
                           ? "not-allowed"

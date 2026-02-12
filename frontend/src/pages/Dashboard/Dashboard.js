@@ -113,11 +113,139 @@ function TopLoadingBar() {
   );
 }
 
+function ProfileSidebar({ user, onClose, onLogout }) {
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        onClick={onClose}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: "rgba(0,0,0,0.5)",
+          zIndex: 1500,
+        }}
+      />
+
+      {/* Sidebar */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          height: "100%",
+          width: "300px",
+          background: "#0f172a",
+          color: "white",
+          padding: "24px",
+          zIndex: 2000,
+          boxShadow: "-4px 0 20px rgba(0,0,0,0.4)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          animation: "slideInRight 0.3s ease",
+        }}
+      >
+        {/* TOP SECTION */}
+        <div>
+          <div style={{ marginBottom: "24px" }}>
+            <div
+              style={{
+                width: "60px",
+                height: "60px",
+                borderRadius: "50%",
+                background: "#2563eb",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "20px",
+                fontWeight: 700,
+                marginBottom: "12px",
+              }}
+            >
+              {getInitials(user?.email || "")}
+
+            </div>
+
+            <div style={{ fontSize: "16px", fontWeight: 700 }}>
+              {user.name}
+            </div>
+
+            <div style={{ fontSize: "13px", color: "#94a3b8" }}>
+              {user.email}
+            </div>
+          </div>
+
+          <hr style={{ borderColor: "rgba(255,255,255,0.1)" }} />
+
+          <div
+            style={{
+              marginTop: "20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            <button style={menuBtnStyle}>Profile</button>
+            <button style={menuBtnStyle}>Settings</button>
+          </div>
+        </div>
+
+        {/* BOTTOM SECTION */}
+        <div>
+          <button
+            style={{
+              ...menuBtnStyle,
+              color: "#f87171",
+              fontWeight: 600,
+            }}
+            onClick={onLogout}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <style>
+        {`
+          @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+          }
+        `}
+      </style>
+    </>
+  );
+}
+
+const menuBtnStyle = {
+  background: "transparent",
+  border: "none",
+  color: "white",
+  textAlign: "left",
+  fontSize: "14px",
+  cursor: "pointer",
+};
+
+
+function getInitials(name = "") {
+  return name
+    .split(" ")
+    .map(word => word[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+
 
 
 /* ================= Dashboard ================= */
 
-function Dashboard() {
+function Dashboard({ user, logout }) {
   const today = getTodayDate();
 
   const {
@@ -149,6 +277,8 @@ function Dashboard() {
   const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
 
   const [theme, setTheme] = useState("dark");
+  const [showProfilePanel, setShowProfilePanel] = useState(false);
+
 
   const kpis = calculateKPIs(
     Array.isArray(habits) ? habits : [],
@@ -242,12 +372,12 @@ function Dashboard() {
     >
       <style>
         {`
-@keyframes loadingBar {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-  100% { transform: translateX(200%); }
-}
-`}
+        @keyframes loadingBar {
+          0% { transform: translateX(-100%); }
+          50% { transform: translateX(100%); }
+          100% { transform: translateX(200%); }
+        }
+        `}
       </style>
 
       {/* ================= Header ================= */}
@@ -263,6 +393,7 @@ function Dashboard() {
           borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
+        {/* LEFT SIDE - TITLE */}
         <div>
           <div style={{ fontSize: "16px", fontWeight: 700 }}>
             Habit Tracker
@@ -272,22 +403,69 @@ function Dashboard() {
           </div>
         </div>
 
-        <button
-          onClick={() => setShowModal(true)}
+        {/* RIGHT SIDE - BUTTON GROUP */}
+        <div
           style={{
-            padding: "8px 14px",
-            borderRadius: "8px",
-            border: "none",
-            background: "#2563eb",
-            color: "#ffffff",
-            fontSize: "13px",
-            fontWeight: 600,
-            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
           }}
         >
-          + Add Habit
-        </button>
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              padding: "8px 14px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#2563eb",
+              color: "#ffffff",
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            + Add Habit
+          </button>
+
+          <button
+  onClick={() => setShowProfilePanel(true)}
+  style={{
+    width: "38px",
+    height: "38px",
+    borderRadius: "50%",
+    border: "1px solid rgba(255,255,255,0.15)",
+    background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+    color: "#ffffff",
+    fontWeight: 700,
+    fontSize: "14px",
+    letterSpacing: "0.5px",
+    cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
+    transition: "all 0.2s ease",
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.08)";
+    e.currentTarget.style.boxShadow =
+      "0 6px 16px rgba(37,99,235,0.45)";
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.boxShadow =
+      "0 4px 12px rgba(37,99,235,0.35)";
+  }}
+  onMouseDown={(e) => {
+    e.currentTarget.style.transform = "scale(0.95)";
+  }}
+  onMouseUp={(e) => {
+    e.currentTarget.style.transform = "scale(1.08)";
+  }}
+>
+  {getInitials(user?.email || "")}
+</button>
+
+        </div>
       </div>
+
 
       <AddHabitModal
         showModal={showModal}
@@ -483,6 +661,19 @@ function Dashboard() {
           </button>
         </div>
       )}
+      {showProfilePanel && (
+        <ProfileSidebar
+          user={user}
+          onClose={() => setShowProfilePanel(false)}
+          onLogout={() => {
+            setShowProfilePanel(false);
+            logout();
+          }}
+
+        />
+      )}
+
+
     </div>
   );
 }

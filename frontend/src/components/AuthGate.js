@@ -68,7 +68,7 @@ function AuthGate() {
           overflow: "auto",
         }}
       >
-        <Dashboard />
+        <Dashboard user={user} logout={logout} />
       </main>
 
       {/* ================= FOOTER ================= */}
