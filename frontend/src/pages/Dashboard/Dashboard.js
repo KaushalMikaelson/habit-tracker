@@ -53,6 +53,8 @@ function getTodayDate() {
 
 
 
+
+
 /* ================= Skeleton Loader ================= */
 
 function DashboardSkeleton() {
@@ -82,6 +84,35 @@ function DashboardSkeleton() {
     </div>
   );
 }
+
+/* ================= Top Loading Bar ================= */
+
+function TopLoadingBar() {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "4px",
+        background: "rgba(255,255,255,0.08)",
+        zIndex: 2000,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: "40%",
+          background: "linear-gradient(90deg, #2563eb, #60a5fa)",
+          animation: "loadingBar 1.2s infinite ease-in-out",
+        }}
+      />
+    </div>
+  );
+}
+
 
 
 /* ================= Dashboard ================= */
@@ -197,7 +228,7 @@ function Dashboard() {
   }
 
 
-  
+
 
   /* ================= Render ================= */
 
@@ -209,6 +240,16 @@ function Dashboard() {
           "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)",
       }}
     >
+      <style>
+        {`
+@keyframes loadingBar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(200%); }
+}
+`}
+      </style>
+
       {/* ================= Header ================= */}
       <div
         style={{
@@ -256,10 +297,26 @@ function Dashboard() {
         addHabit={handleAddHabit}
       />
 
+      {loading && <TopLoadingBar />}
 
-      
+
       {loading ? (
-        <DashboardSkeleton />
+        <>
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "40px",
+              fontSize: "14px",
+              fontWeight: 600,
+              color: "#94a3b8",
+            }}
+          >
+            Loading your habits...
+          </div>
+
+          <DashboardSkeleton />
+        </>
+
       ) : habits.length === 0 ? (
         <div style={{ marginTop: "48px", textAlign: "center" }}>
           <h2>No habits yet</h2>
