@@ -16,7 +16,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
       <KpiRing
         value={kpis.momentum}
         direction={kpis.momentumDirection}
-        
+        delta={kpis.momentumDelta}
         label="Momentum"
         color="#38bdf8"
       />

@@ -32,13 +32,13 @@ export function calculateKPIs(habits, selectedMonth) {
     return defaultKPIs();
   }
 
-  const todayStr = dayjs().format("YYYY-MM-DD");
-  const yesterdayStr = dayjs()
-    .subtract(1, "day")
-    .format("YYYY-MM-DD");
-
   const today = dayjs().startOf("day");
+  const todayStr = today.format("YYYY-MM-DD");
+  const yesterdayStr = today.subtract(1, "day").format("YYYY-MM-DD");
+
   const isCurrentMonth = selectedMonth.isSame(today, "month");
+
+  /* ================= WEEK CALCULATION ================= */
 
   const weekStart =
     today.day() === 0
@@ -53,6 +53,8 @@ export function calculateKPIs(habits, selectedMonth) {
     .add(daysElapsedThisWeek - 1, "day")
     .endOf("day");
 
+  /* ================= MONTH CALCULATION ================= */
+
   const monthStart = selectedMonth.startOf("month").startOf("day");
   const monthEnd = selectedMonth.endOf("month").endOf("day");
   const daysInMonth = selectedMonth.daysInMonth();
@@ -61,14 +63,13 @@ export function calculateKPIs(habits, selectedMonth) {
     ? today.date()
     : daysInMonth;
 
-  const prevMonthStart = selectedMonth
-    .subtract(1, "month")
-    .startOf("month")
-    .startOf("day");
+  const prevMonth = selectedMonth.subtract(1, "month");
+  const prevMonthStart = prevMonth.startOf("month").startOf("day");
+  const prevMonthEnd = prevMonth.endOf("month").endOf("day");
 
-  const prevComparisonEnd = prevMonthStart
-    .add(daysElapsedInMonth - 1, "day")
-    .endOf("day");
+  const prevPrevMonth = selectedMonth.subtract(2, "month");
+  const prevPrevMonthStart = prevPrevMonth.startOf("month").startOf("day");
+  const prevPrevMonthEnd = prevPrevMonth.endOf("month").endOf("day");
 
   const totalHabits = habits.length;
   if (totalHabits === 0) return defaultKPIs();
@@ -79,13 +80,14 @@ export function calculateKPIs(habits, selectedMonth) {
   let prevWeekCompleted = 0;
   let monthlyCompleted = 0;
   let prevMonthCompleted = 0;
+  let prevPrevMonthCompleted = 0;
 
   habits.forEach((habit) => {
     const completedDates = Array.isArray(habit.completedDates)
       ? habit.completedDates
       : [];
 
-    /* ================= DAILY (FIXED SAFELY) ================= */
+    /* ================= DAILY ================= */
 
     if (completedDates.includes(todayStr)) {
       todayCompleted++;
@@ -126,12 +128,23 @@ export function calculateKPIs(habits, selectedMonth) {
       if (
         d.isBetween(
           prevMonthStart,
-          prevComparisonEnd,
+          prevMonthEnd,
           "day",
           "[]"
         )
       ) {
         prevMonthCompleted++;
+      }
+
+      if (
+        d.isBetween(
+          prevPrevMonthStart,
+          prevPrevMonthEnd,
+          "day",
+          "[]"
+        )
+      ) {
+        prevPrevMonthCompleted++;
       }
     });
   });
@@ -166,21 +179,38 @@ export function calculateKPIs(habits, selectedMonth) {
 
   /* ================= MONTHLY ================= */
 
-  const currentMonthRate =
-    monthlyCompleted / (totalHabits * daysElapsedInMonth);
+  const monthly = Math.round(
+    (monthlyCompleted /
+      (totalHabits * daysElapsedInMonth)) *
+      100
+  );
 
-  const prevMonthRate =
-    prevMonthCompleted / (totalHabits * daysElapsedInMonth);
+  const prevMonthly = Math.round(
+    (prevMonthCompleted /
+      (totalHabits * prevMonth.daysInMonth())) *
+      100
+  );
 
-  const monthly = Math.round(currentMonthRate * 100);
-  const prevMonthly = Math.round(prevMonthRate * 100);
+  const prevPrevMonthly = Math.round(
+    (prevPrevMonthCompleted /
+      (totalHabits * prevPrevMonth.daysInMonth())) *
+      100
+  );
 
   const monthlyDelta = monthly - prevMonthly;
 
-  /* ================= MOMENTUM ================= */
+  /* ================= MOMENTUM (TREND ACCELERATION) ================= */
 
-  const momentum = monthly;
-  const momentumDelta = monthlyDelta;
+  // Previous month’s improvement trend
+  const prevMonthlyDelta =
+    prevMonthly - prevPrevMonthly;
+
+  // Current improvement strength
+  const momentum = monthlyDelta;
+
+  // Acceleration of improvement
+  const momentumDelta =
+    monthlyDelta - prevMonthlyDelta;
 
   return {
     daily,
