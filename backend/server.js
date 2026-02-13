@@ -22,7 +22,7 @@ app.use(
     origin: [
       "http://localhost:3000", // React (CRA)
       "http://localhost:3001", // React (CRA) - alternate port
-      "https://habit-tracker-kappa-two.vercel.app",
+      "https://habit-tracker-km.vercel.app",
 
     ],
     credentials: true,
