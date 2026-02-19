@@ -30,7 +30,7 @@ function KpiIntroBox() {
   return (
     <div
       style={{
-        height: "160px",
+        height: "180px",
         borderRadius: "16px",
         padding: "16px",
 

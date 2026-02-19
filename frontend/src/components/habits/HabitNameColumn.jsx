@@ -17,7 +17,8 @@ function SortableHabitRow({ habit, children }) {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.6 : 1,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : "auto",
   };
 
   return (
@@ -64,110 +65,161 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
 
   return (
     <>
-      {/* ================= Scoped Styles ================= */}
       <style>{`
-        .habit-row {
+        .habit-name-row {
           transition: background 0.15s ease;
+          position: relative;
         }
-
-        .habit-row:hover {
-          background: rgba(255,255,255,0.06);
+        .habit-name-row::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 2px;
+          background: #2563eb;
+          opacity: 0;
+          transition: opacity 0.15s ease;
+          border-radius: 0 2px 2px 0;
         }
-
-        .action-wrapper {
+        .habit-name-row:hover {
+          background: rgba(255,255,255,0.04);
+        }
+        .habit-name-row:hover::before {
+          opacity: 1;
+        }
+        .habit-action-group {
           display: flex;
-          gap: 6px;
+          gap: 5px;
           opacity: 0;
           transition: opacity 0.15s ease;
         }
-
-        .habit-row:hover .action-wrapper {
+        .habit-name-row:hover .habit-action-group {
           opacity: 1;
         }
-
-        .icon-btn {
-          width: 22px;
-          height: 22px;
-          border-radius: 50%;
+        .habit-icon-btn {
+          width: 24px;
+          height: 24px;
+          border-radius: 6px;
           border: none;
           cursor: pointer;
-          font-size: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: transform 0.15s ease, background 0.15s ease;
         }
-
-        .edit-btn {
-          background: #22c55e;
-          color: #020617;
-          font-weight: 700;
+        .habit-icon-btn:hover {
+          transform: scale(1.1);
         }
-
-        .trash-btn {
-          background: #ef4444;
-          color: white;
+        .habit-edit-btn {
+          background: rgba(34,197,94,0.15);
+          color: #22c55e;
+          border: 1px solid rgba(34,197,94,0.2);
         }
-
-        .edit-input {
-          width: 100%;
-          background: rgba(255,255,255,0.08);
-          border: 1px solid rgba(255,255,255,0.2);
-          border-radius: 6px;
-          padding: 4px 6px;
-          color: #e5e7eb;
-          font-size: 13px;
-          outline: none;
+        .habit-edit-btn:hover {
+          background: rgba(34,197,94,0.25);
         }
-
-        .drag-handle {
-          cursor: grab;
+        .habit-delete-btn {
+          background: rgba(239,68,68,0.12);
+          color: #f87171;
+          border: 1px solid rgba(239,68,68,0.2);
+        }
+        .habit-delete-btn:hover {
+          background: rgba(239,68,68,0.22);
+        }
+        .habit-confirm-btn {
+          background: rgba(34,197,94,0.15);
+          color: #22c55e;
+          border: 1px solid rgba(34,197,94,0.2);
+        }
+        .habit-cancel-btn {
+          background: rgba(255,255,255,0.06);
           color: #94a3b8;
-          font-size: 14px;
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+        .habit-edit-input {
+          width: 100%;
+          background: rgba(255,255,255,0.07);
+          border: 1px solid rgba(37,99,235,0.4);
+          border-radius: 6px;
+          padding: 4px 8px;
+          color: #f1f5f9;
+          font-size: 13px;
+          font-family: 'Inter', sans-serif;
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+        }
+        .drag-handle-dots {
+          cursor: grab;
+          color: #334155;
+          font-size: 13px;
           padding-right: 6px;
           user-select: none;
+          transition: color 0.15s ease;
+          line-height: 1;
         }
-
-        .drag-handle:active {
+        .habit-name-row:hover .drag-handle-dots {
+          color: #64748b;
+        }
+        .drag-handle-dots:active {
           cursor: grabbing;
         }
       `}</style>
 
       <div
         style={{
-          background: "linear-gradient(180deg, #020617, #020617cc)",
+          background: "linear-gradient(180deg, #020617, rgba(2,6,23,0.9))",
           borderRadius: "16px",
           overflow: "hidden",
           color: "#e5e7eb",
-          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
         }}
       >
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
         <div
           style={{
             height: HEADER_HEIGHT,
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "12px",
-            fontWeight: 800,
-            letterSpacing: "0.14em",
-            color: "#93c5fd",
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            gap: "6px",
+            borderBottom: "1px solid rgba(255,255,255,0.06)",
           }}
         >
-          DAILY HABITS
+          <div style={{
+            width: "28px",
+            height: "28px",
+            borderRadius: "8px",
+            background: "rgba(37,99,235,0.15)",
+            border: "1px solid rgba(37,99,235,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "14px",
+          }}>
+            ◈
+          </div>
+          <div style={{
+            fontSize: "10px",
+            fontWeight: 700,
+            letterSpacing: "0.16em",
+            color: "#475569",
+            textTransform: "uppercase",
+          }}>
+            Habits
+          </div>
         </div>
 
-        {/* ================= HABIT ROWS ================= */}
+        {/* HABIT ROWS */}
         {safeHabits.length === 0 ? (
-          <div
-            style={{
-              padding: "16px",
-              textAlign: "center",
-              fontSize: "12px",
-              color: "#9ca3af",
-            }}
-          >
+          <div style={{
+            padding: "20px 16px",
+            textAlign: "center",
+            fontSize: "12px",
+            color: "#334155",
+          }}>
             No habits yet
           </div>
         ) : (
@@ -178,32 +230,32 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
               <SortableHabitRow key={habit._id} habit={habit}>
                 {({ attributes, listeners }) => (
                   <div
-                    className="habit-row"
+                    className="habit-name-row"
                     style={{
                       height: ROW_HEIGHT,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "space-between",
-                      padding: "0 12px",
+                      padding: "0 10px 0 12px",
                       fontSize: "13px",
-                      borderBottom: "1px solid rgba(255,255,255,0.05)",
-                      gap: "8px",
+                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      gap: "6px",
                     }}
                   >
-                    {/* DRAG HANDLE (DOTS) */}
+                    {/* DRAG HANDLE */}
                     <div
-                      className="drag-handle"
+                      className="drag-handle-dots"
                       {...attributes}
                       {...listeners}
                     >
-                      ⠿⠿
+                      ⠿
                     </div>
 
                     {/* NAME / INPUT */}
                     <div style={{ flex: 1, overflow: "hidden" }}>
                       {isEditing ? (
                         <input
-                          className="edit-input"
+                          className="habit-edit-input"
                           autoFocus
                           value={editValue}
                           onChange={(e) => setEditValue(e.target.value)}
@@ -213,14 +265,14 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
                           }}
                         />
                       ) : (
-                        <span
-                          style={{
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "block",
-                          }}
-                        >
+                        <span style={{
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "block",
+                          color: "#cbd5e1",
+                          fontWeight: 500,
+                        }}>
                           {habit.title}
                         </span>
                       )}
@@ -228,33 +280,32 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
 
                     {/* ACTIONS */}
                     {isEditing ? (
-                      <div className="action-wrapper" style={{ opacity: 1 }}>
-                        <button
-                          className="icon-btn edit-btn"
-                          onClick={() => saveEdit(habit)}
-                        >
-                          ✓
+                      <div className="habit-action-group" style={{ opacity: 1 }}>
+                        <button className="habit-icon-btn habit-confirm-btn" onClick={() => saveEdit(habit)} title="Save">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
                         </button>
-                        <button
-                          className="icon-btn trash-btn"
-                          onClick={cancelEdit}
-                        >
-                          ✕
+                        <button className="habit-icon-btn habit-cancel-btn" onClick={cancelEdit} title="Cancel">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
                         </button>
                       </div>
                     ) : (
-                      <div className="action-wrapper">
-                        <button
-                          className="icon-btn edit-btn"
-                          onClick={() => startEdit(habit)}
-                        >
-                          ✎
+                      <div className="habit-action-group">
+                        <button className="habit-icon-btn habit-edit-btn" onClick={() => startEdit(habit)} title="Edit">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
                         </button>
-                        <button
-                          className="icon-btn trash-btn"
-                          onClick={() => handleDelete(habit)}
-                        >
-                          ✕
+                        <button className="habit-icon-btn habit-delete-btn" onClick={() => handleDelete(habit)} title="Delete">
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                          </svg>
                         </button>
                       </div>
                     )}

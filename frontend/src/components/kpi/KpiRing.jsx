@@ -64,8 +64,8 @@ function KpiRing({
     direction === "up"
       ? "#22c55e"
       : direction === "down"
-      ? "#ef4444"
-      : "#94a3b8";
+        ? "#ef4444"
+        : "#94a3b8";
 
   const sign = delta > 0 ? "+" : "";
 
@@ -84,7 +84,7 @@ function KpiRing({
         🔥
       </span>
     ) : null;
-    const gradientId = `shimmer-${label}`;
+  const gradientId = `shimmer-${label}`;
 
   return (
     <div
@@ -129,12 +129,12 @@ function KpiRing({
 
         <svg width="120" height="120">
           <defs>
-  <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
-    <stop offset="0%" stopColor={color} stopOpacity="0.50" />
-    <stop offset="50%" stopColor={color} stopOpacity="1" />
-    <stop offset="100%" stopColor={color} stopOpacity="0.25" />
-  </linearGradient>
-</defs>
+            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor={color} stopOpacity="0.50" />
+              <stop offset="50%" stopColor={color} stopOpacity="1" />
+              <stop offset="100%" stopColor={color} stopOpacity="0.25" />
+            </linearGradient>
+          </defs>
 
 
           {/* Background ring */}

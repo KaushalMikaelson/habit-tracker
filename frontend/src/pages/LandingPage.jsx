@@ -11,50 +11,121 @@ export default function LandingPage() {
 
   return (
     <AuthLayout>
+      {/* ================= GLOBAL STYLES ================= */}
+      <style>{`
+        @keyframes gradientShift {
+          0%, 100% { background-position: 0% 50%; }
+          50%       { background-position: 100% 50%; }
+        }
+        .hero-headline {
+          background: linear-gradient(135deg, #f1f5f9, #38bdf8, #22c55e, #f1f5f9);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: gradientShift 6s ease infinite;
+        }
+        .lp-cta-btn {
+          padding: 1rem 3.2rem;
+          font-size: 1rem;
+          border-radius: 999px;
+          border: none;
+          cursor: pointer;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          color: #fff;
+          font-weight: 700;
+          font-family: 'Inter', sans-serif;
+          box-shadow: 0 16px 40px rgba(34,197,94,0.4);
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          letter-spacing: 0.01em;
+        }
+        .lp-cta-btn:hover {
+          transform: translateY(-2px) scale(1.04);
+          box-shadow: 0 22px 55px rgba(34,197,94,0.55);
+        }
+        .lp-cta-btn-sm {
+          padding: 0.8rem 2.2rem;
+          border-radius: 999px;
+          border: none;
+          cursor: pointer;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          color: #fff;
+          font-weight: 700;
+          font-family: 'Inter', sans-serif;
+          box-shadow: 0 12px 30px rgba(34,197,94,0.35);
+          transition: transform 0.25s ease;
+        }
+        .lp-cta-btn-sm:hover { transform: scale(1.05); }
+        .lp-login-btn {
+          background: transparent;
+          border: none;
+          color: #94a3b8;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-family: 'Inter', sans-serif;
+          font-weight: 500;
+          transition: color 0.15s ease;
+          padding: 0.4rem 0.8rem;
+        }
+        .lp-login-btn:hover { color: #f1f5f9; }
+        .lp-signup-btn {
+          padding: 0.45rem 1.4rem;
+          border-radius: 999px;
+          border: none;
+          cursor: pointer;
+          background: linear-gradient(135deg, #22c55e, #16a34a);
+          color: #fff;
+          font-weight: 700;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.9rem;
+          box-shadow: 0 6px 18px rgba(34,197,94,0.35);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .lp-signup-btn:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 10px 24px rgba(34,197,94,0.5);
+        }
+      `}</style>
+
       {/* ================= HEADER ================= */}
       <div
         style={{
-          background:
-            "linear-gradient(180deg, rgba(2,6,23,0.95), rgba(2,6,23,1))",
-          borderTop: ".5px solid rgba(255,255,255,0.06)",
+          background: "rgba(2,6,23,0.85)",
+          backdropFilter: "blur(16px)",
+          borderBottom: ".5px solid rgba(255,255,255,0.07)",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          padding: "1.5rem 2.5rem",
+          padding: "1.2rem 2.5rem",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
         }}
       >
-        <h2 style={{ margin: 0, fontWeight: 600, color: "#f9fafb" }}>
-          Habit Tracker
-        </h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "30px",
+            height: "30px",
+            borderRadius: "8px",
+            background: "linear-gradient(135deg, #2563eb, #38bdf8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(37,99,235,0.4)",
+          }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+            </svg>
+          </div>
+          <h2 style={{ margin: 0, fontWeight: 800, color: "#f1f5f9", fontSize: "1.05rem", letterSpacing: "-0.01em" }}>
+            Habit Tracker
+          </h2>
+        </div>
 
-        <div style={{ display: "flex", gap: "1.2rem" }}>
-          <button
-            onClick={() => navigate("/login")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#e5e7eb",
-              cursor: "pointer",
-              fontSize: "0.95rem",
-            }}
-          >
-            Login
-          </button>
-
-          <button
-            onClick={() => navigate("/signup")}
-            style={{
-              padding: "0.45rem 1.3rem",
-              borderRadius: "999px",
-              border: "none",
-              cursor: "pointer",
-              background: "#22c55e",
-              color: "#022c22",
-              fontWeight: 700,
-            }}
-          >
-            Sign up
-          </button>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <button className="lp-login-btn" onClick={() => navigate("/login")}>Login</button>
+          <button className="lp-signup-btn" onClick={() => navigate("/signup")}>Sign up</button>
         </div>
       </div>
 
@@ -141,23 +212,42 @@ export default function LandingPage() {
                 margin: "0 auto",
               }}
             >
+              <div style={{
+                display: "inline-block",
+                padding: "5px 14px",
+                borderRadius: "999px",
+                background: "rgba(34,197,94,0.12)",
+                border: "1px solid rgba(34,197,94,0.25)",
+                color: "#4ade80",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                letterSpacing: "0.06em",
+                marginBottom: "1.5rem",
+                textTransform: "uppercase",
+              }}>
+                ✦ Build Better Habits
+              </div>
               <h1
+                className="hero-headline"
                 style={{
-                  fontSize: "3.2rem",
-                  fontWeight: 800,
+                  fontSize: "3.4rem",
+                  fontWeight: 900,
                   marginBottom: "1.2rem",
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "-0.03em",
+                  lineHeight: 1.1,
                 }}
               >
-                Track Your Habits Everyday.
+                Track Your Habits,<br />Every Single Day.
               </h1>
 
               <p
                 style={{
-                  fontSize: "1.3rem",
+                  fontSize: "1.2rem",
                   lineHeight: 1.7,
-                  color: "#cbd5f5",
+                  color: "rgba(203,213,245,0.85)",
                   marginBottom: "3rem",
+                  maxWidth: "560px",
+                  margin: "0 auto 3rem",
                 }}
               >
                 Every day, it gets a little easier.
@@ -166,31 +256,10 @@ export default function LandingPage() {
               </p>
 
               <button
+                className="lp-cta-btn"
                 onClick={() => navigate("/signup")}
-                style={{
-                  padding: "1rem 3.2rem",
-                  fontSize: "1rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  cursor: "pointer",
-                  background: "#22c55e",
-                  color: "#022c22",
-                  fontWeight: 700,
-                  boxShadow: "0 20px 45px rgba(34,197,94,0.4)",
-                  transition: "transform 0.25s ease, box-shadow 0.25s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.06)";
-                  e.currentTarget.style.boxShadow =
-                    "0 26px 60px rgba(34,197,94,0.55)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow =
-                    "0 20px 45px rgba(34,197,94,0.4)";
-                }}
               >
-                Get Started
+                Get Started — It&apos;s Free
               </button>
             </div>
           </div>
@@ -416,8 +485,11 @@ export default function LandingPage() {
             <h2
               style={{
                 fontSize: "2.4rem",
-                color: "#f9fafb",
+                fontWeight: 800,
+                color: "#f1f5f9",
                 marginBottom: "1rem",
+                letterSpacing: "-0.02em",
+                lineHeight: 1.2,
               }}
             >
               Start building better habits today
@@ -425,25 +497,17 @@ export default function LandingPage() {
 
             <p
               style={{
-                color: "#cbd5f5",
+                color: "#64748b",
                 marginBottom: "2.5rem",
+                fontSize: "1.05rem",
               }}
             >
               It only takes a minute to begin.
             </p>
 
             <button
+              className="lp-cta-btn"
               onClick={() => navigate("/signup")}
-              style={{
-                padding: "1rem 3rem",
-                fontSize: "1rem",
-                borderRadius: "999px",
-                border: "none",
-                cursor: "pointer",
-                background: "#22c55e",
-                color: "#022c22",
-                fontWeight: 700,
-              }}
             >
               Create your account
             </button>
@@ -541,7 +605,7 @@ export default function LandingPage() {
             opacity: 0,
             transform: "translateY(40px)",
             transition: "opacity 0.8s ease, transform 0.8s ease",
-            
+
           }}
         >
           <div
@@ -640,24 +704,8 @@ export default function LandingPage() {
                 Start building better habits today.
               </p>
               <button
+                className="lp-cta-btn-sm"
                 onClick={() => navigate("/signup")}
-                style={{
-                  padding: "0.8rem 2.2rem",
-                  borderRadius: "999px",
-                  border: "none",
-                  cursor: "pointer",
-                  background: "#22c55e",
-                  color: "#022c22",
-                  fontWeight: 700,
-                  boxShadow: "0 15px 35px rgba(34,197,94,0.35)",
-                  transition: "transform 0.25s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = "scale(1.05)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
-                }
               >
                 Sign up free
               </button>

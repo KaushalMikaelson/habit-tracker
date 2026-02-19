@@ -47,7 +47,7 @@ function TopHabits({
   return (
     <div
       style={{
-        height:195,
+        height:180,
         boxSizing: "border-box",
         background: "linear-gradient(180deg, #020617, #020617cc)",
         borderRadius: "16px",

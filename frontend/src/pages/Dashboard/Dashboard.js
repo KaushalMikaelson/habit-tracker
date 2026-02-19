@@ -42,7 +42,7 @@ import {
 
 /* ================= Constants ================= */
 
-const KPI_ROW_HEIGHT = 170;
+const KPI_ROW_HEIGHT = 180;
 
 /* ================= Helpers ================= */
 
@@ -367,7 +367,7 @@ function Dashboard({ user, logout }) {
       style={{
         minHeight: "100vh",
         background:
-          "radial-gradient(1200px 600px at 20% -10%, #475569 0%, #1e293b 60%)",
+          "radial-gradient(ellipse 1400px 700px at 15% -5%, #334155 0%, #1e293b 45%, #020617 100%)",
       }}
     >
       <style>
@@ -386,83 +386,97 @@ function Dashboard({ user, logout }) {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          height: "56px",
-          padding: "0 16px",
-          background: "rgba(30, 41, 59, 0.75)",
-          backdropFilter: "blur(10px)",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          height: "60px",
+          padding: "0 20px",
+          background: "rgba(2, 6, 23, 0.7)",
+          backdropFilter: "blur(16px)",
+          borderBottom: "1px solid rgba(255,255,255,0.07)",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
         }}
       >
-        {/* LEFT SIDE - TITLE */}
-        <div>
-          <div style={{ fontSize: "16px", fontWeight: 700 }}>
-            Habit Tracker
+        {/* LEFT SIDE - BRAND */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <div style={{
+            width: "32px",
+            height: "32px",
+            borderRadius: "9px",
+            background: "linear-gradient(135deg, #2563eb, #38bdf8)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(37,99,235,0.4)",
+            flexShrink: 0,
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+            </svg>
           </div>
-          <div style={{ fontSize: "12px", color: "#6b7280" }}>
-            Track your consistency
+          <div>
+            <div style={{ fontSize: "15px", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
+              Habit Tracker
+            </div>
+            <div style={{ fontSize: "11px", color: "#334155", fontWeight: 500 }}>
+              Track your consistency
+            </div>
           </div>
         </div>
 
         {/* RIGHT SIDE - BUTTON GROUP */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
             onClick={() => setShowModal(true)}
             style={{
-              padding: "8px 14px",
-              borderRadius: "8px",
+              padding: "8px 16px",
+              borderRadius: "10px",
               border: "none",
-              background: "#2563eb",
+              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
               color: "#ffffff",
               fontSize: "13px",
               fontWeight: 600,
               cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
+              transition: "transform 0.15s ease, box-shadow 0.15s ease",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontFamily: "'Inter', sans-serif",
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(37,99,235,0.5)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.35)"; }}
           >
-            + Add Habit
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add Habit
           </button>
 
           <button
-  onClick={() => setShowProfilePanel(true)}
-  style={{
-    width: "38px",
-    height: "38px",
-    borderRadius: "50%",
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-    color: "#ffffff",
-    fontWeight: 700,
-    fontSize: "14px",
-    letterSpacing: "0.5px",
-    cursor: "pointer",
-    boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
-    transition: "all 0.2s ease",
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "scale(1.08)";
-    e.currentTarget.style.boxShadow =
-      "0 6px 16px rgba(37,99,235,0.45)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-    e.currentTarget.style.boxShadow =
-      "0 4px 12px rgba(37,99,235,0.35)";
-  }}
-  onMouseDown={(e) => {
-    e.currentTarget.style.transform = "scale(0.95)";
-  }}
-  onMouseUp={(e) => {
-    e.currentTarget.style.transform = "scale(1.08)";
-  }}
->
-  {getInitials(user?.email || "")}
-</button>
-
+            onClick={() => setShowProfilePanel(true)}
+            style={{
+              width: "38px",
+              height: "38px",
+              borderRadius: "50%",
+              border: "2px solid rgba(37,99,235,0.4)",
+              background: "linear-gradient(135deg, #1d4ed8, #2563eb)",
+              color: "#ffffff",
+              fontWeight: 800,
+              fontSize: "13px",
+              letterSpacing: "0.5px",
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(37,99,235,0.4)",
+              transition: "all 0.2s ease",
+              fontFamily: "'Inter', sans-serif",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.1)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(37,99,235,0.55)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 4px 14px rgba(37,99,235,0.4)"; }}
+            onMouseDown={(e) => { e.currentTarget.style.transform = "scale(0.94)"; }}
+            onMouseUp={(e) => { e.currentTarget.style.transform = "scale(1.1)"; }}
+          >
+            {getInitials(user?.email || "")}
+          </button>
         </div>
       </div>
 
@@ -504,158 +518,181 @@ function Dashboard({ user, logout }) {
         </div>
       ) : (
         <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+  collisionDetection={closestCenter}
+  onDragEnd={handleDragEnd}
+>
+  <SortableContext
+    items={habits.map(h => h._id)}
+    strategy={verticalListSortingStrategy}
+  >
+    <DashboardLayout>
+      {/* LEFT */}
+      <div
+        style={{
+          width: LEFT_COLUMN_WIDTH,
+          minWidth: LEFT_COLUMN_WIDTH,
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px", // ✅ restored to first file
+        }}
+      >
+        <div style={{ height: KPI_ROW_HEIGHT }}> {/* ✅ restored */}
+          <KpiIntroBox />
+        </div>
+
+        <TodayFocus habits={habits} onToggle={toggleHabit} />
+
+        <div style={{ marginTop: "10px" }} />
+
+        <HabitNameColumn
+          habits={habits}
+          deleteHabit={deleteHabit}
+          editHabit={editHabit}
+        />
+      </div>
+
+      {/* CENTER */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          minWidth: 0,
+        }}
+      >
+        <div
+          style={{
+            height: KPI_ROW_HEIGHT,
+            background:
+              "linear-gradient(180deg, rgba(15,23,42,0.85), rgba(2,6,23,0.85))",
+            borderRadius: "16px",
+            padding: "12px",
+            display: "flex",
+            alignItems: "center",
+          }}
         >
-          <SortableContext
-            items={habits.map(h => h._id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <DashboardLayout>
-              {/* LEFT */}
-              <div
-                style={{
-                  width: LEFT_COLUMN_WIDTH,
-                  minWidth: LEFT_COLUMN_WIDTH,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "40px",
-                }}
-              >
-                <div style={{ height: KPI_ROW_HEIGHT }}>
-                  <KpiIntroBox />
-                </div>
+          <KpiRingRow
+            kpis={kpis}
+            isCurrentMonth={isCurrentMonth}
+          />
+        </div>
 
-                <TodayFocus habits={habits} onToggle={toggleHabit} />
+        <div style={{ marginTop: "-40px" }} />
 
-                <div style={{ marginTop: "-62px" }} />
+        <HabitGraphs
+          habits={habits}
+          month={selectedMonth}
+          isCurrentMonth={isCurrentMonth}
+        />
 
-                <HabitNameColumn
-                  habits={habits}
-                  deleteHabit={deleteHabit}
-                  editHabit={editHabit}
-                />
-              </div>
+        <div
+          style={{
+            background: "transparent",
+            borderRadius: "12px",
+            overflow: "hidden",
+            minWidth: 0,
+          }}
+        >
+          <DashboardHeader
+            monthLabel={monthLabel}
+            goToPreviousMonth={goToPreviousMonth}
+            goToNextMonth={goToNextMonth}
+            theme={theme}
+            setTheme={setTheme}
+          />
 
-              {/* CENTER */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  minWidth: 0,
-                }}
-              >
-                <div
-                  style={{
-                    height: KPI_ROW_HEIGHT,
-                    background:
-                      "linear-gradient(180deg, rgba(15,23,42,0.85), rgba(2,6,23,0.85))",
-                    borderRadius: "16px",
-                    padding: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                  }}
-                >
-                  <KpiRingRow
-                    kpis={kpis}
-                    isCurrentMonth={isCurrentMonth}
-                  />
-                </div>
+          <DashboardGrid
+            habits={habits}
+            monthDates={monthDates}
+            today={today}
+            toggleHabit={toggleHabit}
+            gridScrollRef={gridScrollRef}
+            isFutureDate={isFutureDate}
+            theme={theme}
+          />
+        </div>
+      </div>
 
-                <div style={{ marginTop: "-40px" }} />
+      {/* RIGHT */}
+      <div
+        style={{
+          width: RIGHT_COLUMN_WIDTH,
+          minWidth: RIGHT_COLUMN_WIDTH,
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+          alignSelf: "flex-start",
+        }}
+      >
+        <TopHabits
+          habits={habits}
+          currentYear={currentYear}
+          currentMonth={currentMonth}
+          height={KPI_ROW_HEIGHT}
+        />
 
-                <HabitGraphs
-                  habits={habits}
-                  month={selectedMonth}
-                  isCurrentMonth={isCurrentMonth}
-                />
+        <TodoNotes />
+        <div style={{ marginTop: "45px" }} />
 
-                <div
-                  style={{
-                    background: "transparent",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    minWidth: 0,
-                  }}
-                >
-                  <DashboardHeader
-                    monthLabel={monthLabel}
-                    goToPreviousMonth={goToPreviousMonth}
-                    goToNextMonth={goToNextMonth}
-                    theme={theme}
-                    setTheme={setTheme}
-                  />
+        <HabitProgressColumn
+          habits={habits}
+          currentMonth={selectedMonth}
+        />
+      </div>
+    </DashboardLayout>
+  </SortableContext>
+</DndContext>
 
-                  <DashboardGrid
-                    habits={habits}
-                    monthDates={monthDates}
-                    today={today}
-                    toggleHabit={toggleHabit}
-                    gridScrollRef={gridScrollRef}
-                    isFutureDate={isFutureDate}
-                    theme={theme}
-                  />
-                </div>
-              </div>
-
-              {/* RIGHT */}
-              <div
-                style={{
-                  width: RIGHT_COLUMN_WIDTH,
-                  minWidth: RIGHT_COLUMN_WIDTH,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  alignSelf: "flex-start",
-                }}
-              >
-                <TopHabits
-                  habits={habits}
-                  currentYear={currentYear}
-                  currentMonth={currentMonth}
-                  height={KPI_ROW_HEIGHT}
-                />
-
-                <TodoNotes />
-
-                <HabitProgressColumn
-                  habits={habits}
-                  currentMonth={selectedMonth}
-                />
-              </div>
-            </DashboardLayout>
-          </SortableContext>
-        </DndContext>
       )}
 
       {showUndo && (
         <div
           style={{
             position: "fixed",
-            bottom: "16px",
+            bottom: "24px",
             left: "50%",
             transform: "translateX(-50%)",
-            background: "#111827",
-            color: "#ffffff",
-            padding: "10px 14px",
-            borderRadius: "8px",
+            background: "rgba(15,23,42,0.95)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#e2e8f0",
+            padding: "12px 18px",
+            borderRadius: "12px",
             display: "flex",
-            gap: "12px",
+            alignItems: "center",
+            gap: "14px",
             fontSize: "13px",
+            fontWeight: 500,
             zIndex: 1000,
+            boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+            animation: "slideUp 0.3s cubic-bezier(.4,0,.2,1)",
+            whiteSpace: "nowrap",
           }}
         >
-          <span>Habit deleted</span>
+          <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            </svg>
+            Habit deleted
+          </span>
           <button
             onClick={undoDelete}
             style={{
-              background: "transparent",
-              border: "none",
+              background: "rgba(96,165,250,0.12)",
+              border: "1px solid rgba(96,165,250,0.25)",
               color: "#60a5fa",
               cursor: "pointer",
               fontWeight: 700,
+              fontSize: "12px",
+              padding: "4px 10px",
+              borderRadius: "6px",
+              fontFamily: "'Inter', sans-serif",
+              letterSpacing: "0.04em",
+              transition: "background 0.15s ease",
             }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(96,165,250,0.22)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(96,165,250,0.12)"}
           >
             UNDO
           </button>
