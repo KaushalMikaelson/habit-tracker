@@ -216,7 +216,7 @@ export default function TodayFocus() {
 
 const styles = {
   container: {
-    height: "378px",
+    height: "415px",
     borderRadius: "18px",
     padding: "16px",
     background: "linear-gradient(180deg, #020617, #020617cc)",

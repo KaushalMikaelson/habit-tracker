@@ -542,7 +542,7 @@ function Dashboard({ user, logout }) {
 
         <TodayFocus habits={habits} onToggle={toggleHabit} />
 
-        <div style={{ marginTop: "10px" }} />
+        <div style={{ marginTop: "-30px" }} />
 
         <HabitNameColumn
           habits={habits}
@@ -632,7 +632,7 @@ function Dashboard({ user, logout }) {
         />
 
         <TodoNotes />
-        <div style={{ marginTop: "45px" }} />
+        <div style={{ marginTop: "10px" }} />
 
         <HabitProgressColumn
           habits={habits}
