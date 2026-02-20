@@ -47,21 +47,10 @@ const PALETTES = {
         glow: "rgba(239,68,68,0.55)",
         accent: null,
     },
-
-    // 3 — Emerald Growth (Green)
-    3: {
-        outer: "#052e16",
-        mid: "#16a34a",
-        core: "#4ade80",
-        tip: "#dcfce7",
-        hotcore: "#ffffff",
-        base: "#02160c",
-        glow: "rgba(22,163,74,0.65)",
-        accent: null,
-    },
+    
 
     // 4 — Electric Acceleration (Blue)
-    4: {
+    3: {
         outer: "#0a1124",
         mid: "#2563eb",
         core: "#60a5fa",
@@ -73,7 +62,7 @@ const PALETTES = {
     },
 
     // 5 — Apex Plasma (Purple)
-    5: {
+    4: {
         outer: "#1e0033",
         mid: "#7c3aed",
         core: "#c084fc",
@@ -86,14 +75,14 @@ const PALETTES = {
 
     // 6 — Quantum Reactor (Cosmic Violet + Magenta)
     // 6 — Obsidian Apex (Premium Black)
-    6: {
+    5: {
         outer: "#050505",        // deep matte black
         mid: "#1c1c1c",          // graphite layer
         core: "#2a2a2a",         // dense inner black
         tip: "#e5e5e5",          // subtle silver highlight
         hotcore: "#ffffff",      // white center (controlled energy)
         base: "#000000",         // pure black base
-        glow: "rgba(0,0,0,0.85)", // dark shadow aura
+        glow: "rgba(212,175,55,0.8)", // subtle gold aura // dark shadow aura
         accent: "#d4af37",       // premium gold accent (optional)
     }
 
@@ -101,10 +90,9 @@ const PALETTES = {
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
 function getStage(level) {
-    if (level >= 10) return 6;
-    if (level >= 8) return 5;
-    if (level >= 6) return 4;
-    if (level >= 4) return 3;
+    if (level >= 10) return 5;
+    if (level >= 8) return 4;
+    if (level >= 6) return 3;
     if (level >= 2) return 2;
     return 1;
 }
@@ -222,27 +210,99 @@ function SmokeState() {
 /* ── Stage 1: Spark flicker ──────────────────────────────────────────────── */
 function SparkState() {
     const p = PALETTES[1];
+
     return (
         <motion.div
             style={{
-                width: "48px", height: "60px",
-                display: "flex", alignItems: "center", justifyContent: "center",
+                width: "48px",
+                height: "60px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 flexShrink: 0,
+                position: "relative",
+                filter: `drop-shadow(0 0 10px ${p.glow})`,
             }}
-            animate={{ opacity: [0.4, 0.88, 0.4], scale: [0.95, 1.04, 0.95] }}
-            transition={{ duration: 2.4, ease: "easeInOut", repeat: Infinity }}
-            title="Growth spark — momentum beginning"
+            
+        
+            title="Growth spark — ignition beginning"
         >
-            <svg width="20" height="26" viewBox="0 0 28 38" fill="none">
+            {/* Micro heat aura */}
+            <motion.div
+                style={{
+                    position: "absolute",
+                    width: "40px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    background: `radial-gradient(ellipse at 50% 70%, ${p.glow} 0%, transparent 70%)`,
+                    filter: "blur(6px)",
+                }}
+                animate={{
+                    scale: [0.9, 1.3, 0.9],
+                    opacity: [0.3, 0.6, 0.3],
+                }}
+                transition={{
+                    duration: 2,
+                    ease: "easeOut",
+                    repeat: Infinity,
+                }}
+            />
+
+            <svg width="20" height="30" viewBox="0 0 28 38" fill="none">
                 <defs>
-                    <linearGradient id="spark_g" x1="14" y1="18" x2="14" y2="38" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor={p.tip} stopOpacity="0.85" />
+                    <linearGradient
+                        id="spark_g"
+                        x1="14"
+                        y1="12"
+                        x2="14"
+                        y2="38"
+                        gradientUnits="userSpaceOnUse"
+                    >
+                        <stop offset="0%" stopColor={p.tip} stopOpacity="0.95" />
+                        <stop offset="60%" stopColor={p.core} stopOpacity="0.85" />
                         <stop offset="100%" stopColor={p.mid} stopOpacity="1" />
                     </linearGradient>
                 </defs>
+
+                {/* Core spark */}
                 <path d={P_CORE} fill="url(#spark_g)" />
-                <path d={P_HOTCORE} fill={p.tip} opacity="0.6" />
+
+                {/* White-hot needle */}
+                <path
+                    d={P_HOTCORE}
+                    fill={p.hotcore}
+                    opacity="0.7"
+                    style={{ mixBlendMode: "screen" }}
+                />
             </svg>
+
+            {/* Tiny rising sparks */}
+            {[0, 0.6, 1.2].map((delay, i) => (
+                <motion.div
+                    key={i}
+                    style={{
+                        position: "absolute",
+                        width: "5px",
+                        height: "5px",
+                        borderRadius: "50%",
+                        background: p.tip,
+                        top: "32px",
+                        left: `${20 + i * 4}px`,
+                        pointerEvents: "none",
+                    }}
+                    animate={{
+                        y: [-2, -16],
+                        opacity: [0, 1, 0],
+                        scale: [0.8, 1, 0.4],
+                    }}
+                    transition={{
+                        delay,
+                        duration: 1.2,
+                        repeat: Infinity,
+                        ease: "easeOut",
+                    }}
+                />
+            ))}
         </motion.div>
     );
 }
@@ -322,11 +382,10 @@ function HeatBloom({ glow, duration, intensity }) {
 function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
     const computed = useMemo(() => {
         // Balanced growth formula: discipline + improvement + acceleration
-        const raw = (monthly * 0.7) + (momentum * 1.8) + (momentumDelta * 2.2);
-        const score = Math.max(0, Math.min(100, raw));
+        const score = Math.max(0, Math.min(100, monthly));
 
-        // Stage 0 (smoke): total growth health below ignition threshold
-        if (score < 20) return { stage: 0, level: 0, normalized: 0 };
+        // Stage 0 (smoke): below ignition threshold
+        if (score < 1) return { stage: 0, level: 0, normalized: 0 };
 
         const norm = score / 100;
         const level = Math.max(1, Math.ceil(norm * 10));
@@ -334,9 +393,8 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
         const palette = PALETTES[stage];
         const { outer: blurOuter, mid: blurMid } = getBlur(stage);
 
-        // Stage-proportional flame size: grows visibly with each level
-        const flameW = Math.round(20 + norm * 24);  // 20px → 44px
-        const flameH = Math.round(27 + norm * 31);  // 27px → 58px
+        const flameW = Math.round(20 + norm * 24);
+        const flameH = Math.round(27 + norm * 31);
 
         return {
             stage, level, normalized: norm, palette, blurOuter, blurMid,
@@ -344,7 +402,8 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
             glowPx: 8 + norm * 38,
             duration: 2.2 - norm * 1.3,
         };
-    }, [momentumDelta, momentum, monthly]);
+
+    }, [monthly]); // 🔥 dependency updated
 
     const { stage, level, normalized, palette, blurOuter, blurMid, flameW, flameH, glowPx, duration } = computed;
 
@@ -357,13 +416,17 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
     const isApex = stage === 6;
     const isPlasma = stage >= 5;
 
-    // Wrapper grows with flame — 16px padding on each axis so glow has room
     const wrapW = flameW + 20;
     const wrapH = flameH + 16;
 
-    const glowFilter = `drop-shadow(0 0 ${glowPx}px ${palette.glow})`;
+    const baseGlow = Math.max(12, glowPx); // ensures minimum glow
+const glowFilter = `
+  drop-shadow(0 0 ${baseGlow}px ${palette.glow})
+  drop-shadow(0 0 ${baseGlow * 0.6}px ${palette.glow})
+  brightness(1.15)
+`;
     const glowFilterHot = `drop-shadow(0 0 ${glowPx * 1.8}px ${palette.glow})`;
-    const bloomIntensity = 0.3 + normalized * 0.5;  // ramps up with level
+    const bloomIntensity = 0.5 + normalized * 0.5;
 
     return (
         <div
@@ -372,46 +435,35 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
                 width: `${wrapW}px`, height: `${wrapH}px`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
-                transition: "width 300ms ease-in-out, height 300ms ease-in-out",
+                
             }}
             title={`Growth Reactor · Level ${level} · Stage ${stage}`}
         >
-            {/* Heat bloom — expanding thermal pulse ripples (replaces spinning ring) */}
             <HeatBloom
                 glow={withAlpha(palette.glow, 0.22)}
                 duration={duration}
                 intensity={bloomIntensity}
             />
 
-            {/* Spark particles (Stage 5–6) */}
             {isPlasma && (
                 <SparkParticles color={palette.hotcore} count={isApex ? 6 : 4} />
             )}
 
-            {/* Flame body — realistic flicker: sway + scaleX breathing + float */}
             <motion.div
                 style={{
                     filter: glowFilter,
                     display: "flex", alignItems: "center", justifyContent: "center",
                 }}
                 animate={{
-                    // Vertical float
                     y: [0, -1.5, -0.5, -2, 0],
-                    // Horizontal sway (organic, not symmetric)
                     x: [0, 0.9, -0.7, 0.4, 0],
-                    // Width breathing — flame base widens/narrows as it burns
                     scaleX: [1, 0.96, 1.03, 0.97, 1],
-                    // Brightness pulse
-                    opacity: [1, 0.84, 0.92, 0.80, 1],
+                    opacity: [1, 0.95, 0.98, 0.94, 1],
                     filter: [glowFilter, glowFilterHot, glowFilter, glowFilterHot, glowFilter],
                 }}
-                transition={{
-                    duration,
-                    ease: "easeInOut",
-                    repeat: Infinity,
-                    times: [0, 0.25, 0.5, 0.75, 1],
-                }}
+                
             >
+
                 <svg width={flameW} height={flameH} viewBox="0 0 28 38" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         {/* Stage-aware blur: hot = sharp, cool = soft */}
@@ -501,7 +553,6 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
                 </svg>
             </motion.div>
 
-            {/* Stage 6: shimmer breathing overlay */}
             {isApex && (
                 <motion.div
                     style={{
@@ -515,5 +566,6 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
         </div>
     );
 }
+
 
 export default MomentumFlame;
