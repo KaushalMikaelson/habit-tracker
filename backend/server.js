@@ -23,7 +23,6 @@ app.use(
       "http://localhost:3000", // React (CRA)
       "http://localhost:3001", // React (CRA) - alternate port
       "https://habit-tracker-km.vercel.app",
-
     ],
     credentials: true,
   })

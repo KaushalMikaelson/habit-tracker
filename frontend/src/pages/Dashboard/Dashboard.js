@@ -12,6 +12,7 @@ import {
 /* ================= Existing imports ================= */
 import AddHabitModal from "../../components/AddHabitModal.jsx";
 import MomentumFlame from "../../components/MomentumFlame.jsx";
+import PrestigeBadge from "../../components/PrestigeBadge";
 import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
 import DashboardLayout from "./DashboardLayout.js";
@@ -432,6 +433,7 @@ function Dashboard({ user, logout }) {
             momentum={kpis.momentum}
             monthly={kpis.monthly}
           />
+          <PrestigeBadge habits={habits} />
           <button
             onClick={() => setShowModal(true)}
             style={{

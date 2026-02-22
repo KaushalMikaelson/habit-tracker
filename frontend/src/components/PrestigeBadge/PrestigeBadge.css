@@ -1,0 +1,312 @@
+/* =============================================
+   Prestige Badge — Premium Visual System
+   ============================================= */
+
+/* ---- Breathing Glow (Platinum + TOP 5%) ---- */
+@keyframes prestigeBreath {
+
+    0%,
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.06);
+    }
+}
+
+/* ---- Shine Sweep (TOP 5%) ---- */
+@keyframes prestigeShineSweep {
+    0% {
+        left: -60%;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    40% {
+        left: 120%;
+        opacity: 0;
+    }
+
+    100% {
+        left: 120%;
+        opacity: 0;
+    }
+}
+
+/* ---- Border Rotation (TOP 5% conic gradient) ---- */
+@keyframes prestigeBorderRotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---- Dropdown entrance ---- */
+@keyframes prestigeDropIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* =============================================
+   Badge Container
+   ============================================= */
+
+.prestige-badge-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    z-index: 50;
+}
+
+/* ---- The Clickable Badge ---- */
+
+.prestige-badge {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.22s cubic-bezier(.4, 0, .2, 1),
+        box-shadow 0.22s cubic-bezier(.4, 0, .2, 1);
+    user-select: none;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.prestige-badge:hover {
+    transform: scale(1.08);
+}
+
+.prestige-badge:active {
+    transform: scale(0.96);
+}
+
+/* Inner shadow + depth illusion */
+.prestige-badge::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4),
+        inset 0 -1px 3px rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+}
+
+/* Reflection highlight */
+.prestige-badge::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 6px;
+    width: 16px;
+    height: 8px;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.22) 0%,
+            rgba(255, 255, 255, 0) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Percentage text inside badge */
+.prestige-badge-text {
+    position: relative;
+    z-index: 3;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+/* =============================================
+   TOP 5% — Special Effects
+   ============================================= */
+
+/* Animated conic border */
+.prestige-top5-border {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    animation: prestigeBorderRotate 3s linear infinite;
+    z-index: -1;
+}
+
+/* Breathing glow layer */
+.prestige-glow {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    animation: prestigeBreath 2.8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Shine sweep overlay */
+.prestige-shine {
+    position: absolute;
+    top: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            rgba(255, 215, 0, 0) 0%,
+            rgba(255, 215, 0, 0.25) 50%,
+            rgba(255, 215, 0, 0) 100%);
+    animation: prestigeShineSweep 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 4;
+    border-radius: 50%;
+}
+
+/* Crown icon */
+.prestige-crown {
+    position: absolute;
+    top: -7px;
+    right: -4px;
+    z-index: 5;
+    font-size: 12px;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6));
+    line-height: 1;
+}
+
+/* =============================================
+   Dropdown Panel
+   ============================================= */
+
+.prestige-dropdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+.prestige-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: 280px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    z-index: 1000;
+    animation: prestigeDropIn 0.25s cubic-bezier(.4, 0, .2, 1);
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* Rank title */
+.prestige-dropdown-rank {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Stats rows */
+.prestige-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.prestige-stat-label {
+    font-size: 12px;
+    color: #94a3b8;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.prestige-stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+/* Next tier section */
+.prestige-next-tier {
+    margin-top: 14px;
+    padding-top: 10px;
+}
+
+.prestige-next-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+/* Progress bar */
+.prestige-progress-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.prestige-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(.4, 0, .2, 1);
+}
+
+.prestige-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+/* Tooltip */
+.prestige-tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.02em;
+}
