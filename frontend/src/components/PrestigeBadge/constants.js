@@ -106,3 +106,65 @@ export function getNextTier(score) {
     const currentIndex = PRESTIGE_TIERS.indexOf(currentTier);
     return currentIndex > 0 ? PRESTIGE_TIERS[currentIndex - 1] : null;
 }
+
+/**
+ * Flame Tiers — Monthly Progress
+ * Mirrors MomentumFlame component stages.
+ */
+export const FLAME_TIERS = [
+    {
+        key: "apex",
+        label: "Apex Reactor",
+        min: 91,
+        max: 100,
+        color: "#d4af37", // Gold
+        gradient: "linear-gradient(135deg, #050505, #1c1c1c)",
+    },
+    {
+        key: "plasma",
+        label: "Plasma Energy",
+        min: 71,
+        max: 90,
+        color: "#c084fc", // Purple
+        gradient: "linear-gradient(135deg, #1e0033, #7c3aed)",
+    },
+    {
+        key: "blue",
+        label: "Blue Acceleration",
+        min: 51,
+        max: 70,
+        color: "#60a5fa", // Blue
+        gradient: "linear-gradient(135deg, #0a1124, #2563eb)",
+    },
+    {
+        key: "ember",
+        label: "Ember Flame",
+        min: 11,
+        max: 50,
+        color: "#f59e0b", // Orange-Red
+        gradient: "linear-gradient(135deg, #3b0d02, #ef4444)",
+    },
+    {
+        key: "spark",
+        label: "Spark",
+        min: 0,
+        max: 10,
+        color: "#fde047", // Yellow
+        gradient: "linear-gradient(135deg, #140f02, #2b1d00)",
+    },
+];
+
+export function getFlameTier(score) {
+    const clamped = Math.max(0, Math.min(100, score));
+    return (
+        FLAME_TIERS.find((t) => clamped >= t.min && clamped <= t.max) ||
+        FLAME_TIERS[FLAME_TIERS.length - 1]
+    );
+}
+
+export function getNextFlameTier(score) {
+    const clamped = Math.max(0, Math.min(100, score));
+    const currentTier = getFlameTier(clamped);
+    const currentIndex = FLAME_TIERS.indexOf(currentTier);
+    return currentIndex > 0 ? FLAME_TIERS[currentIndex - 1] : null;
+}

@@ -1,4 +1,7 @@
 import dayjs from "dayjs";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isBetween);
 
 /**
  * Prestige Badge — Lifetime Scoring
@@ -20,12 +23,21 @@ export function calculateLifetimeStats(habits) {
             totalCompleted: 0,
             totalPossible: 0,
             currentStreak: 0,
+            monthlyScore: 0,
+            monthlyCompleted: 0,
+            monthlyPossible: 0,
         };
     }
 
     const today = dayjs().startOf("day");
     let totalCompleted = 0;
     let totalPossible = 0;
+
+    // Monthly variables
+    const monthStart = today.startOf("month");
+    const daysElapsedInMonth = today.date(); // current day of month
+    let monthlyCompleted = 0;
+    const totalHabits = habits.length;
 
     habits.forEach((habit) => {
         const completedDates = Array.isArray(habit.completedDates)
@@ -39,6 +51,14 @@ export function calculateLifetimeStats(habits) {
         const createdAt = dayjs(habit.createdAt).startOf("day");
         const daysSinceCreation = today.diff(createdAt, "day") + 1;
         totalPossible += Math.max(daysSinceCreation, 1);
+
+        // Calculate monthly completed tasks
+        completedDates.forEach((date) => {
+            const d = dayjs(date).startOf("day");
+            if (d.isBetween(monthStart, today.endOf("day"), "day", "[]")) {
+                monthlyCompleted++;
+            }
+        });
     });
 
     // Lifetime completion percentage
@@ -51,11 +71,21 @@ export function calculateLifetimeStats(habits) {
     // where ALL habits were completed
     const currentStreak = calculateStreak(habits, today);
 
+    // Monthly score calculation
+    const monthlyPossible = totalHabits * daysElapsedInMonth;
+    const monthlyScore =
+        monthlyPossible > 0
+            ? Math.round((monthlyCompleted / monthlyPossible) * 100)
+            : 0;
+
     return {
         lifetimeScore: Math.min(lifetimeScore, 100),
         totalCompleted,
         totalPossible,
         currentStreak,
+        monthlyScore: Math.min(monthlyScore, 100),
+        monthlyCompleted,
+        monthlyPossible,
     };
 }
 

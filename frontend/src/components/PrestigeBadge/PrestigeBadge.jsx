@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTier, getNextTier } from "./constants";
+import { getTier, getNextTier, getFlameTier, getNextFlameTier } from "./constants";
 import { calculateLifetimeStats } from "./scoring";
 import "./PrestigeBadge.css";
 
@@ -42,6 +42,20 @@ export default function PrestigeBadge({ habits }) {
         )
         : 100;
 
+    /* ---- Flame Progress ---- */
+    const currentFlame = useMemo(() => getFlameTier(stats.monthlyScore), [stats.monthlyScore]);
+    const nextFlame = useMemo(() => getNextFlameTier(stats.monthlyScore), [stats.monthlyScore]);
+
+    const flameProgressPercent = nextFlame
+        ? Math.round(
+            ((stats.monthlyScore - currentFlame.min) / Math.max(1, (nextFlame.min - currentFlame.min))) * 100
+        )
+        : 100;
+
+    const tasksNeededForNextFlame = nextFlame
+        ? Math.max(0, Math.ceil((nextFlame.min / 100) * stats.monthlyPossible) - stats.monthlyCompleted)
+        : 0;
+
     return (
         <div className="prestige-badge-wrapper" ref={wrapperRef}>
             {/* ---- The Badge ---- */}
@@ -80,6 +94,11 @@ export default function PrestigeBadge({ habits }) {
 
                 {/* Crown (TOP 5% only) */}
                 {tier.isTop5 && <span className="prestige-crown">👑</span>}
+
+                {/* Shield Icon */}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ color: tier.textColor, zIndex: 3, opacity: 0.9 }}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
 
                 {/* Percentage text */}
                 <span
@@ -174,6 +193,36 @@ export default function PrestigeBadge({ habits }) {
                                     </div>
                                 </div>
                             )}
+
+                            {/* Flame Progress */}
+                            <div className="prestige-next-tier" style={{ marginTop: "16px" }}>
+                                <div className="prestige-next-label">
+                                    🔥 Next Flame: {nextFlame ? nextFlame.label : "Apex Achieved"} {nextFlame ? `(${nextFlame.min}%)` : ""}
+                                </div>
+
+                                <div className="prestige-progress-track">
+                                    <motion.div
+                                        className="prestige-progress-fill"
+                                        style={{
+                                            background: nextFlame ? nextFlame.gradient : currentFlame.gradient,
+                                        }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${Math.min(100, Math.max(0, flameProgressPercent))}%` }}
+                                        transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                                    />
+                                </div>
+
+                                <div className="prestige-progress-text">
+                                    <span>{stats.monthlyScore}%</span>
+                                    <span>{nextFlame ? nextFlame.min : 100}%</span>
+                                </div>
+
+                                {nextFlame && (
+                                    <div style={{ marginTop: "8px", fontSize: "11px", color: "#94a3b8", textAlign: "center", fontWeight: 500, letterSpacing: "0.02em" }}>
+                                        Complete <span style={{ color: nextFlame.color, fontWeight: 700 }}>{tasksNeededForNextFlame}</span> more task{tasksNeededForNextFlame !== 1 ? 's' : ''} this month for next stage!
+                                    </div>
+                                )}
+                            </div>
 
                             {/* At max tier */}
                             {!nextTier && (
