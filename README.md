@@ -1,43 +1,47 @@
-# 🎯 Habit Tracker
+# 🎯 Habit Tracker (Premium Edition)
 
-A full-stack habit tracking application that helps users build and maintain positive habits through visual tracking and daily accountability.
+A full-stack, aesthetically driven habit tracking application designed to help users build and maintain positive habits through highly visual tracking, progressive rewards, and daily accountability.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)
 ![React](https://img.shields.io/badge/react-18.2.0-61dafb.svg)
 
-## ✨ Features
+## ✨ Premium Features
 
-- **User Authentication**: Secure signup and login with JWT-based authentication
-- **Habit Management**: Create, track, and delete habits with ease
-- **Visual Calendar**: Interactive calendar view to track habit completion
-- **Daily Tracking**: Mark habits as complete for specific dates
-- **Soft Delete**: Undo accidental deletions with built-in recovery
-- **Responsive Design**: Works seamlessly across desktop and mobile devices
-- **Real-time Updates**: Instant feedback on all habit operations
+- **Dynamic Dark Mode UI**: A stunning, modern dark-themed interface built from scratch with glassmorphism effects, radial gradients, and fluid micro-animations.
+- **Prestige Badge System**: Long-term performance indicator. Earn progressive visual badges (Bronze, Silver, Gold, Platinum, Diamond, Apex) based on lifetime habit completion percentage. Features dynamic lighting and particle effects.
+- **Momentum Flame 2.0**: A physically accurate, multi-layered gas flame visualizer that grows and changes color based on your monthly consistency and momentum.
+- **Advanced KPI Dashboard**: At-a-glance circular progress rings for Today, Weekly, and Monthly completion rates, plus historical momentum tracking.
+- **Interactive Habit Grid**: A responsive, horizontally scrolling calendar grid to mark habits complete.
+- **Drag-and-Drop Reordering**: Intuitively reorder your habits using `@dnd-kit`.
+- **Soft Delete & Undo**: Accidentally deleted a habit? Instantly recover it with a custom animated toast notification.
+- **Detailed Analytics**: Visual graphs and Top Habits tracking to analyze your long-term performance.
+- **Mobile-First Responsive Layout**: flawless experience across desktop, tablet, and mobile devices.
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React** 18.2.0 - UI library
+- **React** 18.2.0 - Core UI library
 - **React Router** 7.11.0 - Client-side routing
+- **Framer Motion** - Fluid animations and layout transitions
+- **@dnd-kit core/sortable** - Drag and drop functionality
+- **Day.js** - Lightweight date parsing and formatting
 - **Axios** - HTTP client for API requests
-- **JWT Decode** - Token management
-- **React Testing Library** - Component testing
+- **JWT Decode** - Secure frontend token management
 
 ### Backend
-- **Node.js** with **Express** 5.2.1 - Server framework
-- **MongoDB** with **Mongoose** 9.1.1 - Database and ODM
-- **JWT** - Authentication tokens
-- **Bcrypt** - Password hashing
-- **CORS** - Cross-origin resource sharing
+- **Node.js** with **Express** 5.2.1 - Robust server framework
+- **MongoDB** with **Mongoose** 9.1.1 - NoSQL Database and ODM
+- **JSON Web Tokens (JWT)** - Secure, stateless authentication
+- **Bcrypt** - Enterprise-grade password hashing
+- **CORS** - Secure cross-origin resource sharing
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure your development environment meets the following requirements:
 - **Node.js** (v14.0.0 or higher)
 - **npm** (v6.0.0 or higher)
-- **MongoDB** (v4.0 or higher) - Running locally or accessible remotely
+- **MongoDB** (v4.0 or higher) - Running locally or via MongoDB Atlas
 
 ## 🚀 Getting Started
 
@@ -50,7 +54,7 @@ cd habit-tracker
 
 ### 2. Install Dependencies
 
-Install dependencies for both frontend and backend:
+Install dependencies for both the frontend and backend environments:
 
 ```bash
 # Install root dependencies
@@ -76,7 +80,7 @@ cd backend
 cp .env.example .env
 ```
 
-Edit the `.env` file with your configuration:
+Edit the `.env` file with your specific configuration details:
 
 ```env
 # Server Configuration
@@ -85,7 +89,7 @@ PORT=5000
 # MongoDB Configuration
 MONGO_URI=mongodb://127.0.0.1:27017/habit-tracker
 
-# JWT Secret (Change this to a secure random string)
+# JWT Configuration
 JWT_SECRET=your_super_secret_jwt_key_here
 
 # Logging Configuration
@@ -103,7 +107,7 @@ REACT_APP_API_URL=http://localhost:5000
 
 ### 4. Start MongoDB
 
-Ensure MongoDB is running on your system:
+Ensure your MongoDB instance is running:
 
 ```bash
 # On Windows
@@ -117,140 +121,96 @@ sudo systemctl start mongod
 
 #### Development Mode
 
-Open two terminal windows:
+Launch the application by opening two separate terminal windows:
 
-**Terminal 1 - Backend:**
+**Terminal 1 - Backend Server:**
 ```bash
 cd backend
 node server.js
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - Frontend Application:**
 ```bash
 cd frontend
 npm start
 ```
 
-The application will be available at:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:5000
+The application will now be accessible at:
+- **Frontend App**: `http://localhost:3000`
+- **Backend API**: `http://localhost:5000`
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
 ```
 habit-tracker/
 ├── backend/
-│   ├── controllers/        # Request handlers
-│   ├── middleware/         # Authentication middleware
-│   ├── models/            # Mongoose schemas
-│   │   ├── User.js
-│   │   └── Habit.js
-│   ├── routes/            # API routes
-│   │   ├── auth.routes.js
-│   │   ├── habits.routes.js
-│   │   └── dashboard.routes.js
-│   ├── utils/             # Utility functions
-│   ├── server.js          # Entry point
-│   ├── .env.example       # Environment template
-│   └── package.json
+│   ├── controllers/        # Business logic & request handlers
+│   ├── middleware/         # Auth & validation middleware
+│   ├── models/            # Mongoose schemas (User, Habit)
+│   ├── routes/            # REST API route definitions
+│   ├── utils/             # Helper functions & logger
+│   └── server.js          # Express application entry point
 │
 ├── frontend/
-│   ├── public/            # Static files
+│   ├── public/            # Static assets
 │   ├── src/
-│   │   ├── api/          # API client configuration
-│   │   ├── auth/         # Authentication context
-│   │   ├── components/   # Reusable components
-│   │   │   ├── habits/
-│   │   │   ├── AddHabitModal.jsx
-│   │   │   └── AuthGate.js
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── pages/        # Page components
-│   │   │   ├── Dashboard/
-│   │   │   ├── Login.js
-│   │   │   └── Signup.js
-│   │   ├── utils/        # Utility functions
-│   │   ├── App.js        # Root component
-│   │   └── index.js      # Entry point
+│   │   ├── api/          # Axios instance & API calls
+│   │   ├── components/   # Modular React components
+│   │   │   ├── habits/   # Grid, layout, and habit controls
+│   │   │   ├── kpi/      # Analytical rings and stats
+│   │   │   ├── MomentumFlame/ # Complex visual indicator
+│   │   │   └── PrestigeBadge/ # Long-term progression system
+│   │   ├── hooks/        # Custom React hooks (useHabits)
+│   │   ├── pages/        # High-level route components (Dashboard, Auth)
+│   │   ├── utils/        # Date formatting, calc logic
+│   │   └── App.js        # Root component routing
 │   └── package.json
-│
 └── README.md
 ```
 
-## 🔌 API Endpoints
+## 🔌 Core API Endpoints
 
 ### Authentication
-- `POST /api/auth/signup` - Register a new user
-- `POST /api/auth/login` - Login user
+- `POST /api/auth/signup` - Register a new user account
+- `POST /api/auth/login` - Authenticate user and receive JWT
 
-### Habits
-- `GET /api/habits` - Get all habits for authenticated user
-- `POST /api/habits` - Create a new habit
-- `PATCH /api/habits/:id/toggle` - Toggle habit completion for a date
-- `DELETE /api/habits/:id` - Soft delete a habit
-- `PATCH /api/habits/:id/undo` - Restore a deleted habit
+### Habits Management
+- `GET /api/habits` - Retrieve all habits for the authenticated user
+- `POST /api/habits` - Create a new habit entry
+- `PATCH /api/habits/:id/toggle` - Toggle habit completion status for a specific date
+- `DELETE /api/habits/:id` - Soft delete a habit (allows undo)
+- `PATCH /api/habits/:id/undo` - Restore a previously soft-deleted habit
+- `PATCH /api/habits/reorder` - Update habit display order
 
-### Dashboard
-- `GET /api/dashboard` - Get dashboard data
+## 🔒 Security Posture
 
-## 🧪 Testing
-
-### Frontend Tests
-
-```bash
-cd frontend
-npm test
-```
-
-### Run Tests in Watch Mode
-
-```bash
-npm test -- --watch
-```
-
-## 🔒 Security Features
-
-- **Password Hashing**: Bcrypt with salt rounds for secure password storage
-- **JWT Authentication**: Stateless authentication with secure tokens
-- **Protected Routes**: Middleware-based route protection
-- **Input Validation**: Server-side validation for all inputs
-- **CORS Configuration**: Controlled cross-origin access
-
-## 🎨 Key Features Explained
-
-### Soft Delete with Undo
-Habits are never permanently deleted immediately. Instead, they're marked as deleted and can be restored within the session, preventing accidental data loss.
-
-### Date-Specific Tracking
-Each habit maintains an array of completed dates, allowing users to track their progress over time and mark habits as complete for any specific date.
-
-### Configurable Logging
-The backend includes a flexible logging system with multiple levels (none, error, info, debug) to help with development and debugging. See `backend/LOGGING.md` for details.
+- **Password Cryptography**: Bcrypt hashing with secure salt rounds
+- **Stateless Auth**: JWT-based authentication preventing session hijacking
+- **Route Protection**: Custom Express middleware for strict endpoint access control
+- **Input Sanitization**: Server-side validation to prevent injection attacks
+- **CORS Policies**: Strictly controlled cross-origin resource sharing rules
 
 ## 🐛 Troubleshooting
 
-### MongoDB Connection Issues
-- Ensure MongoDB is running: `mongod --version`
-- Check the connection string in `.env`
-- Verify MongoDB is accessible at the specified port
+### MongoDB Connection Timeout
+- Verify MongoDB daemon is actively running: `mongod --version`
+- Double-check the `MONGO_URI` connection string in your backend `.env` file
 
-### Port Already in Use
-If port 5000 or 3000 is already in use:
+### Address Already in Use (EADDRINUSE)
+If ports 5000 or 3000 are blocked by another process:
 ```bash
-# Find and kill the process (Windows)
+# Windows: Find and terminate process
 netstat -ano | findstr :5000
 taskkill /PID <PID> /F
-
-# Change the port in .env (backend) or package.json (frontend)
 ```
 
-### JWT Authentication Errors
-- Ensure `JWT_SECRET` is set in backend `.env`
-- Clear browser localStorage and try logging in again
-- Check that the token is being sent in request headers
+### Authentication Failures
+- Verify `JWT_SECRET` is correctly populated in the backend `.env`
+- Clear browser `localStorage` and attempt re-login to flush stale tokens
 
 ## 📝 License
 
-This project is licensed under the MIT License.
+This project is open-source and licensed under the MIT License.
 
 ## 👤 Author
 
@@ -259,12 +219,7 @@ This project is licensed under the MIT License.
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/KaushalMikaelson/habit-tracker/issues).
-
-## ⭐ Show Your Support
-
-Give a ⭐️ if this project helped you!
+Contributions, bug reports, and feature requests are highly encouraged. Please check the [issues page](https://github.com/KaushalMikaelson/habit-tracker/issues) to get involved.
 
 ---
-
-**Built with ❤️ using React and Node.js**
+**Crafted with focus and discipline.**
