@@ -1,0 +1,92 @@
+[
+  {
+    "order": 0,
+    "isDeleted": false,
+    "deletedAt": null,
+    "_id": "695e33a1dba47cf727333512",
+    "title": "Morning Workout",
+    "completedDates": [
+      "2026-01-07"
+    ],
+    "userId": "69591e7a97eea9f3bbcb7161",
+    "createdAt": "2026-01-07T10:21:22.011Z",
+    "updatedAt": "2026-01-07T10:23:43.344Z",
+    "__v": 3
+  },
+  {
+    "order": 0,
+    "isDeleted": false,
+    "deletedAt": null,
+    "_id": "695e3bf038ae27a27a734d90",
+    "title": "Morning Workout done",
+    "completedDates": [],
+    "userId": "69591e7a97eea9f3bbcb7161",
+    "createdAt": "2026-01-07T10:56:48.435Z",
+    "updatedAt": "2026-01-07T10:56:48.435Z",
+    "__v": 0
+  },
+  {
+    "order": 0,
+    "isDeleted": false,
+    "deletedAt": null,
+    "_id": "695e3d23834a44ae431ae7c9",
+    "title": "Morning Workout is",
+    "completedDates": [],
+    "userId": "69591e7a97eea9f3bbcb7161",
+    "createdAt": "2026-01-07T11:01:55.450Z",
+    "updatedAt": "2026-01-07T11:01:55.450Z",
+    "__v": 0
+  },
+  {
+    "_id": "698a12e82815044b576b08a0",
+    "title": "eat",
+    "userId": "698a12c02815044b576b089a",
+    "completedDates": [
+      "2026-02-04",
+      "2026-02-02",
+      "2026-02-07",
+      "2026-02-09"
+    ],
+    "order": 0,
+    "isDeleted": false,
+    "deletedAt": null,
+    "createdAt": "2026-02-09T17:01:28.246Z",
+    "updatedAt": "2026-02-09T17:02:00.994Z",
+    "__v": 4
+  },
+  {
+    "_id": "698a12f32815044b576b08a3",
+    "title": "drink",
+    "userId": "698a12c02815044b576b089a",
+    "completedDates": [
+      "2026-02-04",
+      "2026-02-02",
+      "2026-02-03",
+      "2026-02-06",
+      "2026-02-07",
+      "2026-02-08",
+      "2026-02-09"
+    ],
+    "order": 1,
+    "isDeleted": false,
+    "deletedAt": null,
+    "createdAt": "2026-02-09T17:01:39.520Z",
+    "updatedAt": "2026-02-09T17:01:59.725Z",
+    "__v": 7
+  },
+  {
+    "_id": "698a12f82815044b576b08a6",
+    "title": "dance",
+    "userId": "698a12c02815044b576b089a",
+    "completedDates": [
+      "2026-02-02",
+      "2026-02-04"
+    ],
+    "order": 2,
+    "isDeleted": false,
+    "deletedAt": null,
+    "createdAt": "2026-02-09T17:01:44.184Z",
+    "updatedAt": "2026-02-09T17:01:50.901Z",
+    "__v": 2
+  }
+]

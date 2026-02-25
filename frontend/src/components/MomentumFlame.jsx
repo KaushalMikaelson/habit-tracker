@@ -90,9 +90,9 @@ const PALETTES = {
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
 function getStage(level) {
-    if (level >= 10) return 5;
-    if (level >= 8) return 4;
-    if (level >= 6) return 3;
+    if (level >= 9) return 5;
+    if (level >= 7) return 4;
+    if (level >= 5) return 3;
     if (level >= 2) return 2;
     return 1;
 }

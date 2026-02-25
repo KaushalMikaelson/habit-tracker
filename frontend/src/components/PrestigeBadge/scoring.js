@@ -47,10 +47,29 @@ export function calculateLifetimeStats(habits) {
         // Count all completed tasks for this habit
         totalCompleted += completedDates.length;
 
-        // Calculate days since habit was created (inclusive of creation day)
-        const createdAt = dayjs(habit.createdAt).startOf("day");
-        const daysSinceCreation = today.diff(createdAt, "day") + 1;
-        totalPossible += Math.max(daysSinceCreation, 1);
+        // Calculate days since habit was started (earliest of creation date or any completed date)
+        const dbCreatedAt = habit.createdAt ? dayjs(habit.createdAt).startOf("day") : today;
+        let startDate = dbCreatedAt;
+
+        if (completedDates.length > 0) {
+            let earliestCompleted = dayjs(completedDates[0]).startOf("day");
+            completedDates.forEach((dStr) => {
+                const d = dayjs(dStr).startOf("day");
+                if (d.isBefore(earliestCompleted)) {
+                    earliestCompleted = d;
+                }
+            });
+            if (earliestCompleted.isBefore(startDate)) {
+                startDate = earliestCompleted;
+            }
+        }
+
+        const daysSinceCreation = today.diff(startDate, "day") + 1;
+
+        let possibleForHabit = Math.max(daysSinceCreation, 1);
+        possibleForHabit = Math.max(possibleForHabit, completedDates.length); // Safety net to prevent >100% per habit
+
+        totalPossible += possibleForHabit;
 
         // Calculate monthly completed tasks
         completedDates.forEach((date) => {
