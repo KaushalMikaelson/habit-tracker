@@ -47,7 +47,7 @@ const PALETTES = {
         glow: "rgba(239,68,68,0.55)",
         accent: null,
     },
-    
+
 
     // 4 — Electric Acceleration (Blue)
     3: {
@@ -89,11 +89,11 @@ const PALETTES = {
 };
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
-function getStage(level) {
-    if (level >= 9) return 5;
-    if (level >= 7) return 4;
-    if (level >= 5) return 3;
-    if (level >= 2) return 2;
+function getStage(score) {
+    if (score >= 91) return 5;
+    if (score >= 71) return 4;
+    if (score >= 51) return 3;
+    if (score >= 11) return 2;
     return 1;
 }
 
@@ -223,8 +223,8 @@ function SparkState() {
                 position: "relative",
                 filter: `drop-shadow(0 0 10px ${p.glow})`,
             }}
-            
-        
+
+
             title="Growth spark — ignition beginning"
         >
             {/* Micro heat aura */}
@@ -389,7 +389,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
 
         const norm = score / 100;
         const level = Math.max(1, Math.ceil(norm * 10));
-        const stage = getStage(level);
+        const stage = getStage(score);
         const palette = PALETTES[stage];
         const { outer: blurOuter, mid: blurMid } = getBlur(stage);
 
@@ -420,7 +420,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
     const wrapH = flameH + 16;
 
     const baseGlow = Math.max(12, glowPx); // ensures minimum glow
-const glowFilter = `
+    const glowFilter = `
   drop-shadow(0 0 ${baseGlow}px ${palette.glow})
   drop-shadow(0 0 ${baseGlow * 0.6}px ${palette.glow})
   brightness(1.15)
@@ -435,7 +435,7 @@ const glowFilter = `
                 width: `${wrapW}px`, height: `${wrapH}px`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
-                
+
             }}
             title={`Growth Reactor · Level ${level} · Stage ${stage}`}
         >
@@ -461,7 +461,7 @@ const glowFilter = `
                     opacity: [1, 0.95, 0.98, 0.94, 1],
                     filter: [glowFilter, glowFilterHot, glowFilter, glowFilterHot, glowFilter],
                 }}
-                
+
             >
 
                 <svg width={flameW} height={flameH} viewBox="0 0 28 38" fill="none" xmlns="http://www.w3.org/2000/svg">
