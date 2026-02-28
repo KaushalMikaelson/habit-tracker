@@ -1,3 +1,5 @@
+import { isDateAccessible } from "../../utils/habitUtils";
+
 const DAY_COLUMN_WIDTH = 34; // px
 
 function DashboardGrid({
@@ -185,14 +187,21 @@ function DashboardGrid({
                     : [];
                   const isCompleted = completedDates.includes(date);
                   const isFuture = isFutureDate(date);
+                  const isBeforeCreation = !isDateAccessible(habit, date);
+                  const isDisabled = isFuture || isBeforeCreation;
                   const isToday = date === today;
                   const isWeekend = [0, 6].includes(new Date(date).getDay());
                   const isWeekStart = new Date(date).getDay() === 1;
 
                   let cellClass = "";
-                  if (isFuture) cellClass = isDark ? "future-dark" : "future-light";
+                  if (isDisabled) cellClass = isDark ? "future-dark" : "future-light";
                   else if (isCompleted) cellClass = "completed";
                   else cellClass = isDark ? "pending-dark" : "pending-light";
+
+                  let titleText = "Mark complete";
+                  if (isCompleted) titleText = "Mark incomplete";
+                  else if (isBeforeCreation) titleText = "Before creation";
+                  else if (isFuture) titleText = "Future date";
 
                   return (
                     <div
@@ -213,11 +222,11 @@ function DashboardGrid({
                       }}
                     >
                       <button
-                        disabled={isFuture}
-                        onClick={() => !isFuture && toggleHabit(habit._id, date)}
+                        disabled={isDisabled}
+                        onClick={() => !isDisabled && toggleHabit(habit._id, date)}
                         className={`habit-cell-btn ${cellClass}`}
                         style={{ pointerEvents: "auto" }}
-                        title={isCompleted ? "Mark incomplete" : isFuture ? "Future date" : "Mark complete"}
+                        title={titleText}
                       >
                         {isCompleted ? "✓" : ""}
                       </button>

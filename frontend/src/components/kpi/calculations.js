@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { calculateWeeklyCompletion, calculateMonthlyCompletion, isDateAccessible } from "../../utils/habitUtils";
 
 dayjs.extend(isBetween);
 
@@ -36,51 +37,29 @@ export function calculateKPIs(habits, selectedMonth) {
   const todayStr = today.format("YYYY-MM-DD");
   const yesterdayStr = today.subtract(1, "day").format("YYYY-MM-DD");
 
-  const isCurrentMonth = selectedMonth.isSame(today, "month");
-
-  /* ================= WEEK CALCULATION ================= */
-
-  const weekStart =
-    today.day() === 0
-      ? today.subtract(6, "day").startOf("day")
-      : today.startOf("week").add(1, "day");
-
-  const daysElapsedThisWeek =
-    today.diff(weekStart, "day") + 1;
-
-  const prevWeekStart = weekStart.subtract(7, "day");
-  const prevWeekEnd = prevWeekStart
-    .add(daysElapsedThisWeek - 1, "day")
-    .endOf("day");
-
-  /* ================= MONTH CALCULATION ================= */
-
-  const monthStart = selectedMonth.startOf("month").startOf("day");
-  const monthEnd = selectedMonth.endOf("month").endOf("day");
-  const daysInMonth = selectedMonth.daysInMonth();
-
-  const daysElapsedInMonth = isCurrentMonth
-    ? today.date()
-    : daysInMonth;
-
-  const prevMonth = selectedMonth.subtract(1, "month");
-  const prevMonthStart = prevMonth.startOf("month").startOf("day");
-  const prevMonthEnd = prevMonth.endOf("month").endOf("day");
-
-  const prevPrevMonth = selectedMonth.subtract(2, "month");
-  const prevPrevMonthStart = prevPrevMonth.startOf("month").startOf("day");
-  const prevPrevMonthEnd = prevPrevMonth.endOf("month").endOf("day");
-
   const totalHabits = habits.length;
   if (totalHabits === 0) return defaultKPIs();
 
   let todayCompleted = 0;
+  let dailyTotalHabits = 0;
+
   let yesterdayCompleted = 0;
+  let yesterdayTotalHabits = 0;
+
   let weeklyCompleted = 0;
+  let weeklyTotal = 0;
+
   let prevWeekCompleted = 0;
+  let prevWeeklyTotal = 0;
+
   let monthlyCompleted = 0;
+  let monthlyTotal = 0;
+
   let prevMonthCompleted = 0;
+  let prevMonthlyTotal = 0;
+
   let prevPrevMonthCompleted = 0;
+  let prevPrevMonthlyTotal = 0;
 
   habits.forEach((habit) => {
     const completedDates = Array.isArray(habit.completedDates)
@@ -88,129 +67,108 @@ export function calculateKPIs(habits, selectedMonth) {
       : [];
 
     /* ================= DAILY ================= */
-
-    if (completedDates.includes(todayStr)) {
-      todayCompleted++;
+    if (isDateAccessible(habit, todayStr)) {
+      dailyTotalHabits++;
+      if (completedDates.includes(todayStr)) {
+        todayCompleted++;
+      }
     }
 
-    if (completedDates.includes(yesterdayStr)) {
-      yesterdayCompleted++;
+    if (isDateAccessible(habit, yesterdayStr)) {
+      yesterdayTotalHabits++;
+      if (completedDates.includes(yesterdayStr)) {
+        yesterdayCompleted++;
+      }
     }
 
-    /* ================= OTHER KPIs ================= */
+    /* ================= WEEKLY ================= */
+    const w = calculateWeeklyCompletion(habit, today, today);
+    weeklyCompleted += w.completed;
+    weeklyTotal += w.total;
 
-    completedDates.forEach((date) => {
-      const d = dayjs(date).startOf("day");
+    const prevW = calculateWeeklyCompletion(
+      habit,
+      today.subtract(1, "week").startOf("week"),
+      today
+    );
+    prevWeekCompleted += prevW.completed;
+    prevWeeklyTotal += prevW.total;
 
-      if (
-        d.isBetween(weekStart, today.endOf("day"), "day", "[]")
-      ) {
-        weeklyCompleted++;
-      }
+    /* ================= MONTHLY ================= */
+    const m = calculateMonthlyCompletion(habit, selectedMonth, today);
+    monthlyCompleted += m.completed;
+    monthlyTotal += m.total;
 
-      if (
-        d.isBetween(prevWeekStart, prevWeekEnd, "day", "[]")
-      ) {
-        prevWeekCompleted++;
-      }
+    const prevM = calculateMonthlyCompletion(
+      habit,
+      selectedMonth.subtract(1, "month"),
+      today
+    );
+    prevMonthCompleted += prevM.completed;
+    prevMonthlyTotal += prevM.total;
 
-      if (
-        d.isBetween(
-          monthStart,
-          isCurrentMonth ? today.endOf("day") : monthEnd,
-          "day",
-          "[]"
-        )
-      ) {
-        monthlyCompleted++;
-      }
-
-      if (
-        d.isBetween(
-          prevMonthStart,
-          prevMonthEnd,
-          "day",
-          "[]"
-        )
-      ) {
-        prevMonthCompleted++;
-      }
-
-      if (
-        d.isBetween(
-          prevPrevMonthStart,
-          prevPrevMonthEnd,
-          "day",
-          "[]"
-        )
-      ) {
-        prevPrevMonthCompleted++;
-      }
-    });
+    const prevPrevM = calculateMonthlyCompletion(
+      habit,
+      selectedMonth.subtract(2, "month"),
+      today
+    );
+    prevPrevMonthCompleted += prevPrevM.completed;
+    prevPrevMonthlyTotal += prevPrevM.total;
   });
 
   /* ================= DAILY ================= */
 
-  const daily = Math.round(
-    (todayCompleted / totalHabits) * 100
-  );
+  const daily =
+    dailyTotalHabits > 0
+      ? Math.round((todayCompleted / dailyTotalHabits) * 100)
+      : 0;
 
-  const yesterdayDaily = Math.round(
-    (yesterdayCompleted / totalHabits) * 100
-  );
+  const yesterdayDaily =
+    yesterdayTotalHabits > 0
+      ? Math.round((yesterdayCompleted / yesterdayTotalHabits) * 100)
+      : 0;
 
   const dailyDelta = daily - yesterdayDaily;
 
   /* ================= WEEKLY ================= */
 
-  const weekly = Math.round(
-    (weeklyCompleted /
-      (totalHabits * daysElapsedThisWeek)) *
-      100
-  );
+  const weekly =
+    weeklyTotal > 0 ? Math.round((weeklyCompleted / weeklyTotal) * 100) : 0;
 
-  const prevWeekly = Math.round(
-    (prevWeekCompleted /
-      (totalHabits * daysElapsedThisWeek)) *
-      100
-  );
+  const prevWeekly =
+    prevWeeklyTotal > 0
+      ? Math.round((prevWeekCompleted / prevWeeklyTotal) * 100)
+      : 0;
 
   const weeklyDelta = weekly - prevWeekly;
 
   /* ================= MONTHLY ================= */
 
-  const monthly = Math.round(
-    (monthlyCompleted /
-      (totalHabits * daysElapsedInMonth)) *
-      100
-  );
+  const monthly =
+    monthlyTotal > 0 ? Math.round((monthlyCompleted / monthlyTotal) * 100) : 0;
 
-  const prevMonthly = Math.round(
-    (prevMonthCompleted /
-      (totalHabits * prevMonth.daysInMonth())) *
-      100
-  );
+  const prevMonthly =
+    prevMonthlyTotal > 0
+      ? Math.round((prevMonthCompleted / prevMonthlyTotal) * 100)
+      : 0;
 
-  const prevPrevMonthly = Math.round(
-    (prevPrevMonthCompleted /
-      (totalHabits * prevPrevMonth.daysInMonth())) *
-      100
-  );
+  const prevPrevMonthly =
+    prevPrevMonthlyTotal > 0
+      ? Math.round((prevPrevMonthCompleted / prevPrevMonthlyTotal) * 100)
+      : 0;
 
   const monthlyDelta = monthly - prevMonthly;
 
   /* ================= MOMENTUM (TREND ACCELERATION) ================= */
 
   // Previous month’s improvement trend
-  const prevMonthlyDelta =
-    prevMonthly - prevPrevMonthly;
+  const prevMonthlyDelta = prevMonthly - prevPrevMonthly;
 
   // Current improvement strength
   const momentum = monthlyDelta;
 
   // Acceleration of improvement
-  const momentumDelta =
-    monthlyDelta - prevMonthlyDelta;
+  const momentumDelta = monthlyDelta - prevMonthlyDelta;
 
   return {
     daily,

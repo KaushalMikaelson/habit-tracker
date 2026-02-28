@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
+import { getEffectiveStartDate, calculateMonthlyCompletion } from "../../utils/habitUtils";
 
 dayjs.extend(isBetween);
 
@@ -33,11 +34,8 @@ export function calculateLifetimeStats(habits) {
     let totalCompleted = 0;
     let totalPossible = 0;
 
-    // Monthly variables
-    const monthStart = today.startOf("month");
-    const daysElapsedInMonth = today.date(); // current day of month
     let monthlyCompleted = 0;
-    const totalHabits = habits.length;
+    let monthlyPossible = 0;
 
     habits.forEach((habit) => {
         const completedDates = Array.isArray(habit.completedDates)
@@ -48,22 +46,7 @@ export function calculateLifetimeStats(habits) {
         totalCompleted += completedDates.length;
 
         // Calculate days since habit was started (earliest of creation date or any completed date)
-        const dbCreatedAt = habit.createdAt ? dayjs(habit.createdAt).startOf("day") : today;
-        let startDate = dbCreatedAt;
-
-        if (completedDates.length > 0) {
-            let earliestCompleted = dayjs(completedDates[0]).startOf("day");
-            completedDates.forEach((dStr) => {
-                const d = dayjs(dStr).startOf("day");
-                if (d.isBefore(earliestCompleted)) {
-                    earliestCompleted = d;
-                }
-            });
-            if (earliestCompleted.isBefore(startDate)) {
-                startDate = earliestCompleted;
-            }
-        }
-
+        const startDate = getEffectiveStartDate(habit);
         const daysSinceCreation = today.diff(startDate, "day") + 1;
 
         let possibleForHabit = Math.max(daysSinceCreation, 1);
@@ -71,13 +54,10 @@ export function calculateLifetimeStats(habits) {
 
         totalPossible += possibleForHabit;
 
-        // Calculate monthly completed tasks
-        completedDates.forEach((date) => {
-            const d = dayjs(date).startOf("day");
-            if (d.isBetween(monthStart, today.endOf("day"), "day", "[]")) {
-                monthlyCompleted++;
-            }
-        });
+        // Calculate exact monthly possible and completed
+        const m = calculateMonthlyCompletion(habit, today, today);
+        monthlyCompleted += m.completed;
+        monthlyPossible += m.total;
     });
 
     // Lifetime completion percentage
@@ -91,7 +71,6 @@ export function calculateLifetimeStats(habits) {
     const currentStreak = calculateStreak(habits, today);
 
     // Monthly score calculation
-    const monthlyPossible = totalHabits * daysElapsedInMonth;
     const monthlyScore =
         monthlyPossible > 0
             ? Math.round((monthlyCompleted / monthlyPossible) * 100)
