@@ -25,11 +25,6 @@ function HabitProgressColumn({ habits, currentMonth }) {
     ? currentMonth
     : dayjs(currentMonth);
 
-  const currentMonthStr = month.format("YYYY-MM");
-
-  const totalDaysSoFar = month.isSame(today, "month")
-    ? today.date()           // current month → up to today
-    : month.daysInMonth();   // past month → full month
 
   /* ---------- Build (NO SORTING) ---------- */
 
