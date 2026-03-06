@@ -191,7 +191,7 @@ function DashboardGrid({
                   const isDisabled = isFuture || isBeforeCreation;
                   const isToday = date === today;
                   const isWeekend = [0, 6].includes(new Date(date).getDay());
-                  const isWeekStart = new Date(date).getDay() === 1;
+                  const isWeekStart = new Date(date).getDay() === 0;
 
                   let cellClass = "";
                   if (isDisabled) cellClass = isDark ? "future-dark" : "future-light";
