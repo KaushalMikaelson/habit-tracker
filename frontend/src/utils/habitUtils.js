@@ -48,10 +48,8 @@ export function isDateAccessible(habit, dateStr) {
  */
 export function calculateWeeklyCompletion(habit, targetDate = dayjs(), todayDate = dayjs()) {
     const target = dayjs(targetDate).startOf("day");
-    const weekStart = target.day() === 0
-        ? target.subtract(6, "day").startOf("day")
-        : target.startOf("week").add(1, "day"); // ISO week start (Monday)
-    const weekEnd = weekStart.add(6, "day").endOf("day");
+    const weekStart = target.startOf("week"); // Sunday start
+    const weekEnd = target.endOf("week"); // Saturday end
 
     const today = dayjs(todayDate).startOf("day");
 
