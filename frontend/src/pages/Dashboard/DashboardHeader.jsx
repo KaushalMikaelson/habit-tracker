@@ -83,7 +83,7 @@ function DashboardHeader({
           padding: "0 14px",
           height: "52px",
           background: isDark
-            ? "rgba(2,6,23,0.9)"
+            ? "rgba(11, 16, 30, 0.9)"
             : "#f9fafb",
           backdropFilter: "blur(10px)",
           borderBottom: isDark

@@ -18,7 +18,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
         direction={kpis.momentumDirection}
         delta={kpis.momentumDelta}
         label="Momentum"
-        color="#38bdf8"
+        color="#22c55e"
       />
 
       {/* DAILY */}
@@ -27,7 +27,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
         direction={kpis.dailyDirection}
         delta={kpis.dailyDelta}
         label="Today"
-        color="#22c55e"
+        color="#ef4444"
         disabled={!isCurrentMonth}
       />
 
@@ -47,7 +47,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
         direction={kpis.monthlyDirection}
          delta={kpis.monthlyDelta}
         label="Monthly"
-        color="#facc15"
+        color="#ef4444"
       />
     </div>
   );

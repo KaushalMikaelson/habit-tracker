@@ -368,8 +368,7 @@ function Dashboard({ user, logout }) {
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "radial-gradient(ellipse 1400px 700px at 15% -5%, #334155 0%, #1e293b 45%, #020617 100%)",
+        background: "#121826",
       }}
     >
       <style>
@@ -390,7 +389,7 @@ function Dashboard({ user, logout }) {
           alignItems: "center",
           height: "60px",
           padding: "0 20px",
-          background: "rgba(2, 6, 23, 0.7)",
+          background: "rgba(18, 24, 38, 0.7)",
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           position: "sticky",
@@ -571,8 +570,7 @@ function Dashboard({ user, logout }) {
                 <div
                   style={{
                     height: KPI_ROW_HEIGHT,
-                    background:
-                      "linear-gradient(180deg, rgba(15,23,42,0.85), rgba(2,6,23,0.85))",
+                    background: "#0B101E",
                     borderRadius: "16px",
                     padding: "12px",
                     display: "flex",

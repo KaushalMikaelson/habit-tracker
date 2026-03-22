@@ -126,7 +126,7 @@ const styles = {
         height: "415px",
         borderRadius: "18px",
         padding: "16px",
-        background: "linear-gradient(180deg, #020617, #020617cc)",
+        background: "#0B101E",
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
         display: "flex",
         flexDirection: "column",
@@ -159,7 +159,7 @@ const styles = {
 
     input: {
         flex: 1,
-        background: "#020617",
+        background: "#1A2031",
         border: "1px solid #1e293b",
         borderRadius: "10px",
         padding: "8px 10px",
@@ -173,7 +173,7 @@ const styles = {
         borderRadius: "10px",
         border: "none",
         background: "#22c55e",
-        color: "#020617",
+        color: "#ffffff",
         fontSize: "18px",
         cursor: "pointer",
         boxShadow: "0 0 10px rgba(34,197,94,0.5)",

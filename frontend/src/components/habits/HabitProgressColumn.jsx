@@ -47,7 +47,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
         position: "relative",
         width: "100%",
         minWidth: 0,
-        background: "linear-gradient(180deg, #020617, #020617cc)",
+        background: "#0B101E",
         borderRadius: "16px",
         overflow: "hidden",
         boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",

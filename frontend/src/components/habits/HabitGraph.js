@@ -130,7 +130,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
         marginTop: "28px",
         padding: "22px",
         borderRadius: "20px",
-        background: "linear-gradient(180deg, #020617, #020617cc)",
+        background: "#0B101E",
         boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
         color: "#e5e7eb",
       }}
@@ -158,7 +158,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
               position: "absolute",
               left: hover.x - 42,
               top: hover.y - 60,
-              background: "#020617",
+              background: "#1A2031",
               border: "1px solid rgba(255,255,255,0.2)",
               padding: "6px 8px",
               borderRadius: "8px",
@@ -286,7 +286,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
                   cy={p.y}
                   r={isToday ? 6 : 4.5}
                   fill={isToday ? "#60a5fa" : "#22c55e"}
-                  stroke="#020617"
+                  stroke="#0B101E"
                   strokeWidth="1.2"
                   onMouseEnter={() => setHover(p)}
                   onMouseLeave={() => setHover(null)}

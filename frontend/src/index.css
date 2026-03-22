@@ -1,9 +1,9 @@
 /* ===== DESIGN TOKENS ===== */
 :root {
   /* Colors */
-  --color-bg:        #020617;
-  --color-surface:   #0f172a;
-  --color-surface-2: #1e293b;
+  --color-bg:        #121826;
+  --color-surface:   #0B101E;
+  --color-surface-2: #1A2031;
   --color-border:    rgba(255, 255, 255, 0.08);
   --color-text:      #f1f5f9;
   --color-muted:     #94a3b8;

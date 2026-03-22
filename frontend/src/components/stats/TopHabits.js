@@ -49,7 +49,7 @@ function TopHabits({
       style={{
         height:180,
         boxSizing: "border-box",
-        background: "linear-gradient(180deg, #020617, #020617cc)",
+        background: "#0B101E",
         borderRadius: "16px",
         padding: "16px",
         color: "#e5e7eb",
@@ -65,7 +65,7 @@ function TopHabits({
           fontSize: "12px",
           letterSpacing: "0.14em",
           fontWeight: 800,
-          color: "#93c5fd",
+          color: "#ffffff",
           display: "flex",
           alignItems: "center",
           flexShrink: 0,

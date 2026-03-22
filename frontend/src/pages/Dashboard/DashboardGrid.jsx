@@ -68,7 +68,7 @@ function DashboardGrid({
       <div
         style={{
           background: isDark
-            ? "linear-gradient(180deg, #020617, #020617cc)"
+            ? "#0B101E"
             : "#ffffff",
           borderRadius: "16px",
           overflow: "hidden",

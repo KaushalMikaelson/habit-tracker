@@ -1,15 +1,32 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../../auth/AuthContext";
 
-const DEFAULT_DATA = {
-  name: "Your Name",
-  quote: "Your Quote.",
-};
+const Edit2 = ({ size = 12 }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+  </svg>
+);
 
 function KpiIntroBox() {
-  const [data, setData] = useState(DEFAULT_DATA);
+  const { user } = useAuth();
+
+  const [data, setData] = useState({
+    name: user?.name?.split(' ')[0] || "User",
+    quote: user?.quote || "No rest for me in this world. Perhaps in the next.",
+  });
   const [editing, setEditing] = useState(false);
 
-  // 🔹 Load saved data
+  // 🔹 If user data loads asynchronously, sync it
+  useEffect(() => {
+    if (user) {
+      setData({
+        name: user.name?.split(' ')[0] || "User",
+        quote: user.quote || "No rest for me in this world. Perhaps in the next.",
+      });
+    }
+  }, [user]);
+
+  // 🔹 Load saved local data if any (combines with auth user state)
   useEffect(() => {
     const saved = localStorage.getItem("kpiIntroBox");
     if (saved) {
@@ -37,8 +54,7 @@ function KpiIntroBox() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-
-        background: "linear-gradient(180deg, #020617, #020617)",
+        background: "#0B101E",
         boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
         color: "#e5e7eb",
 
@@ -50,16 +66,21 @@ function KpiIntroBox() {
         onClick={() => setEditing((e) => !e)}
         style={{
           position: "absolute",
-          top: "10px",
+          top: "12px",
           right: "12px",
           background: "none",
           border: "none",
           color: "#38bdf8",
-          fontSize: "12px",
+          fontSize: "11px",
+          fontWeight: 600,
           cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
           opacity: 0.8,
         }}
       >
+        {!editing && <Edit2 size={12} />}
         {editing ? "Save" : "Edit"}
       </button>
 

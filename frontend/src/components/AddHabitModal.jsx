@@ -87,7 +87,7 @@ function AddHabitModal({
                 style={{
                     position: "fixed",
                     inset: 0,
-                    background: "rgba(2, 6, 23, 0.7)",
+                    background: "rgba(18, 24, 38, 0.7)",
                     backdropFilter: "blur(6px)",
                     zIndex: 1000,
                     animation: "modalOverlayIn 0.2s ease",
@@ -102,7 +102,7 @@ function AddHabitModal({
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: "400px",
-                    background: "linear-gradient(160deg, #0f172a, #1e293b)",
+                    background: "linear-gradient(160deg, #0B101E, #1A2031)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "20px",
                     padding: "28px",
