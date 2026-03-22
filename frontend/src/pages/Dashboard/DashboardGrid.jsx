@@ -10,6 +10,10 @@ function DashboardGrid({
   gridScrollRef,
   isFutureDate,
   theme, // ✅ RECEIVE THEME
+  monthLabel,
+  goToPreviousMonth,
+  goToNextMonth,
+  setTheme,
 }) {
   const isDark = theme === "dark";
 
@@ -24,10 +28,72 @@ function DashboardGrid({
           60%  { transform: scale(1.2); }
           100% { transform: scale(1); }
         }
+        .dash-nav-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          font-size: 13px;
+          font-weight: 700;
+          transition: all 0.18s cubic-bezier(.4,0,.2,1);
+        }
+        .dash-nav-btn-dark {
+          border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.06);
+          color: #94a3b8;
+        }
+        .dash-nav-btn-dark:hover {
+          background: rgba(255,255,255,0.12);
+          color: #f1f5f9;
+          transform: scale(1.08);
+        }
+        .dash-nav-btn-dark:active { transform: scale(0.95); }
+        .dash-nav-btn-light {
+          border: 1px solid #e5e7eb;
+          background: #ffffff;
+          color: #374151;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .dash-nav-btn-light:hover {
+          background: #f9fafb;
+          transform: scale(1.08);
+        }
+        .dash-nav-btn-light:active { transform: scale(0.95); }
+        .theme-toggle-btn {
+          padding: 5px 12px;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 700;
+          font-family: 'Inter', sans-serif;
+          letter-spacing: 0.06em;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .theme-toggle-dark {
+          border: 1px solid rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.05);
+          color: #64748b;
+        }
+        .theme-toggle-dark:hover {
+          background: rgba(255,255,255,0.1);
+          color: #94a3b8;
+        }
+        .theme-toggle-light {
+          border: 1px solid #e5e7eb;
+          background: #f9fafb;
+          color: #6b7280;
+        }
+        .theme-toggle-light:hover {
+          background: #f3f4f6;
+          color: #374151;
+        }
         .habit-cell-btn {
-          width: 22px;
-          height: 22px;
-          border-radius: 6px;
+          width: 26px;
+          height: 26px;
+          border-radius: 8px;
           border: none;
           font-weight: 700;
           font-size: 11px;
@@ -43,7 +109,7 @@ function DashboardGrid({
           animation: checkPop 0.25s cubic-bezier(.4,0,.2,1);
         }
         .habit-cell-btn.pending-dark {
-          background: rgba(255,255,255,0.12);
+          background: rgba(255,255,255,0.035);
           color: transparent;
         }
         .habit-cell-btn.pending-light {
@@ -68,7 +134,7 @@ function DashboardGrid({
       <div
         style={{
           background: isDark
-            ? "#0B101E"
+            ? "#020617"
             : "#ffffff",
           borderRadius: "16px",
           overflow: "hidden",
@@ -78,6 +144,76 @@ function DashboardGrid({
           border: isDark ? "none" : "1px solid #e5e7eb",
         }}
       >
+        {/* INTEGRATED HEADER */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "53px",
+            padding: "0 24px",
+            background: "transparent",
+            boxSizing: "border-box",
+          }}
+        >
+        {/* LEFT: Empty space equivalent for centering */}
+        <div style={{ flex: 1 }} />
+
+        {/* CENTER: Pill navigation */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            background: isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
+            borderRadius: "14px",
+            padding: "6px",
+            gap: "16px",
+            border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
+          }}
+        >
+          <button
+            onClick={goToPreviousMonth}
+            aria-label="Previous month"
+            className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
+          >
+            ‹
+          </button>
+
+          <div
+            style={{
+              width: "120px",
+              textAlign: "center",
+              fontSize: "13px",
+              fontWeight: 800,
+              letterSpacing: "0.12em",
+              color: isDark ? "#60a5fa" : "#1e40af",
+              textTransform: "uppercase",
+            }}
+          >
+            {monthLabel}
+          </div>
+
+          <button
+            onClick={goToNextMonth}
+            aria-label="Next month"
+            className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
+          >
+            ›
+          </button>
+        </div>
+
+        {/* RIGHT: Theme Toggle */}
+        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", paddingRight: "4px" }}>
+          <button
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className={`theme-toggle-btn ${isDark ? "theme-toggle-dark" : "theme-toggle-light"}`}
+          >
+            {isDark ? "☀ Light" : "☾ Dark"}
+          </button>
+        </div>
+      </div>
+
+
         {/* SCROLLABLE DATE GRID */}
         <div
           ref={gridScrollRef}
@@ -123,9 +259,6 @@ function DashboardGrid({
                 display: "grid",
                 gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
                 height: "36px",
-                borderBottom: isDark
-                  ? "1px solid rgba(255,255,255,0.06)"
-                  : "1px solid #f1f5f9",
               }}
             >
               {safeMonthDates.map((date) => {
@@ -143,11 +276,16 @@ function DashboardGrid({
                         ? isDark ? "#60a5fa" : "#2563eb"
                         : isDark ? "#64748b" : "#9ca3af",
                       background: isToday
-                        ? isDark ? "rgba(96,165,250,0.1)" : "#eff6ff"
+                        ? isDark ? "rgba(96,165,250,0.12)" : "#eff6ff"
                         : "transparent",
-                      borderRadius: isToday ? "6px" : "0",
-                      margin: isToday ? "4px 2px" : "0",
+                      borderBottom: !isToday
+                        ? isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid #f1f5f9"
+                        : "none",
+                      borderRadius: isToday ? "8px 8px 0 0" : "0",
+                      margin: "0",
+                      height: "100%",
                       position: "relative",
+                      boxSizing: "border-box",
                     }}
                   >
                     {date.slice(8, 10)}
@@ -176,9 +314,6 @@ function DashboardGrid({
                   display: "grid",
                   gridTemplateColumns: `repeat(${safeMonthDates.length}, ${DAY_COLUMN_WIDTH}px)`,
                   height: "38px",
-                  borderBottom: isDark
-                    ? "1px solid rgba(255,255,255,0.04)"
-                    : "1px solid #f8fafc",
                 }}
               >
                 {safeMonthDates.map((date) => {
@@ -211,12 +346,12 @@ function DashboardGrid({
                         alignItems: "center",
                         justifyContent: "center",
                         background: isToday
-                          ? isDark ? "rgba(96,165,250,0.05)" : "rgba(37,99,235,0.04)"
+                          ? isDark ? "rgba(96,165,250,0.12)" : "rgba(37,99,235,0.04)"
                           : isWeekend
                             ? isDark ? "rgba(255,255,255,0.02)" : "#fafafa"
                             : "transparent",
                         borderLeft: isWeekStart
-                          ? isDark ? "1px solid rgba(34,197,94,0.2)" : "1px solid #bbf7d0"
+                          ? isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid #e2e8f0"
                           : "none",
                         pointerEvents: "none",
                       }}

@@ -10,6 +10,7 @@ function DashboardLayout({ children }) {
         padding: "24px",
         alignItems: "start",
         width: "100%",
+        minWidth: 0,
         boxSizing: "border-box",
       }}
     >

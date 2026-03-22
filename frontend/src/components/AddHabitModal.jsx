@@ -102,7 +102,7 @@ function AddHabitModal({
                     left: "50%",
                     transform: "translate(-50%, -50%)",
                     width: "400px",
-                    background: "linear-gradient(160deg, #0B101E, #1A2031)",
+                    background: "linear-gradient(160deg, #020617, #1A2031)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "20px",
                     padding: "28px",

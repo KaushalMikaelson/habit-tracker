@@ -4,12 +4,10 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: "24px",
-        alignItems: "center",
-        justifyItems: "center",
+        display: "flex",
+        gap: "16px",
         width: "100%",
+        height: "100%",
       }}
     >
       {/* MOMENTUM */}
@@ -21,7 +19,7 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
         color="#22c55e"
       />
 
-      {/* DAILY */}
+      {/* TODAY */}
       <KpiRing
         value={kpis.daily}
         direction={kpis.dailyDirection}
@@ -45,9 +43,9 @@ function KpiRingRow({ kpis, isCurrentMonth }) {
       <KpiRing
         value={kpis.monthly}
         direction={kpis.monthlyDirection}
-         delta={kpis.monthlyDelta}
+        delta={kpis.monthlyDelta}
         label="Monthly"
-        color="#ef4444"
+        color="#f97316"
       />
     </div>
   );

@@ -126,7 +126,7 @@ const styles = {
         height: "415px",
         borderRadius: "18px",
         padding: "16px",
-        background: "#0B101E",
+        background: "#020617",
         boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
         display: "flex",
         flexDirection: "column",

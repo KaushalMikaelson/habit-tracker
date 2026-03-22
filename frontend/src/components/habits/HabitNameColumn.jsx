@@ -168,7 +168,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
 
       <div
         style={{
-          background: "#0B101E",
+          background: "#020617",
           borderRadius: "16px",
           overflow: "hidden",
           color: "#e5e7eb",

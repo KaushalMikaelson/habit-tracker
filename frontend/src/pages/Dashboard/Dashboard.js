@@ -13,9 +13,7 @@ import {
 import AddHabitModal from "../../components/AddHabitModal.jsx";
 import MomentumFlame from "../../components/MomentumFlame.jsx";
 import PrestigeBadge from "../../components/PrestigeBadge";
-import DashboardHeader from "./DashboardHeader.jsx";
 import DashboardGrid from "./DashboardGrid.jsx";
-import DashboardLayout from "./DashboardLayout.js";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -31,10 +29,7 @@ import TodoNotes from "../../components/Todo/TodoNotes";
 import TodayFocus from "../../components/Todo/TodayFocus";
 
 import useHabits from "../../hooks/useHabits";
-import {
-  LEFT_COLUMN_WIDTH,
-  RIGHT_COLUMN_WIDTH,
-} from "./DashboardLayout.constants";
+// Unused constants removed
 
 import {
   getCurrentYearMonth,
@@ -368,7 +363,7 @@ function Dashboard({ user, logout }) {
     <div
       style={{
         minHeight: "100vh",
-        background: "#121826",
+        background: "#0b101e",
       }}
     >
       <style>
@@ -389,7 +384,7 @@ function Dashboard({ user, logout }) {
           alignItems: "center",
           height: "60px",
           padding: "0 20px",
-          background: "rgba(18, 24, 38, 0.7)",
+          background: "rgba(11, 16, 30, 0.8)",
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           position: "sticky",
@@ -532,120 +527,124 @@ function Dashboard({ user, logout }) {
             items={habits.map(h => h._id)}
             strategy={verticalListSortingStrategy}
           >
-            <DashboardLayout>
-              {/* LEFT */}
-              <div
-                style={{
-                  width: LEFT_COLUMN_WIDTH,
-                  minWidth: LEFT_COLUMN_WIDTH,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "20px", // ✅ restored to first file
-                }}
-              >
-                <div style={{ height: KPI_ROW_HEIGHT }}> {/* ✅ restored */}
-                  <KpiIntroBox />
-                </div>
+            <div
+              style={{
+                display: "flex",
+                gap: "24px",
+                padding: "24px",
+                width: "100%",
+                boxSizing: "border-box",
+                alignItems: "start",
+              }}
+            >
 
-                <TodayFocus habits={habits} onToggle={toggleHabit} />
-
-                <div style={{ marginTop: "-30px" }} />
-
-                <HabitNameColumn
-                  habits={habits}
-                  deleteHabit={deleteHabit}
-                  editHabit={editHabit}
-                />
-              </div>
-
-              {/* CENTER */}
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  minWidth: 0,
-                }}
-              >
+                {/* LEFT COLUMN */}
                 <div
                   style={{
-                    height: KPI_ROW_HEIGHT,
-                    background: "#0B101E",
-                    borderRadius: "16px",
-                    padding: "12px",
+                    flex: 1,
+                    minWidth: 260,
                     display: "flex",
-                    alignItems: "center",
+                    flexDirection: "column",
+                    gap: "24px",
                   }}
                 >
-                  <KpiRingRow
-                    kpis={kpis}
+                  <div style={{ height: KPI_ROW_HEIGHT }}>
+                    <KpiIntroBox />
+                  </div>
+
+                  <TodayFocus habits={habits} onToggle={toggleHabit} />
+
+                  <HabitNameColumn
+                    habits={habits}
+                    deleteHabit={deleteHabit}
+                    editHabit={editHabit}
+                  />
+                </div>
+
+                {/* CENTER COLUMN */}
+                <div
+                  style={{
+                    flex: 4,
+                    minWidth: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0px",
+                  }}
+                >
+                  {/* KPI RINGS */}
+                  <div
+                    style={{
+                      height: KPI_ROW_HEIGHT,
+                      display: "flex",
+                      width: "100%",
+                    }}
+                  >
+                    <KpiRingRow
+                      kpis={kpis}
+                      isCurrentMonth={isCurrentMonth}
+                    />
+                  </div>
+
+                  {/* GRAPHS */}
+                  <HabitGraphs
+                    habits={habits}
+                    month={selectedMonth}
                     isCurrentMonth={isCurrentMonth}
                   />
+
+                  {/* GRID */}
+                  <div
+                    style={{
+                      marginTop: "24px",
+                      borderRadius: "12px",
+                      overflow: "hidden",
+                      minWidth: 0,
+                    }}
+                  >
+                    <DashboardGrid
+                      habits={habits}
+                      monthDates={monthDates}
+                      today={today}
+                      toggleHabit={toggleHabit}
+                      gridScrollRef={gridScrollRef}
+                      isFutureDate={isFutureDate}
+                      theme={theme}
+                      monthLabel={monthLabel}
+                      goToPreviousMonth={goToPreviousMonth}
+                      goToNextMonth={goToNextMonth}
+                      setTheme={setTheme}
+                    />
+                  </div>
                 </div>
 
-                <div style={{ marginTop: "-40px" }} />
-
-                <HabitGraphs
-                  habits={habits}
-                  month={selectedMonth}
-                  isCurrentMonth={isCurrentMonth}
-                />
-
+                {/* RIGHT COLUMN */}
                 <div
                   style={{
-                    background: "transparent",
-                    borderRadius: "12px",
-                    overflow: "hidden",
-                    minWidth: 0,
+                    flex: 1,
+                    minWidth: 260,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "24px",
                   }}
                 >
-                  <DashboardHeader
-                    monthLabel={monthLabel}
-                    goToPreviousMonth={goToPreviousMonth}
-                    goToNextMonth={goToNextMonth}
-                    theme={theme}
-                    setTheme={setTheme}
-                  />
+                  <div style={{ height: KPI_ROW_HEIGHT }}>
+                    <TopHabits
+                      habits={habits}
+                      currentYear={currentYear}
+                      currentMonth={currentMonth}
+                      height={KPI_ROW_HEIGHT}
+                    />
+                  </div>
 
-                  <DashboardGrid
+                  <TodoNotes />
+
+                  <HabitProgressColumn
                     habits={habits}
-                    monthDates={monthDates}
-                    today={today}
-                    toggleHabit={toggleHabit}
-                    gridScrollRef={gridScrollRef}
-                    isFutureDate={isFutureDate}
-                    theme={theme}
+                    currentMonth={selectedMonth}
                   />
                 </div>
-              </div>
 
-              {/* RIGHT */}
-              <div
-                style={{
-                  width: RIGHT_COLUMN_WIDTH,
-                  minWidth: RIGHT_COLUMN_WIDTH,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  alignSelf: "flex-start",
-                }}
-              >
-                <TopHabits
-                  habits={habits}
-                  currentYear={currentYear}
-                  currentMonth={currentMonth}
-                  height={KPI_ROW_HEIGHT}
-                />
-
-                <TodoNotes />
-                <div style={{ marginTop: "10px" }} />
-
-                <HabitProgressColumn
-                  habits={habits}
-                  currentMonth={selectedMonth}
-                />
-              </div>
-            </DashboardLayout>
+            </div>
           </SortableContext>
         </DndContext>
 

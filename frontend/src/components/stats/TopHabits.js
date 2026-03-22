@@ -1,9 +1,10 @@
 import dayjs from "dayjs";
+import { motion } from "framer-motion";
 
 function TopHabits({
   habits,
   currentYear,
-  currentMonth, // 0-based (Jan = 0)
+  currentMonth,
   limit = 3,
   height,
 }) {
@@ -47,28 +48,30 @@ function TopHabits({
   return (
     <div
       style={{
-        height:180,
+        height: "100%",
         boxSizing: "border-box",
-        background: "#0B101E",
+        background: "#020617",
         borderRadius: "16px",
-        padding: "16px",
+        padding: "14px 20px",
         color: "#e5e7eb",
         display: "flex",
         flexDirection: "column",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
+        boxShadow:
+          "inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.1)",
       }}
     >
       {/* HEADER */}
       <div
         style={{
-          height: 28,
+          height: 20,
           fontSize: "12px",
           letterSpacing: "0.14em",
           fontWeight: 800,
-          color: "#ffffff",
+          color: "white",
           display: "flex",
           alignItems: "center",
           flexShrink: 0,
+          marginBottom: "8px",
         }}
       >
         TOP HABITS
@@ -81,7 +84,7 @@ function TopHabits({
           overflowY: "hidden",
           display: "flex",
           flexDirection: "column",
-          gap: "12px",
+          gap: "10px",
         }}
       >
         {topHabits.length === 0 ? (
@@ -94,15 +97,27 @@ function TopHabits({
               (habit.score / maxScore) * 100
             );
 
+            const rankColor = colors[index % colors.length];
+
             return (
-              <div key={habit._id}>
+              <motion.div
+                key={habit._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: index * 0.08,
+                  duration: 0.25,
+                  ease: "easeOut",
+                }}
+                whileHover={{ scale: 1.01 }}
+              >
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     fontSize: "13px",
-                    marginBottom: "6px",
+                    marginBottom: "4px",
                   }}
                 >
                   <div
@@ -110,13 +125,13 @@ function TopHabits({
                       display: "flex",
                       alignItems: "center",
                       gap: "8px",
-                      maxWidth: "75%",
+                      maxWidth: "75%", // minWidth was not present, but maxWidth is kept
                     }}
                   >
                     <span
                       style={{
-                        fontWeight: 700,
-                        color: colors[index],
+                        fontWeight: 800,
+                        color: rankColor,
                       }}
                     >
                       #{index + 1}
@@ -127,6 +142,8 @@ function TopHabits({
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        fontWeight: 600,
+                        color: "var(--text-primary)",
                       }}
                     >
                       {habit.title}
@@ -135,9 +152,9 @@ function TopHabits({
 
                   <span
                     style={{
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      color: colors[index],
+                      fontSize: "13px",
+                      fontWeight: 800,
+                      color: rankColor,
                     }}
                   >
                     {habit.score}
@@ -152,15 +169,21 @@ function TopHabits({
                     overflow: "hidden",
                   }}
                 >
-                  <div
+                  <motion.div
                     style={{
-                      width: `${percent}%`,
                       height: "100%",
-                      background: colors[index],
+                      background: rankColor,
+                    }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${percent}%` }}
+                    transition={{
+                      delay: index * 0.08 + 0.15,
+                      duration: 0.5,
+                      ease: "easeOut",
                     }}
                   />
                 </div>
-              </div>
+              </motion.div>
             );
           })
         )}

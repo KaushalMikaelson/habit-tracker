@@ -2,7 +2,7 @@
 :root {
   /* Colors */
   --color-bg:        #121826;
-  --color-surface:   #0B101E;
+  --color-surface:   #020617;
   --color-surface-2: #1A2031;
   --color-border:    rgba(255, 255, 255, 0.08);
   --color-text:      #f1f5f9;
@@ -13,6 +13,11 @@
   --color-purple:    #a855f7;
   --color-yellow:    #facc15;
   --color-red:       #ef4444;
+
+  /* Aliases used by components */
+  --text-primary:    #f1f5f9;
+  --text-muted:      #475569;
+  --accent-green:    #22c55e;
 
   /* Radii */
   --radius-sm:  8px;

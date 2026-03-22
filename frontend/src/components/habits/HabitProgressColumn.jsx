@@ -47,7 +47,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
         position: "relative",
         width: "100%",
         minWidth: 0,
-        background: "#0B101E",
+        background: "#020617",
         borderRadius: "16px",
         overflow: "hidden",
         boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
@@ -65,7 +65,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          height: "55px",
+          height: "77px",
           color: "#93c5fd",
         }}
       >
