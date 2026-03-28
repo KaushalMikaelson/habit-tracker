@@ -17,8 +17,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
 
   const activeLinkStyle = {
     ...linkStyle,
-    color: "#34d399",
-    background: "rgba(16, 185, 129, 0.1)",
+    color: "var(--theme-2, #34d399)",
+    background: "rgba(255, 255, 255, 0.06)",
     position: "relative",
   };
 
@@ -29,7 +29,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
     transform: "translateY(-50%)",
     width: "4px",
     height: "20px",
-    background: "#34d399",
+    background: "var(--theme-1, #34d399)",
     borderTopRightRadius: "4px",
     borderBottomRightRadius: "4px",
   };
@@ -100,11 +100,11 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
               width: "36px",
               height: "36px",
               borderRadius: "10px",
-              background: "linear-gradient(135deg, #3b82f6, #60a5fa)",
+              background: "linear-gradient(135deg, var(--theme-1, #3b82f6), var(--theme-2, #60a5fa))",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
               flexShrink: 0,
             }}
           >
@@ -232,6 +232,20 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
               <line x1="10" y1="9" x2="8" y2="9"></line>
             </svg>
             Notes
+          </div>
+
+          <div 
+            style={activeView === "journal" ? activeLinkStyle : linkStyle}
+            onClick={() => { if (onNavigate) onNavigate("journal"); if (onClose) onClose(); }}
+            onMouseEnter={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
+            onMouseLeave={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+          >
+            {activeView === "journal" && <div style={activeIndicatorStyle} />}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            My Space
           </div>
         </div>
 

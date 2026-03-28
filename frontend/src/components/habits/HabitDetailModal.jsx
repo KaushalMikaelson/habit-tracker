@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import { calculateHabitStreak } from '../../utils/habitUtils';
+import ConfirmModal from '../ConfirmModal';
 
 export default function HabitDetailModal({ habit, monthDates, onClose, isFutureDate, toggleHabit, updateHabit, updateNote }) {
   const [archiving, setArchiving] = useState(false);
   const [pausing, setPausing] = useState(false);
   const [archiveSuccess, setArchiveSuccess] = useState(null); // null | 'archived' | 'active' | 'paused'
+  const [confirmState, setConfirmState] = useState({ isOpen: false, action: null });
 
   if (!habit) return null;
 
@@ -16,40 +18,56 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
   const startedOn = habit.createdAt ? dayjs(habit.createdAt).format('MMM D, YYYY') : 'Unknown';
   const noteForToday = habit.notes?.[todayStr] || '';
 
-  async function handleArchiveToggle() {
-    const actionName = habit.status === 'archived' ? 'unfreeze' : 'freeze';
-    if (!window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
-      return;
-    }
-    const newStatus = habit.status === 'archived' ? 'active' : 'archived';
-    setArchiving(true);
-    try {
-      await updateHabit(habit._id, undefined, undefined, newStatus);
-      setArchiveSuccess(newStatus);
-      setTimeout(() => {
-        onClose();
-      }, 1200);
-    } catch (_) {
-      setArchiving(false);
+  function requestConfirm(action) {
+    setConfirmState({ isOpen: true, action });
+  }
+
+  async function executeConfirm() {
+    const { action } = confirmState;
+    setConfirmState({ isOpen: false, action: null });
+    if (!action) return;
+
+    if (action === "freeze" || action === "unfreeze") {
+      const newStatus = habit.status === 'archived' ? 'active' : 'archived';
+      setArchiving(true);
+      try {
+        await updateHabit(habit._id, undefined, undefined, newStatus);
+        setArchiveSuccess(newStatus);
+        setTimeout(() => onClose(), 1200);
+      } catch (_) {
+        setArchiving(false);
+      }
+    } else if (action === "pause" || action === "resume") {
+      const newStatus = habit.status === 'paused' ? 'active' : 'paused';
+      setPausing(true);
+      try {
+        await updateHabit(habit._id, undefined, undefined, newStatus);
+        setArchiveSuccess(newStatus);
+        setTimeout(() => onClose(), 1200);
+      } catch (_) {
+        setPausing(false);
+      }
     }
   }
 
-  async function handlePauseToggle() {
-    const actionName = habit.status === 'paused' ? 'resume' : 'pause';
-    if (!window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
-      return;
+  function getConfirmProps() {
+    const { action } = confirmState;
+    if (!action) return {};
+    switch (action) {
+      case "freeze": return { title: "Freeze Habit", message: `Are you sure you want to freeze "${habit.title}"?`, confirmColor: "#38bdf8", confirmText: "Freeze" };
+      case "unfreeze": return { title: "Unfreeze Habit", message: `Are you sure you want to unfreeze "${habit.title}"?`, confirmColor: "#fb923c", confirmText: "Unfreeze" };
+      case "pause": return { title: "Pause Habit", message: `Are you sure you want to pause "${habit.title}"?`, confirmColor: "#a855f7", confirmText: "Pause" };
+      case "resume": return { title: "Resume Habit", message: `Are you sure you want to resume "${habit.title}"?`, confirmColor: "#60a5fa", confirmText: "Resume" };
+      default: return {};
     }
-    const newStatus = habit.status === 'paused' ? 'active' : 'paused';
-    setPausing(true);
-    try {
-      await updateHabit(habit._id, undefined, undefined, newStatus);
-      setArchiveSuccess(newStatus);
-      setTimeout(() => {
-        onClose();
-      }, 1200);
-    } catch (_) {
-      setPausing(false);
-    }
+  }
+
+  function handleArchiveToggle() {
+    requestConfirm(habit.status === 'archived' ? 'unfreeze' : 'freeze');
+  }
+
+  function handlePauseToggle() {
+    requestConfirm(habit.status === 'paused' ? 'resume' : 'pause');
   }
 
   const isArchived = habit.status === 'archived';
@@ -267,6 +285,13 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
           </button>
         </div>
       </div>
+
+      <ConfirmModal 
+        isOpen={confirmState.isOpen}
+        onCancel={() => setConfirmState({ isOpen: false, action: null })}
+        onConfirm={executeConfirm}
+        {...getConfirmProps()}
+      />
     </div>
   );
 }

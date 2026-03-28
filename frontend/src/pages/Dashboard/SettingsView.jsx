@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ConfirmModal from "../../components/ConfirmModal";
 
 const DEFAULT_CATEGORIES = [
   { value: "Health", label: "Health 🏃" },
@@ -31,28 +32,56 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
   const [editLabel, setEditLabel] = useState("");
   const [editEmoji, setEditEmoji] = useState("");
   const [saved, setSaved] = useState(false);
+  const [confirmState, setConfirmState] = useState({ isOpen: false, habit: null, action: null });
+
+  function requestConfirm(habit, action) {
+    setConfirmState({ isOpen: true, habit, action });
+  }
+
+  function executeConfirm() {
+    const { habit, action } = confirmState;
+    if (!habit || !action) return;
+
+    if (action === "delete") {
+      deleteHabit(habit._id);
+    } else if (action === "freeze") {
+      editHabit(habit._id, undefined, undefined, 'archived');
+    } else if (action === "unfreeze") {
+      editHabit(habit._id, undefined, undefined, 'active');
+    } else if (action === "pause") {
+      editHabit(habit._id, undefined, undefined, 'paused');
+    } else if (action === "resume") {
+      editHabit(habit._id, undefined, undefined, 'active');
+    }
+  }
+
+  function getConfirmProps() {
+    const { habit, action } = confirmState;
+    if (!habit || !action) return {};
+    
+    switch (action) {
+      case "delete": return { title: "Delete Habit", message: `Are you sure you want to delete "${habit.title}"?`, confirmColor: "#ef4444", confirmText: "Delete" };
+      case "freeze": return { title: "Freeze Habit", message: `Are you sure you want to freeze "${habit.title}"? It will stop prompting for daily action.`, confirmColor: "#38bdf8", confirmText: "Freeze" };
+      case "unfreeze": return { title: "Unfreeze Habit", message: `Are you sure you want to unfreeze "${habit.title}"?`, confirmColor: "#fb923c", confirmText: "Unfreeze" };
+      case "pause": return { title: "Pause Habit", message: `Are you sure you want to pause "${habit.title}"? It will be excluded from all stats.`, confirmColor: "#a855f7", confirmText: "Pause" };
+      case "resume": return { title: "Resume Habit", message: `Are you sure you want to resume "${habit.title}"?`, confirmColor: "#60a5fa", confirmText: "Resume" };
+      default: return {};
+    }
+  }
+
+  function handleFreezeToggle(habit) {
+    requestConfirm(habit, habit.status === 'archived' ? 'unfreeze' : 'freeze');
+  }
+
+  function handlePauseToggle(habit) {
+    requestConfirm(habit, habit.status === 'paused' ? 'resume' : 'pause');
+  }
 
   const displayHabits = habits.filter(h => {
     const s = h.status || "active";
     if (defaultStatusFilter !== "all" && s !== defaultStatusFilter) return false;
     return true;
   });
-
-  function handleFreezeToggle(habit) {
-    const newStatus = habit.status === 'archived' ? 'active' : 'archived';
-    const actionName = habit.status === 'archived' ? 'unfreeze' : 'freeze';
-    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
-      editHabit(habit._id, undefined, undefined, newStatus);
-    }
-  }
-
-  function handlePauseToggle(habit) {
-    const newStatus = habit.status === 'paused' ? 'active' : 'paused';
-    const actionName = habit.status === 'paused' ? 'resume' : 'pause';
-    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
-      editHabit(habit._id, undefined, undefined, newStatus);
-    }
-  }
 
   function addCategory() {
     const name = newCatName.trim();
@@ -510,9 +539,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                     </button>
                     <button
                       onClick={() => {
-                        if (window.confirm(`Delete "${habit.title}"?`)) {
-                          deleteHabit(habit._id);
-                        }
+                        requestConfirm(habit, "delete");
                       }}
                       title="Delete"
                       style={{
@@ -534,6 +561,13 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
           )}
         </div>
       </div>
+      
+      <ConfirmModal 
+        isOpen={confirmState.isOpen}
+        onCancel={() => setConfirmState({ isOpen: false, habit: null, action: null })}
+        onConfirm={executeConfirm}
+        {...getConfirmProps()}
+      />
     </div>
   );
 }

@@ -11,6 +11,8 @@ function AddHabitModal({
     addHabit,
 }) {
     const [localStatus, setLocalStatus] = useState("active");
+    const [aiSuggestions, setAiSuggestions] = useState([]);
+    const [loadingAI, setLoadingAI] = useState(false);
     const categories = getStoredCategories();
 
     if (!showModal) return null;
@@ -20,6 +22,25 @@ function AddHabitModal({
     function handleAdd() {
         addHabit(localStatus);
     }
+
+    const handleAskAIBreakdown = async () => {
+        if (!newHabit.trim()) return;
+        setLoadingAI(true);
+        try {
+            const res = await fetch("/api/ai/breakdown", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ habitTitle: newHabit })
+            });
+            const json = await res.json();
+            if (json.suggestions) {
+                setAiSuggestions(json.suggestions);
+            }
+        } catch (err) {
+            console.error(err);
+        }
+        setLoadingAI(false);
+    };
 
     return (
         <>
@@ -105,7 +126,7 @@ function AddHabitModal({
 
             {/* Overlay */}
             <div
-                onClick={() => { setShowModal(false); setNewHabit(""); }}
+                onClick={() => { setShowModal(false); setNewHabit(""); setAiSuggestions([]); }}
                 style={{
                     position: "fixed",
                     inset: 0,
@@ -185,6 +206,44 @@ function AddHabitModal({
                     autoFocus
                 />
 
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "8px" }}>
+                    <button
+                        type="button"
+                        onClick={handleAskAIBreakdown}
+                        disabled={loadingAI || !newHabit.trim()}
+                        style={{
+                            background: "linear-gradient(135deg, rgba(167,139,250,0.15), rgba(192,132,252,0.15))",
+                            border: "1px solid rgba(192,132,252,0.3)",
+                            color: "#c084fc", fontSize: "11px", fontWeight: 700, padding: "4px 8px", borderRadius: "6px",
+                            cursor: loadingAI || !newHabit.trim() ? "not-allowed" : "pointer",
+                            opacity: loadingAI || !newHabit.trim() ? 0.6 : 1, transition: "all 0.2s"
+                        }}
+                    >
+                        {loadingAI ? "Thinking..." : "✨ AI Goal Breakdown"}
+                    </button>
+                    {aiSuggestions.length > 0 && <span style={{ fontSize: "11px", color: "#64748b" }}>Click to select</span>}
+                </div>
+
+                {aiSuggestions.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "12px" }}>
+                        {aiSuggestions.map((sug, idx) => (
+                            <button
+                                key={idx}
+                                onClick={(e) => { e.preventDefault(); setNewHabit(sug); }}
+                                style={{
+                                    background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+                                    color: "#e2e8f0", fontSize: "12px", padding: "6px 12px", borderRadius: "12px",
+                                    cursor: "pointer", transition: "all 0.2s"
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "rgba(192,132,252,0.15)"; e.currentTarget.style.borderColor = "rgba(192,132,252,0.3)"; e.currentTarget.style.color = "#c084fc" }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#e2e8f0" }}
+                            >
+                                {sug}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {/* Category Dropdown */}
                 <label className="modal-field-label">Category</label>
                 <select
@@ -246,7 +305,7 @@ function AddHabitModal({
                 }}>
                     <button
                         className="habit-modal-cancel"
-                        onClick={() => { setShowModal(false); setNewHabit(""); }}
+                        onClick={() => { setShowModal(false); setNewHabit(""); setAiSuggestions([]); }}
                     >
                         Cancel
                     </button>

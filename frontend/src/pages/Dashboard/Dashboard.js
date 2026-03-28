@@ -21,9 +21,12 @@ import WeeklyView from "./WeeklyView.jsx";
 import MonthlyView from "./MonthlyView.jsx";
 import SettingsView from "./SettingsView.jsx";
 import NotesView from "./NotesView.jsx";
+import JournalView from "./JournalView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
+import AiCoachModal from "../../components/AiCoachModal.jsx";
+import MotivationBanner from "../../components/MotivationBanner.jsx";
 
 import HabitNameColumn from "../../components/habits/HabitNameColumn.jsx";
 import HabitProgressColumn from "../../components/habits/HabitProgressColumn.jsx";
@@ -152,6 +155,9 @@ function Dashboard({ user, logout }) {
   const hasAutoScrolledRef = useRef(false);
 
   const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
+  const [showAiModal, setShowAiModal] = useState(false);
+
+  // Initialize theme from local storage or detect prefers-color-scheme
   const [accentTheme, setAccentTheme] = useState(
     localStorage.getItem("appAccentTheme") || "blue"
   );
@@ -177,7 +183,7 @@ function Dashboard({ user, logout }) {
   const [activeView, setActiveView] = useState("dashboard"); // "dashboard" | "stats"
 
 
-  const kpis = calculateKPIs(
+  const calculatedKpis = calculateKPIs(
     visibleHabits,
     selectedMonth
   );
@@ -367,9 +373,9 @@ function Dashboard({ user, logout }) {
         {/* RIGHT SIDE - BUTTON GROUP */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           <MomentumFlame
-            momentumDelta={kpis.momentumDelta}
-            momentum={kpis.momentum}
-            monthly={kpis.monthly}
+            momentumDelta={calculatedKpis.momentumDelta}
+            momentum={calculatedKpis.momentum}
+            monthly={calculatedKpis.monthly}
           />
           <style>{`
             :root {
@@ -381,33 +387,59 @@ function Dashboard({ user, logout }) {
 
 
 
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <button
+              onClick={() => setShowAiModal(true)}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "20px",
+                border: "1px solid rgba(14, 165, 233, 0.4)",
+                background: "linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(56, 189, 248, 0.15))",
+                color: "#38bdf8",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontFamily: "'Inter', sans-serif",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(14, 165, 233, 0.3)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+              </svg>
+              AI Coach
+            </button>
 
-          <button
-            onClick={() => setShowModal(true)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: "10px",
-              border: "none",
-              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-              color: "#ffffff",
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 4px 12px rgba(37,99,235,0.35)",
-              transition: "transform 0.15s ease, box-shadow 0.15s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              fontFamily: "'Inter', sans-serif",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(37,99,235,0.5)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.35)"; }}
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Add Habit
-          </button>
+            <button
+              onClick={() => setShowModal(true)}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "20px",
+                border: "1px solid rgba(255, 255, 255, 0.12)",
+                background: "rgba(255,255,255,0.06)",
+                color: "#ffffff",
+                fontWeight: 700,
+                fontSize: "14px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontFamily: "'Inter', sans-serif",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(37,99,235,0.5)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.35)"; }}
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              Add Habit
+            </button>
+          </div>
 
           <div style={{ position: "relative" }}>
             <button
@@ -625,6 +657,12 @@ function Dashboard({ user, logout }) {
         addHabit={handleAddHabit}
       />
 
+      <AiCoachModal
+        show={showAiModal}
+        onClose={() => setShowAiModal(false)}
+        habits={visibleHabits}
+      />
+
       {loading && <TopLoadingBar />}
 
       {selectedHabitForDetail && (
@@ -651,6 +689,8 @@ function Dashboard({ user, logout }) {
         />
       ) : activeView === "notes" ? (
         <NotesView habits={habits} updateNote={updateNote} />
+      ) : activeView === "journal" ? (
+        <JournalView user={user} />
       ) : activeView === "stats" ? (
         <StatsView habits={visibleHabits} />
       ) : activeView === "weekly" ? (
@@ -659,6 +699,9 @@ function Dashboard({ user, logout }) {
         <MonthlyView habits={visibleHabits} />
       ) : (
         <>
+          {/* MotivationBanner — AI-powered daily greeting above the habit grid */}
+          <MotivationBanner habits={habits} />
+
           {visibleHabits.length === 0 ? (
             <div style={{ marginTop: "48px", textAlign: "center" }}>
               <h2>No habits match filters</h2>
@@ -696,7 +739,7 @@ function Dashboard({ user, logout }) {
                     }}
                   >
                     <div style={{ height: KPI_ROW_HEIGHT }}>
-                      <KpiIntroBox />
+                      <KpiIntroBox habits={visibleHabits} />
                     </div>
                     <TodayFocus habits={visibleHabits} onToggle={toggleHabit} />
                     <HabitNameColumn
@@ -718,7 +761,7 @@ function Dashboard({ user, logout }) {
                     }}
                   >
                     <div style={{ height: KPI_ROW_HEIGHT, display: "flex", width: "100%" }}>
-                      <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
+                      <KpiRingRow kpis={calculatedKpis} isCurrentMonth={isCurrentMonth} />
                     </div>
                     <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
                     <div style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0 }}>

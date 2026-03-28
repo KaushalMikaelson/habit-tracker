@@ -7,6 +7,7 @@ const logger = require("./utils/logger");
 const authRoutes = require("./routes/auth.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const habitsRoutes = require("./routes/habits.routes");
+const aiRoutes = require("./routes/ai.routes");
 
 const app = express();
 
@@ -55,6 +56,7 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/habits", habitsRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Health check
 app.get("/", (req, res) => {
