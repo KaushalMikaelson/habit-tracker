@@ -46,22 +46,43 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
   };
 
   return (
-    <div
-      style={{
-        width: "260px",
-        height: "100vh",
-        background: "#0b101e",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
-        position: "sticky",
-        top: 0,
-        display: "flex",
-        flexDirection: "column",
-        flexShrink: 0,
-        zIndex: 50,
-        marginLeft: isOpen ? "0" : "-260px",
-        transition: "margin-left 0.3s ease-in-out",
-      }}
-    >
+    <>
+      {/* OVERLAY */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0,0,0,0.5)",
+            backdropFilter: "blur(4px)",
+            WebkitBackdropFilter: "blur(4px)",
+            zIndex: 9998,
+          }}
+        />
+      )}
+
+      {/* SIDEBAR MAIN CONTAINER */}
+      <div
+        style={{
+          width: "260px",
+          height: "100vh",
+          background: "#0b101e",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          position: "fixed",
+          top: 0,
+          left: isOpen ? "0" : "-260px",
+          display: "flex",
+          flexDirection: "column",
+          flexShrink: 0,
+          zIndex: 9999,
+          transition: "left 0.3s ease-in-out",
+          boxShadow: isOpen ? "4px 0 24px rgba(0,0,0,0.5)" : "none",
+        }}
+      >
       {/* BRAND & HEADER */}
       <div
         style={{
@@ -129,7 +150,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div
             style={activeView === "dashboard" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("dashboard")}
+            onClick={() => { if (onNavigate) onNavigate("dashboard"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -145,7 +166,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
 
           <div 
             style={activeView === "stats" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("stats")}
+            onClick={() => { if (onNavigate) onNavigate("stats"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -160,7 +181,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
 
           <div 
             style={activeView === "weekly" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("weekly")}
+            onClick={() => { if (onNavigate) onNavigate("weekly"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -176,7 +197,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
 
           <div 
             style={activeView === "monthly" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("monthly")}
+            onClick={() => { if (onNavigate) onNavigate("monthly"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -198,7 +219,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
 
           <div 
             style={activeView === "notes" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("notes")}
+            onClick={() => { if (onNavigate) onNavigate("notes"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -219,7 +240,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div 
             style={activeView === "settings" ? activeLinkStyle : linkStyle}
-            onClick={() => onNavigate && onNavigate("settings")}
+            onClick={() => { if (onNavigate) onNavigate("settings"); if (onClose) onClose(); }}
             onMouseEnter={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
             onMouseLeave={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
           >
@@ -275,7 +296,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <span style={{ fontSize: "12px", fontWeight: 500, color: "#64748b" }}>Habit Tracker v1.0</span>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
