@@ -1,160 +1,624 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
+import {
+  calculateMonthlyCompletion,
+  calculateWeeklyCompletion,
+  calculateHabitStreak,
+  getEffectiveStartDate,
+} from '../../utils/habitUtils';
 
-export default function StatsView({ habits }) {
-  const totalHabits = habits?.length || 0;
-  const totalCompletions = habits?.reduce((acc, h) => acc + (h.completedDates?.length || 0), 0) || 0;
-  
-  // Find highest streak
-  let bestStreak = 0;
-  habits?.forEach(h => {
-    const streak = h.highestStreak || h.streak || 0;
-    if (streak > bestStreak) bestStreak = streak;
+/* ─── tiny helpers ────────────────────────────────────────────── */
+const today = dayjs().startOf('day');
+const todayStr = today.format('YYYY-MM-DD');
+
+function pct(n, d) {
+  return d > 0 ? Math.round((n / d) * 100) : 0;
+}
+
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
+
+/* per-habit stats used in multiple sections */
+function buildHabitStats(habits) {
+  return habits.map((h) => {
+    const completedDates = Array.isArray(h.completedDates) ? h.completedDates : [];
+    const totalCompletions = completedDates.length;
+
+    // streak (live calc)
+    const currentStreak = calculateHabitStreak(h, todayStr);
+    const bestStreak = h.highestStreak ?? currentStreak;
+
+    // monthly (current)
+    const { completed: mComp, total: mTotal } = calculateMonthlyCompletion(h, today, today);
+    const monthlyPct = pct(mComp, mTotal);
+
+    // monthly (prev)
+    const { completed: pmComp, total: pmTotal } = calculateMonthlyCompletion(
+      h,
+      today.subtract(1, 'month'),
+      today
+    );
+    const prevMonthlyPct = pct(pmComp, pmTotal);
+
+    // weekly
+    const { completed: wComp, total: wTotal } = calculateWeeklyCompletion(h, today, today);
+    const weeklyPct = pct(wComp, wTotal);
+
+    // last-30 consistency
+    const start30 = today.subtract(29, 'day');
+    const effectiveStart = getEffectiveStartDate(h);
+    const rangeStart = effectiveStart.isAfter(start30) ? effectiveStart : start30;
+    const possible30 = today.diff(rangeStart, 'day') + 1;
+    let done30 = 0;
+    for (let i = 0; i < possible30; i++) {
+      const d = rangeStart.add(i, 'day').format('YYYY-MM-DD');
+      if (completedDates.includes(d)) done30++;
+    }
+    const consistency30 = pct(done30, possible30);
+
+    return {
+      _id: h._id,
+      name: h.name || h.title || 'Unnamed',
+      color: h.color,
+      totalCompletions,
+      currentStreak,
+      bestStreak,
+      monthlyPct,
+      prevMonthlyPct,
+      weeklyPct,
+      consistency30,
+      done30,
+      possible30,
+      completedDates,
+      createdAt: h.createdAt,
+    };
   });
+}
 
-  // Calculate some basic consistency based on past 30 days
-  let past30Total = 0;
-  let past30Completed = 0;
-  const thirtyDaysAgo = dayjs().subtract(30, 'day');
-  
-  habits?.forEach(h => {
-    // Simple mock logic for finding percentages
-    const created = dayjs(h.createdAt || thirtyDaysAgo);
-    let trackingDays = dayjs().diff(created, 'day') + 1;
-    if (trackingDays > 30) trackingDays = 30;
-    if (trackingDays <= 0) trackingDays = 1;
-    
-    past30Total += trackingDays;
-    
-    h.completedDates?.forEach(date => {
-      if (dayjs(date).isAfter(thirtyDaysAgo)) {
-        past30Completed++;
-      }
+/* last-30-day activity map: date → count of habits completed */
+function buildActivityMap(habits) {
+  const map = {};
+  for (let i = 0; i < 30; i++) {
+    const d = today.subtract(29 - i, 'day').format('YYYY-MM-DD');
+    map[d] = 0;
+  }
+  habits.forEach((h) => {
+    (h.completedDates || []).forEach((d) => {
+      if (map[d] !== undefined) map[d]++;
     });
   });
+  return map;
+}
 
-  const overallConsistency = past30Total > 0 ? Math.round((past30Completed / past30Total) * 100) : 0;
+/* ─── colour palette ──────────────────────────────────────────── */
+const PALETTE = [
+  '#34d399', '#60a5fa', '#f472b6', '#fb923c',
+  '#a78bfa', '#facc15', '#38bdf8', '#4ade80',
+];
+function habitColor(idx) {
+  return PALETTE[idx % PALETTE.length];
+}
 
-  // Most Consistent & Needs Work
-  const habitConsistencies = habits?.map(h => {
-    const created = dayjs(h.createdAt || thirtyDaysAgo);
-    let trackingDays = dayjs().diff(created, 'day') + 1;
-    if (trackingDays > 30) trackingDays = 30;
-    if (trackingDays <= 0) trackingDays = 1;
-    
-    let comp = 0;
-    h.completedDates?.forEach(date => {
-      if (dayjs(date).isAfter(thirtyDaysAgo)) comp++;
-    });
-    
-    const pct = Math.round((comp / trackingDays) * 100);
-    return { name: h.name, pct };
-  }).sort((a,b) => b.pct - a.pct) || [];
+/* ─── tiny sub-components ─────────────────────────────────────── */
 
-  const mostConsistent = habitConsistencies.length > 0 ? habitConsistencies[0] : { name: "N/A", pct: 0 };
-  const needsWork = habitConsistencies.length > 0 ? habitConsistencies[habitConsistencies.length - 1] : { name: "N/A", pct: 0 };
-
-  // Reusable card style
-  const cardStyle = {
-    background: "#111827",
-    border: "1px solid rgba(255,255,255,0.05)",
-    borderRadius: "12px",
-    padding: "20px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-  };
-
+function StatCard({ value, label, sub, accent = '#34d399' }) {
   return (
-    <div style={{ padding: "32px", color: "#f8fafc", width: "100%", boxSizing: "border-box", overflowY: "auto", flex: 1 }}>
-      
-      {/* HEADER & TABS */}
-      <h1 style={{ fontSize: "18px", fontWeight: 700, color: "#10b981", margin: "0 0 24px 0" }}>
-        Stats & Insights
+    <div style={{
+      background: '#111827',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: '14px',
+      padding: '24px 20px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: '6px',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: '2px', background: accent,
+      }} />
+      <div style={{ fontSize: '32px', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}>
+        {value}
+      </div>
+      {sub && <div style={{ fontSize: '13px', color: accent, fontWeight: 600 }}>{sub}</div>}
+      <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function ConsistencyBar({ label, pct: p, color = '#34d399' }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ width: '130px', fontSize: '13px', color: '#94a3b8', flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {label}
+      </div>
+      <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.06)', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{
+          height: '100%',
+          width: `${clamp(p, 0, 100)}%`,
+          background: color,
+          borderRadius: '4px',
+          transition: 'width 0.6s ease',
+        }} />
+      </div>
+      <div style={{ width: '38px', textAlign: 'right', fontSize: '13px', fontWeight: 700, color: '#f8fafc', flexShrink: 0 }}>
+        {p}%
+      </div>
+    </div>
+  );
+}
+
+/* heatmap cell colour based on fraction 0-1 */
+function heatColor(fraction) {
+  if (fraction === 0) return 'rgba(255,255,255,0.04)';
+  if (fraction < 0.34) return 'rgba(16,185,129,0.35)';
+  if (fraction < 0.67) return 'rgba(16,185,129,0.60)';
+  return '#10b981';
+}
+
+/* ─── Tab labels ──────────────────────────────────────────────── */
+const TABS = ['Overview', 'Per-Habit Detail', 'Activity'];
+
+/* ═══════════════════════════════════════════════════════════════ */
+export default function StatsView({ habits = [] }) {
+  const [tab, setTab] = useState('Overview');
+
+  const habitStats = useMemo(() => buildHabitStats(habits), [habits]);
+  const activityMap = useMemo(() => buildActivityMap(habits), [habits]);
+  const habitCount = habits.length;
+
+  /* ── global aggregates ── */
+  const totalCompletions = useMemo(
+    () => habitStats.reduce((s, h) => s + h.totalCompletions, 0),
+    [habitStats]
+  );
+
+  const bestStreak = useMemo(
+    () => Math.max(0, ...habitStats.map((h) => h.bestStreak)),
+    [habitStats]
+  );
+
+  /* overall 30-day consistency */
+  const overallConsistency = useMemo(() => {
+    const totalPoss = habitStats.reduce((s, h) => s + h.possible30, 0);
+    const totalDone = habitStats.reduce((s, h) => s + h.done30, 0);
+    return pct(totalDone, totalPoss);
+  }, [habitStats]);
+
+  /* overall weekly */
+  const overallWeekly = useMemo(() => {
+    let wC = 0, wT = 0;
+    habits.forEach((h) => {
+      const { completed, total } = calculateWeeklyCompletion(h, today, today);
+      wC += completed; wT += total;
+    });
+    return pct(wC, wT);
+  }, [habits]);
+
+  /* overall monthly */
+  const overallMonthly = useMemo(() => {
+    let mC = 0, mT = 0;
+    habits.forEach((h) => {
+      const { completed, total } = calculateMonthlyCompletion(h, today, today);
+      mC += completed; mT += total;
+    });
+    return pct(mC, mT);
+  }, [habits]);
+
+  /* today completed */
+  const todayCompleted = useMemo(
+    () => habits.filter((h) => (h.completedDates || []).includes(todayStr)).length,
+    [habits]
+  );
+
+  const sorted30 = useMemo(
+    () => [...habitStats].sort((a, b) => b.consistency30 - a.consistency30),
+    [habitStats]
+  );
+
+  const mostConsistent = sorted30[0];
+  const needsWork = sorted30[sorted30.length - 1];
+
+  /* ─── shared tab-bar ─── */
+  function TabBar() {
+    return (
+      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid rgba(255,255,255,0.07)', marginBottom: '32px' }}>
+        {TABS.map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            style={{
+              padding: '12px 20px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: tab === t ? 700 : 500,
+              color: tab === t ? '#f8fafc' : '#64748b',
+              borderBottom: tab === t ? '2px solid #34d399' : '2px solid transparent',
+              marginBottom: '-1px',
+              transition: 'all 0.2s ease',
+              fontFamily: 'inherit',
+            }}
+            onMouseEnter={(e) => { if (tab !== t) e.currentTarget.style.color = '#94a3b8'; }}
+            onMouseLeave={(e) => { if (tab !== t) e.currentTarget.style.color = '#64748b'; }}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  /* ─── empty state ─────────────────────────────────────────────── */
+  if (habitCount === 0) {
+    return (
+      <div style={{ padding: '40px', color: '#f8fafc', flex: 1 }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#34d399', margin: '0 0 8px 0' }}>
+          Stats & Insights
+        </h1>
+        <TabBar />
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', marginTop: '80px', gap: '16px',
+        }}>
+          <div style={{ fontSize: '48px' }}>📊</div>
+          <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#f8fafc' }}>No data yet</h3>
+          <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Add some habits and start tracking to see your stats here.</p>
+        </div>
+      </div>
+    );
+  }
+
+  /* ════════════════════════ OVERVIEW ══════════════════════════════ */
+  function OverviewTab() {
+    return (
+      <>
+        {/* 6-card KPI row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+          <StatCard value={habitCount} label="Total Habits" accent="#60a5fa" />
+          <StatCard value={totalCompletions} label="Total Completions" accent="#34d399" />
+          <StatCard value={`${bestStreak} 🔥`} label="Best Streak" accent="#fb923c" />
+          <StatCard value={`${overallConsistency}%`} label="30-Day Consistency" accent="#34d399" />
+          <StatCard value={`${overallWeekly}%`} label="This Week" accent="#a78bfa" />
+          <StatCard
+            value={`${todayCompleted}/${habitCount}`}
+            label="Done Today"
+            sub={todayCompleted === habitCount ? '🎉 Perfect day!' : null}
+            accent="#f472b6"
+          />
+        </div>
+
+        {/* Overall consistency bar */}
+        <div style={{
+          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
+        }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '14px' }}>
+            30-DAY OVERALL CONSISTENCY
+          </div>
+          <div style={{ width: '100%', height: '14px', background: 'rgba(255,255,255,0.06)', borderRadius: '7px', overflow: 'hidden' }}>
+            <div style={{
+              height: '100%',
+              width: `${clamp(overallConsistency, 1, 100)}%`,
+              background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+              borderRadius: '7px',
+              transition: 'width 0.6s ease',
+            }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
+            <span style={{ fontSize: '12px', color: '#64748b' }}>0%</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: '#34d399' }}>{overallConsistency}%</span>
+            <span style={{ fontSize: '12px', color: '#64748b' }}>100%</span>
+          </div>
+        </div>
+
+        {/* Two-column bottom */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          {/* habit consistency list */}
+          <div style={{
+            background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: '14px', padding: '20px 24px',
+          }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
+              HABIT CONSISTENCY (30 DAYS)
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {sorted30.map((h, i) => (
+                <ConsistencyBar
+                  key={h._id}
+                  label={h.name}
+                  pct={h.consistency30}
+                  color={habitColor(i)}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* comparison card */}
+          <div style={{
+            background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+            borderRadius: '14px', padding: '20px 24px', display: 'flex',
+            flexDirection: 'column', gap: '16px',
+          }}>
+            <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em' }}>
+              HIGHLIGHTS
+            </div>
+            {mostConsistent && (
+              <HighlightRow
+                icon="⭐"
+                label="Most Consistent"
+                name={mostConsistent.name}
+                value={`${mostConsistent.consistency30}%`}
+                color="#34d399"
+              />
+            )}
+            {needsWork && needsWork._id !== mostConsistent?._id && (
+              <HighlightRow
+                icon="⚠️"
+                label="Needs Attention"
+                name={needsWork.name}
+                value={`${needsWork.consistency30}%`}
+                color="#ef4444"
+              />
+            )}
+            <HighlightRow
+              icon="📅"
+              label="This Month"
+              name="Overall"
+              value={`${overallMonthly}%`}
+              color="#60a5fa"
+            />
+            <HighlightRow
+              icon="🔥"
+              label="Best Streak"
+              name={habitStats.find(h => h.bestStreak === bestStreak)?.name || '—'}
+              value={`${bestStreak} days`}
+              color="#fb923c"
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ════════════════════════ PER-HABIT DETAIL ════════════════════ */
+  function PerHabitTab() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {habitStats.map((h, i) => {
+          const color = habitColor(i);
+          const delta = h.monthlyPct - h.prevMonthlyPct;
+          return (
+            <div key={h._id} style={{
+              background: '#111827',
+              border: `1px solid rgba(255,255,255,0.06)`,
+              borderLeft: `3px solid ${color}`,
+              borderRadius: '14px',
+              padding: '20px 24px',
+            }}>
+              {/* header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc' }}>{h.name}</div>
+                  <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                    Since {dayjs(h.createdAt).format('MMM D, YYYY')} · {h.totalCompletions} completions
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: delta >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
+                  border: `1px solid ${delta >= 0 ? 'rgba(52,211,153,0.25)' : 'rgba(239,68,68,0.25)'}`,
+                  borderRadius: '20px', padding: '4px 12px',
+                  fontSize: '13px', fontWeight: 700,
+                  color: delta >= 0 ? '#34d399' : '#ef4444',
+                }}>
+                  {delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}% vs last month
+                </div>
+              </div>
+
+              {/* mini stat row */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                <MiniStat label="This Week" value={`${h.weeklyPct}%`} color={color} />
+                <MiniStat label="This Month" value={`${h.monthlyPct}%`} color={color} />
+                <MiniStat label="30-Day" value={`${h.consistency30}%`} color={color} />
+                <MiniStat label="Current Streak" value={`${h.currentStreak} 🔥`} color={color} />
+              </div>
+
+              {/* last 30 days dot row */}
+              <div>
+                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '8px', fontWeight: 600, letterSpacing: '0.06em' }}>
+                  LAST 30 DAYS
+                </div>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                  {Array.from({ length: 30 }, (_, i) => {
+                    const d = today.subtract(29 - i, 'day').format('YYYY-MM-DD');
+                    const done = h.completedDates.includes(d);
+                    return (
+                      <div
+                        key={d}
+                        title={`${d}: ${done ? '✅' : '—'}`}
+                        style={{
+                          width: '16px', height: '16px',
+                          borderRadius: '3px',
+                          background: done ? color : 'rgba(255,255,255,0.05)',
+                          opacity: done ? 1 : 0.5,
+                          transition: 'transform 0.15s',
+                          cursor: 'default',
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* ════════════════════════ ACTIVITY HEATMAP ════════════════════ */
+  function ActivityTab() {
+    const entries = Object.entries(activityMap); // [date, count]
+    const maxCount = Math.max(1, ...entries.map(([, c]) => c));
+
+    // group by week (7 columns)
+    const weeks = [];
+    for (let i = 0; i < 30; i += 7) {
+      weeks.push(entries.slice(i, i + 7));
+    }
+
+    return (
+      <>
+        {/* heatmap */}
+        <div style={{
+          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '14px', padding: '24px', marginBottom: '24px',
+        }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '20px' }}>
+            ACTIVITY HEATMAP — LAST 30 DAYS
+          </div>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {weeks.map((week, wi) => (
+              <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                {week.map(([date, count]) => {
+                  const frac = count / maxCount;
+                  return (
+                    <div key={date}
+                      title={`${dayjs(date).format('MMM D')} — ${count} habit${count !== 1 ? 's' : ''} completed`}
+                      style={{
+                        aspectRatio: '1',
+                        background: heatColor(frac),
+                        borderRadius: '6px',
+                        cursor: 'default',
+                        transition: 'transform 0.15s',
+                        position: 'relative',
+                      }}
+                    >
+                      {/* date label on hover via title, tiny day number */}
+                      <span style={{
+                        position: 'absolute', bottom: '2px', right: '4px',
+                        fontSize: '9px', color: 'rgba(255,255,255,0.35)', pointerEvents: 'none',
+                      }}>
+                        {dayjs(date).date()}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+          {/* legend */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>Less</span>
+            {[0, 0.2, 0.5, 0.8, 1].map((f) => (
+              <div key={f} style={{ width: '14px', height: '14px', background: heatColor(f), borderRadius: '3px' }} />
+            ))}
+            <span style={{ fontSize: '11px', color: '#64748b' }}>More</span>
+          </div>
+        </div>
+
+        {/* daily activity list */}
+        <div style={{
+          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: '14px', padding: '20px 24px',
+        }}>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
+            RECENT DAILY ACTIVITY
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {[...entries].reverse().slice(0, 14).map(([date, count]) => {
+              const isToday = date === todayStr;
+              return (
+                <div key={date} style={{
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  padding: '8px 12px', borderRadius: '8px',
+                  background: isToday ? 'rgba(52,211,153,0.06)' : 'transparent',
+                  border: isToday ? '1px solid rgba(52,211,153,0.15)' : '1px solid transparent',
+                }}>
+                  <div style={{ width: '80px', fontSize: '13px', color: isToday ? '#34d399' : '#94a3b8', fontWeight: isToday ? 700 : 400, flexShrink: 0 }}>
+                    {isToday ? 'Today' : dayjs(date).format('MMM D')}
+                  </div>
+                  <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${pct(count, habitCount)}%`,
+                      background: count === habitCount ? '#34d399' : count > 0 ? '#60a5fa' : 'transparent',
+                      borderRadius: '3px',
+                      transition: 'width 0.5s ease',
+                    }} />
+                  </div>
+                  <div style={{ width: '60px', textAlign: 'right', fontSize: '12px', color: '#64748b', flexShrink: 0 }}>
+                    {count}/{habitCount}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  /* ─── main render ─────────────────────────────────────────────── */
+  return (
+    <div style={{
+      flex: 1,
+      overflowY: 'auto',
+      padding: '32px',
+      color: '#f8fafc',
+      boxSizing: 'border-box',
+    }}>
+      <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#34d399', margin: '0 0 24px 0' }}>
+        Stats &amp; Insights
       </h1>
-      
-      <div style={{ display: "flex", gap: "24px", borderBottom: "1px solid rgba(255,255,255,0.05)", marginBottom: "32px" }}>
-        <div style={{ paddingBottom: "12px", borderBottom: "2px solid #10b981", color: "#f8fafc", fontWeight: 600, fontSize: "14px", cursor: "pointer" }}>
-          Overview
-        </div>
-        <div style={{ paddingBottom: "12px", color: "#94a3b8", fontWeight: 500, fontSize: "14px", cursor: "pointer" }}>
-          Per-Habit Detail
-        </div>
+
+      <TabBar />
+
+      {tab === 'Overview' && <OverviewTab />}
+      {tab === 'Per-Habit Detail' && <PerHabitTab />}
+      {tab === 'Activity' && <ActivityTab />}
+    </div>
+  );
+}
+
+/* ─── micro-components ────────────────────────────────────────── */
+function MiniStat({ label, value, color }) {
+  return (
+    <div style={{
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: '10px',
+      padding: '12px',
+      textAlign: 'center',
+    }}>
+      <div style={{ fontSize: '18px', fontWeight: 800, color }}>{value}</div>
+      <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '4px' }}>{label}</div>
+    </div>
+  );
+}
+
+function HighlightRow({ icon, label, name, value, color }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center',
+      background: 'rgba(255,255,255,0.03)',
+      border: '1px solid rgba(255,255,255,0.06)',
+      borderRadius: '10px', padding: '12px 14px', gap: '12px',
+    }}>
+      <span style={{ fontSize: '20px' }}>{icon}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>{label}</div>
+        <div style={{ fontSize: '14px', fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</div>
       </div>
-
-      {/* 4 STAT CARDS */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "24px" }}>
-        <div style={cardStyle}>
-          <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>{totalHabits}</div>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em" }}>TOTAL HABITS</div>
-        </div>
-        <div style={cardStyle}>
-          <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>{totalCompletions}</div>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em" }}>TOTAL COMPLETIONS</div>
-        </div>
-        <div style={cardStyle}>
-          <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>{bestStreak} 🔥</div>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em" }}>BEST STREAK</div>
-        </div>
-        <div style={cardStyle}>
-          <div style={{ fontSize: "28px", fontWeight: 800, marginBottom: "8px" }}>{overallConsistency}%</div>
-          <div style={{ fontSize: "11px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em" }}>CONSISTENCY</div>
-        </div>
-      </div>
-
-      {/* OVERALL CONSISTENCY BAR */}
-      <div style={{ ...cardStyle, alignItems: "flex-start", marginBottom: "24px" }}>
-        <div style={{ fontSize: "11px", fontWeight: 800, color: "#f8fafc", letterSpacing: "0.05em", marginBottom: "16px" }}>
-          OVERALL CONSISTENCY
-        </div>
-        <div style={{ width: "100%", height: "12px", background: "#0f172a", borderRadius: "6px", position: "relative", overflow: "hidden" }}>
-          <div style={{ 
-            height: "100%", 
-            width: `${Math.max(overallConsistency, 1)}%`, 
-            background: "linear-gradient(90deg, #10b981, #06b6d4)", 
-            borderRadius: "6px",
-            transition: "width 0.5s ease"
-          }} />
-        </div>
-      </div>
-
-      {/* BOTTOM ROW */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "32px" }}>
-        
-        {/* NO CATEGORY DATA */}
-        <div style={{ ...cardStyle, textAlign: "center", padding: "40px" }}>
-          <div style={{ fontSize: "32px", marginBottom: "16px" }}>🥚</div>
-          <h3 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: 700 }}>No category data</h3>
-          <p style={{ margin: 0, fontSize: "13px", color: "#94a3b8", maxWidth: "240px", lineHeight: "1.5" }}>
-            Complete habits to see your category breakdown
-          </p>
-        </div>
-
-        {/* CONSISTENCY COMPARISON */}
-        <div style={{ ...cardStyle, alignItems: "flex-start", justifyContent: "flex-start", padding: "24px" }}>
-          <div style={{ fontSize: "11px", fontWeight: 800, color: "#f8fafc", letterSpacing: "0.05em", marginBottom: "20px" }}>
-            CONSISTENCY COMPARISON
-          </div>
-          
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%" }}>
-            {/* Most Consistent Row */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(0,0,0,0.2)", padding: "12px 16px", borderRadius: "8px" }}>
-              <span style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500 }}>Most Consistent:</span>
-              <span style={{ fontSize: "14px", color: "#10b981", fontWeight: 700 }}>{mostConsistent.name} ({mostConsistent.pct}%)</span>
-            </div>
-            
-            {/* Needs Work Row */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(0,0,0,0.2)", padding: "12px 16px", borderRadius: "8px" }}>
-              <span style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500 }}>Needs Work:</span>
-              <span style={{ fontSize: "14px", color: "#ef4444", fontWeight: 700 }}>{needsWork.name} ({needsWork.pct}%)</span>
-            </div>
-          </div>
-          
-        </div>
-      </div>
-
+      <div style={{ fontSize: '14px', fontWeight: 800, color, flexShrink: 0 }}>{value}</div>
     </div>
   );
 }
