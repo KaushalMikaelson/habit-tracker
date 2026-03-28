@@ -17,6 +17,7 @@ import DashboardGrid from "./DashboardGrid.jsx";
 import Sidebar from "../../components/Sidebar.jsx";
 import StatsView from "./StatsView.jsx";
 import WeeklyView from "./WeeklyView.jsx";
+import MonthlyView from "./MonthlyView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -580,11 +581,13 @@ function Dashboard({ user, logout }) {
 
       {loading && <TopLoadingBar />}
 
-      {/* ===== STATS VIEW ===== */}
+      {/* ===== VIEWS ===== */}
       {activeView === "stats" ? (
         <StatsView habits={habits} />
       ) : activeView === "weekly" ? (
         <WeeklyView habits={habits} />
+      ) : activeView === "monthly" ? (
+        <MonthlyView habits={habits} />
       ) : (
         <>
           {loading ? (
