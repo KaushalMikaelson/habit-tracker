@@ -20,7 +20,7 @@ function pct(n, d) { return d > 0 ? Math.round((n / d) * 100) : 0; }
 function KpiCard({ value, label, sub, accent }) {
   return (
     <div style={{
-      background: '#111827',
+      background: '#020617',
       border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: '12px',
       padding: '18px 16px',
@@ -122,7 +122,7 @@ export default function MonthlyView({ habits = [] }) {
 
   /* ─── styles ─────────────────────────────────────────────────── */
   const card = {
-    background: '#111827',
+    background: '#020617',
     border: '1px solid rgba(255,255,255,0.06)',
     borderRadius: '14px',
     padding: '20px 24px',

@@ -38,7 +38,7 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
     }}>
       <div style={{
-        background: '#111827', borderRadius: '20px', padding: '32px',
+        background: '#020617', borderRadius: '20px', padding: '32px',
         width: '520px', maxWidth: '92vw', border: '1px solid rgba(255,255,255,0.1)',
         boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6)',
         position: 'relative', color: '#f8fafc',

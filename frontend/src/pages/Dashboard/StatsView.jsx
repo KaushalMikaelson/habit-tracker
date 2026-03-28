@@ -112,7 +112,7 @@ function habitColor(idx) {
 function StatCard({ value, label, sub, accent = '#34d399' }) {
   return (
     <div style={{
-      background: '#111827',
+      background: '#020617',
       border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: '14px',
       padding: '24px 20px',
@@ -304,7 +304,7 @@ export default function StatsView({ habits = [] }) {
 
         {/* Overall consistency bar */}
         <div style={{
-          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
         }}>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '14px' }}>
@@ -330,7 +330,7 @@ export default function StatsView({ habits = [] }) {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {/* habit consistency list */}
           <div style={{
-            background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+            background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '14px', padding: '20px 24px',
           }}>
             <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
@@ -350,7 +350,7 @@ export default function StatsView({ habits = [] }) {
 
           {/* comparison card */}
           <div style={{
-            background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+            background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
             borderRadius: '14px', padding: '20px 24px', display: 'flex',
             flexDirection: 'column', gap: '16px',
           }}>
@@ -405,7 +405,7 @@ export default function StatsView({ habits = [] }) {
           const weekDelta  = h.weeklyPct  - h.prevWeeklyPct;
           return (
             <div key={h._id} style={{
-              background: '#111827',
+              background: '#020617',
               border: `1px solid rgba(255,255,255,0.06)`,
               borderLeft: `3px solid ${color}`,
               borderRadius: '14px',
@@ -482,7 +482,7 @@ export default function StatsView({ habits = [] }) {
       <>
         {/* heatmap */}
         <div style={{
-          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
           overflowX: 'auto',
         }}>
@@ -590,7 +590,7 @@ export default function StatsView({ habits = [] }) {
 
         {/* daily activity list */}
         <div style={{
-          background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
+          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
           borderRadius: '14px', padding: '20px 24px',
         }}>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>

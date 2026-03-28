@@ -78,7 +78,7 @@ function DashboardSkeleton() {
           key={i}
           style={{
             height: "48px",
-            background: "#111827",
+            background: "#020617",
             borderRadius: "8px",
             marginBottom: "12px",
             animation: "pulse 1.5s infinite",
@@ -481,7 +481,7 @@ function Dashboard({ user, logout }) {
                      top: "calc(100% + 12px)",
                      right: 0,
                      width: "280px",
-                     background: "#121826",
+                     background: "#020617",
                      borderRadius: "16px",
                      border: "1px solid rgba(255,255,255,0.08)",
                      boxShadow: "0 10px 40px rgba(0,0,0,0.5)",

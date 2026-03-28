@@ -33,7 +33,7 @@ function habitColor(i) { return PALETTE[i % PALETTE.length]; }
 function KpiCard({ value, label, sub, accent }) {
   return (
     <div style={{
-      background: '#111827',
+      background: '#020617',
       border: '1px solid rgba(255,255,255,0.06)',
       borderRadius: '12px',
       padding: '18px 16px',
@@ -306,7 +306,7 @@ export default function WeeklyView({ habits = [] }) {
 
   /* ─── styles ─────────────────────────────────────────────────── */
   const card = {
-    background: '#111827',
+    background: '#020617',
     border: '1px solid rgba(255,255,255,0.06)',
     borderRadius: '14px',
     padding: '20px 24px',

@@ -86,7 +86,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
   }
 
   const cardStyle = {
-    background: "#121826",
+    background: "#020617",
     border: "1px solid rgba(255,255,255,0.07)",
     borderRadius: "16px",
     padding: "24px",

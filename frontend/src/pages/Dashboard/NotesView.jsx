@@ -303,7 +303,7 @@ export default function NotesView({ habits = [], updateNote }) {
                   key={entry.key}
                   className="note-card"
                   style={{
-                    background: "#121826",
+                    background: "#020617",
                     border: "1px solid rgba(255,255,255,0.07)",
                     borderRadius: "14px",
                     padding: "18px 20px",
