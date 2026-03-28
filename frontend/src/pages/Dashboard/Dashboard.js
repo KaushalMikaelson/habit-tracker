@@ -15,6 +15,7 @@ import MomentumFlame from "../../components/MomentumFlame.jsx";
 import PrestigeBadge from "../../components/PrestigeBadge";
 import DashboardGrid from "./DashboardGrid.jsx";
 import Sidebar from "../../components/Sidebar.jsx";
+import StatsView from "./StatsView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -159,6 +160,7 @@ function Dashboard({ user, logout }) {
   const [theme, setTheme] = useState("dark");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeView, setActiveView] = useState("dashboard"); // "dashboard" | "stats"
 
 
   const kpis = calculateKPIs(
@@ -251,7 +253,12 @@ function Dashboard({ user, logout }) {
         background: "#0b101e",
       }}
     >
-      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        activeView={activeView}
+        onNavigate={setActiveView}
+      />
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflowY: "auto" }}>
       <style>
         {`
@@ -572,161 +579,125 @@ function Dashboard({ user, logout }) {
 
       {loading && <TopLoadingBar />}
 
-
-      {loading ? (
-        <>
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "40px",
-              fontSize: "14px",
-              fontWeight: 600,
-              color: "#94a3b8",
-            }}
-          >
-            Loading your habits...
-          </div>
-
-          <DashboardSkeleton />
-        </>
-
-      ) : habits.length === 0 ? (
-        <div style={{ marginTop: "48px", textAlign: "center" }}>
-          <h2>No habits yet</h2>
-          <p style={{ color: "#6b7280" }}>
-            Click “Add Habit” to get started
-          </p>
-        </div>
+      {/* ===== STATS VIEW ===== */}
+      {activeView === "stats" ? (
+        <StatsView habits={habits} />
       ) : (
-        <DndContext
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={habits.map(h => h._id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div
-              style={{
-                display: "flex",
-                gap: "24px",
-                padding: "24px",
-                width: "100%",
-                boxSizing: "border-box",
-                alignItems: "start",
-              }}
-            >
-
-                {/* LEFT COLUMN */}
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 260,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "24px",
-                  }}
-                >
-                  <div style={{ height: KPI_ROW_HEIGHT }}>
-                    <KpiIntroBox />
-                  </div>
-
-                  <TodayFocus habits={habits} onToggle={toggleHabit} />
-
-                  <HabitNameColumn
-                    habits={habits}
-                    deleteHabit={deleteHabit}
-                    editHabit={editHabit}
-                  />
-                </div>
-
-                {/* CENTER COLUMN */}
-                <div
-                  style={{
-                    flex: 4,
-                    minWidth: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0px",
-                  }}
-                >
-                  {/* KPI RINGS */}
-                  <div
-                    style={{
-                      height: KPI_ROW_HEIGHT,
-                      display: "flex",
-                      width: "100%",
-                    }}
-                  >
-                    <KpiRingRow
-                      kpis={kpis}
-                      isCurrentMonth={isCurrentMonth}
-                    />
-                  </div>
-
-                  {/* GRAPHS */}
-                  <HabitGraphs
-                    habits={habits}
-                    month={selectedMonth}
-                    isCurrentMonth={isCurrentMonth}
-                  />
-
-                  {/* GRID */}
-                  <div
-                    style={{
-                      marginTop: "24px",
-                      borderRadius: "12px",
-                      overflow: "hidden",
-                      minWidth: 0,
-                    }}
-                  >
-                    <DashboardGrid
-                      habits={habits}
-                      monthDates={monthDates}
-                      today={today}
-                      toggleHabit={toggleHabit}
-                      gridScrollRef={gridScrollRef}
-                      isFutureDate={isFutureDate}
-                      theme={theme}
-                      monthLabel={monthLabel}
-                      goToPreviousMonth={goToPreviousMonth}
-                      goToNextMonth={goToNextMonth}
-                      setTheme={setTheme}
-                    />
-                  </div>
-                </div>
-
-                {/* RIGHT COLUMN */}
-                <div
-                  style={{
-                    flex: 1,
-                    minWidth: 260,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "24px",
-                  }}
-                >
-                  <div style={{ height: KPI_ROW_HEIGHT }}>
-                    <TopHabits
-                      habits={habits}
-                      currentYear={currentYear}
-                      currentMonth={currentMonth}
-                      height={KPI_ROW_HEIGHT}
-                    />
-                  </div>
-
-                  <TodoNotes />
-
-                  <HabitProgressColumn
-                    habits={habits}
-                    currentMonth={selectedMonth}
-                  />
-                </div>
-
+        <>
+          {loading ? (
+            <>
+              <div
+                style={{
+                  textAlign: "center",
+                  marginTop: "40px",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#94a3b8",
+                }}
+              >
+                Loading your habits...
+              </div>
+              <DashboardSkeleton />
+            </>
+          ) : habits.length === 0 ? (
+            <div style={{ marginTop: "48px", textAlign: "center" }}>
+              <h2>No habits yet</h2>
+              <p style={{ color: "#6b7280" }}>
+                Click “Add Habit” to get started
+              </p>
             </div>
-          </SortableContext>
-        </DndContext>
+          ) : (
+            <DndContext
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={habits.map(h => h._id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "24px",
+                    padding: "24px",
+                    width: "100%",
+                    boxSizing: "border-box",
+                    alignItems: "start",
+                  }}
+                >
+                  {/* LEFT COLUMN */}
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 260,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "24px",
+                    }}
+                  >
+                    <div style={{ height: KPI_ROW_HEIGHT }}>
+                      <KpiIntroBox />
+                    </div>
+                    <TodayFocus habits={habits} onToggle={toggleHabit} />
+                    <HabitNameColumn
+                      habits={habits}
+                      deleteHabit={deleteHabit}
+                      editHabit={editHabit}
+                    />
+                  </div>
 
+                  {/* CENTER COLUMN */}
+                  <div
+                    style={{
+                      flex: 4,
+                      minWidth: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0px",
+                    }}
+                  >
+                    <div style={{ height: KPI_ROW_HEIGHT, display: "flex", width: "100%" }}>
+                      <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
+                    </div>
+                    <HabitGraphs habits={habits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
+                    <div style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0 }}>
+                      <DashboardGrid
+                        habits={habits}
+                        monthDates={monthDates}
+                        today={today}
+                        toggleHabit={toggleHabit}
+                        gridScrollRef={gridScrollRef}
+                        isFutureDate={isFutureDate}
+                        theme={theme}
+                        monthLabel={monthLabel}
+                        goToPreviousMonth={goToPreviousMonth}
+                        goToNextMonth={goToNextMonth}
+                        setTheme={setTheme}
+                      />
+                    </div>
+                  </div>
+
+                  {/* RIGHT COLUMN */}
+                  <div
+                    style={{
+                      flex: 1,
+                      minWidth: 260,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "24px",
+                    }}
+                  >
+                    <div style={{ height: KPI_ROW_HEIGHT }}>
+                      <TopHabits habits={habits} currentYear={currentYear} currentMonth={currentMonth} height={KPI_ROW_HEIGHT} />
+                    </div>
+                    <TodoNotes />
+                    <HabitProgressColumn habits={habits} currentMonth={selectedMonth} />
+                  </div>
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </>
       )}
 
       {showUndo && (
