@@ -41,9 +41,14 @@ function buildHabitStats(habits) {
     );
     const prevMonthlyPct = pct(pmComp, pmTotal);
 
-    // weekly
+    // weekly (current)
     const { completed: wComp, total: wTotal } = calculateWeeklyCompletion(h, today, today);
     const weeklyPct = pct(wComp, wTotal);
+
+    // weekly (prev)
+    const prevWeekStart = today.subtract(1, 'week').startOf('week');
+    const { completed: pwComp, total: pwTotal } = calculateWeeklyCompletion(h, prevWeekStart, today);
+    const prevWeeklyPct = pct(pwComp, pwTotal);
 
     // last-30 consistency
     const start30 = today.subtract(29, 'day');
@@ -67,6 +72,7 @@ function buildHabitStats(habits) {
       monthlyPct,
       prevMonthlyPct,
       weeklyPct,
+      prevWeeklyPct,
       consistency30,
       done30,
       possible30,
@@ -394,7 +400,8 @@ export default function StatsView({ habits = [] }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {habitStats.map((h, i) => {
           const color = habitColor(i);
-          const delta = h.monthlyPct - h.prevMonthlyPct;
+          const monthDelta = h.monthlyPct - h.prevMonthlyPct;
+          const weekDelta  = h.weeklyPct  - h.prevWeeklyPct;
           return (
             <div key={h._id} style={{
               background: '#111827',
@@ -404,22 +411,17 @@ export default function StatsView({ habits = [] }) {
               padding: '20px 24px',
             }}>
               {/* header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px', gap: '12px' }}>
+                <div style={{ minWidth: 0 }}>
                   <div style={{ fontSize: '16px', fontWeight: 700, color: '#f8fafc' }}>{h.name}</div>
                   <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
                     Since {dayjs(h.createdAt).format('MMM D, YYYY')} · {h.totalCompletions} completions
                   </div>
                 </div>
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  background: delta >= 0 ? 'rgba(52,211,153,0.1)' : 'rgba(239,68,68,0.1)',
-                  border: `1px solid ${delta >= 0 ? 'rgba(52,211,153,0.25)' : 'rgba(239,68,68,0.25)'}`,
-                  borderRadius: '20px', padding: '4px 12px',
-                  fontSize: '13px', fontWeight: 700,
-                  color: delta >= 0 ? '#34d399' : '#ef4444',
-                }}>
-                  {delta >= 0 ? '↑' : '↓'} {Math.abs(delta)}% vs last month
+                {/* two delta badges */}
+                <div style={{ display: 'flex', gap: '8px', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                  <DeltaBadge delta={weekDelta} label="vs last week" />
+                  <DeltaBadge delta={monthDelta} label="vs last month" />
                 </div>
               </div>
 
@@ -601,6 +603,27 @@ function MiniStat({ label, value, color }) {
     }}>
       <div style={{ fontSize: '18px', fontWeight: 800, color }}>{value}</div>
       <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, marginTop: '4px' }}>{label}</div>
+    </div>
+  );
+}
+
+function DeltaBadge({ delta, label }) {
+  const up = delta >= 0;
+  return (
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: '5px',
+      background: up ? 'rgba(52,211,153,0.10)' : 'rgba(239,68,68,0.10)',
+      border: `1px solid ${up ? 'rgba(52,211,153,0.25)' : 'rgba(239,68,68,0.25)'}`,
+      borderRadius: '20px',
+      padding: '4px 11px',
+      fontSize: '12px',
+      fontWeight: 700,
+      color: up ? '#34d399' : '#ef4444',
+      whiteSpace: 'nowrap',
+    }}>
+      {up ? '↑' : '↓'} {Math.abs(delta)}% {label}
     </div>
   );
 }
