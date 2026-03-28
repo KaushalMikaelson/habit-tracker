@@ -11,6 +11,7 @@ import {
 
 /* ================= Existing imports ================= */
 import AddHabitModal from "../../components/AddHabitModal.jsx";
+import HabitDetailModal from "../../components/habits/HabitDetailModal.jsx";
 import MomentumFlame from "../../components/MomentumFlame.jsx";
 import PrestigeBadge from "../../components/PrestigeBadge";
 import DashboardGrid from "./DashboardGrid.jsx";
@@ -18,6 +19,8 @@ import Sidebar from "../../components/Sidebar.jsx";
 import StatsView from "./StatsView.jsx";
 import WeeklyView from "./WeeklyView.jsx";
 import MonthlyView from "./MonthlyView.jsx";
+import SettingsView from "./SettingsView.jsx";
+import NotesView from "./NotesView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -141,10 +144,30 @@ function Dashboard({ user, logout }) {
     undoDelete,
     showUndo,
     editHabit,
+    updateNote,
   } = useHabits(today);
 
   const [newHabit, setNewHabit] = useState("");
+  const [newCategory, setNewCategory] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [selectedHabitForDetail, setSelectedHabitForDetail] = useState(null);
+
+  const [categoryFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState(
+    () => localStorage.getItem("habitDefaultStatusFilter") || "active"
+  );
+
+  function handleDefaultStatusFilterChange(val) {
+    setStatusFilter(val);
+    localStorage.setItem("habitDefaultStatusFilter", val);
+  }
+
+  const visibleHabits = Array.isArray(habits) ? habits.filter(h => {
+    const s = h.status || "active";
+    if (statusFilter !== "all" && s !== statusFilter) return false;
+    if (categoryFilter !== "All" && h.category !== categoryFilter) return false;
+    return true;
+  }) : [];
 
   const initialYearMonth = getCurrentYearMonth();
   const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
@@ -157,6 +180,23 @@ function Dashboard({ user, logout }) {
   const hasAutoScrolledRef = useRef(false);
 
   const selectedMonth = dayjs(`${currentYear}-${currentMonth + 1}-01`);
+  const [accentTheme, setAccentTheme] = useState(
+    localStorage.getItem("appAccentTheme") || "blue"
+  );
+
+  const themeColors = {
+    blue: { c1: "#2563eb", c2: "#3b82f6" },
+    emerald: { c1: "#059669", c2: "#10b981" },
+    purple: { c1: "#7e22ce", c2: "#a855f7" },
+    rose: { c1: "#e11d48", c2: "#f43f5e" },
+    amber: { c1: "#d97706", c2: "#f59e0b" },
+  };
+
+  const setAppTheme = (t) => {
+    setAccentTheme(t);
+    localStorage.setItem("appAccentTheme", t);
+  };
+
   const isCurrentMonth = selectedMonth.isSame(dayjs(), "month");
 
   const [theme, setTheme] = useState("dark");
@@ -166,7 +206,7 @@ function Dashboard({ user, logout }) {
 
 
   const kpis = calculateKPIs(
-    Array.isArray(habits) ? habits : [],
+    visibleHabits,
     selectedMonth
   );
 
@@ -221,10 +261,11 @@ function Dashboard({ user, logout }) {
     }
   }
 
-  function handleAddHabit() {
+  function handleAddHabit(status = "active") {
     if (!newHabit.trim()) return;
-    addHabit(newHabit);
+    addHabit(newHabit, newCategory, status);
     setNewHabit("");
+    setNewCategory("");
     setShowModal(false);
   }
 
@@ -358,7 +399,15 @@ function Dashboard({ user, logout }) {
             momentum={kpis.momentum}
             monthly={kpis.monthly}
           />
+          <style>{`
+            :root {
+              --theme-1: ${themeColors[accentTheme].c1};
+              --theme-2: ${themeColors[accentTheme].c2};
+            }
+          `}</style>
           <PrestigeBadge habits={habits} />
+
+
 
 
           <button
@@ -398,7 +447,7 @@ function Dashboard({ user, logout }) {
                 padding: "8px 14px",
                 borderRadius: "20px",
                 border: "none",
-                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                background: "linear-gradient(135deg, var(--theme-1, #2563eb), var(--theme-2, #3b82f6))",
                 color: "#ffffff",
                 fontWeight: 700,
                 fontSize: "14px",
@@ -465,6 +514,29 @@ function Dashboard({ user, logout }) {
                        <div style={{ fontSize: "14px", color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                          {user?.email || ""}
                        </div>
+                     </div>
+                   </div>
+
+                   <hr style={{ borderColor: "rgba(255,255,255,0.06)", margin: "0 -16px 12px -16px", borderStyle: "solid", borderWidth: "1px 0 0 0" }} />
+
+                   {/* Theme Selector UI */}
+                   <div style={{ padding: "4px 0 16px 0" }}>
+                     <div style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: "8px", paddingLeft: "4px" }}>
+                       Accent Color
+                     </div>
+                     <div style={{ display: "flex", gap: "8px", paddingLeft: "4px" }}>
+                       {Object.keys(themeColors).map(t => (
+                         <div
+                           key={t}
+                           onClick={() => setAppTheme(t)}
+                           style={{
+                             width: "24px", height: "24px", borderRadius: "50%", cursor: "pointer",
+                             background: themeColors[t].c1,
+                             border: accentTheme === t ? "2px solid #fff" : "2px solid transparent",
+                             boxShadow: accentTheme === t ? "0 0 0 2px " + themeColors[t].c1 : "none"
+                           }}
+                         />
+                       ))}
                      </div>
                    </div>
 
@@ -576,18 +648,39 @@ function Dashboard({ user, logout }) {
         setShowModal={setShowModal}
         newHabit={newHabit}
         setNewHabit={setNewHabit}
+        newCategory={newCategory}
+        setNewCategory={setNewCategory}
         addHabit={handleAddHabit}
       />
 
       {loading && <TopLoadingBar />}
 
+      {selectedHabitForDetail && (
+        <HabitDetailModal
+          habit={selectedHabitForDetail}
+          monthDates={monthDates}
+          onClose={() => setSelectedHabitForDetail(null)}
+          isFutureDate={isFutureDate}
+          toggleHabit={toggleHabit}
+          updateHabit={editHabit}
+          updateNote={updateNote}
+        />
+      )}
+
       {/* ===== VIEWS ===== */}
-      {activeView === "stats" ? (
-        <StatsView habits={habits} />
+      {activeView === "settings" ? (
+        <SettingsView
+          defaultStatusFilter={statusFilter}
+          onDefaultStatusFilterChange={handleDefaultStatusFilterChange}
+        />
+      ) : activeView === "notes" ? (
+        <NotesView habits={habits} updateNote={updateNote} />
+      ) : activeView === "stats" ? (
+        <StatsView habits={visibleHabits} />
       ) : activeView === "weekly" ? (
-        <WeeklyView habits={habits} />
+        <WeeklyView habits={visibleHabits} />
       ) : activeView === "monthly" ? (
-        <MonthlyView habits={habits} />
+        <MonthlyView habits={visibleHabits} />
       ) : (
         <>
           {loading ? (
@@ -605,11 +698,11 @@ function Dashboard({ user, logout }) {
               </div>
               <DashboardSkeleton />
             </>
-          ) : habits.length === 0 ? (
+          ) : visibleHabits.length === 0 ? (
             <div style={{ marginTop: "48px", textAlign: "center" }}>
-              <h2>No habits yet</h2>
+              <h2>No habits match filters</h2>
               <p style={{ color: "#6b7280" }}>
-                Click “Add Habit” to get started
+                Try changing your category or status filters, or add a new habit.
               </p>
             </div>
           ) : (
@@ -618,7 +711,7 @@ function Dashboard({ user, logout }) {
               onDragEnd={handleDragEnd}
             >
               <SortableContext
-                items={habits.map(h => h._id)}
+                items={visibleHabits.map(h => h._id)}
                 strategy={verticalListSortingStrategy}
               >
                 <div
@@ -644,11 +737,12 @@ function Dashboard({ user, logout }) {
                     <div style={{ height: KPI_ROW_HEIGHT }}>
                       <KpiIntroBox />
                     </div>
-                    <TodayFocus habits={habits} onToggle={toggleHabit} />
+                    <TodayFocus habits={visibleHabits} onToggle={toggleHabit} />
                     <HabitNameColumn
-                      habits={habits}
+                      habits={visibleHabits}
                       deleteHabit={deleteHabit}
                       editHabit={editHabit}
+                      onHabitClick={(habit) => setSelectedHabitForDetail(habit)}
                     />
                   </div>
 
@@ -665,10 +759,10 @@ function Dashboard({ user, logout }) {
                     <div style={{ height: KPI_ROW_HEIGHT, display: "flex", width: "100%" }}>
                       <KpiRingRow kpis={kpis} isCurrentMonth={isCurrentMonth} />
                     </div>
-                    <HabitGraphs habits={habits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
+                    <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
                     <div style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0 }}>
                       <DashboardGrid
-                        habits={habits}
+                        habits={visibleHabits}
                         monthDates={monthDates}
                         today={today}
                         toggleHabit={toggleHabit}
@@ -694,10 +788,10 @@ function Dashboard({ user, logout }) {
                     }}
                   >
                     <div style={{ height: KPI_ROW_HEIGHT }}>
-                      <TopHabits habits={habits} currentYear={currentYear} currentMonth={currentMonth} height={KPI_ROW_HEIGHT} />
+                      <TopHabits habits={visibleHabits} currentYear={currentYear} currentMonth={currentMonth} height={KPI_ROW_HEIGHT} />
                     </div>
                     <TodoNotes />
-                    <HabitProgressColumn habits={habits} currentMonth={selectedMonth} />
+                    <HabitProgressColumn habits={visibleHabits} currentMonth={selectedMonth} />
                   </div>
                 </div>
               </SortableContext>

@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
     logger.debug("Request body:", req.body);
     logger.debug("User from middleware:", req.user);
 
-    const { title } = req.body;
+    const { title, category, status } = req.body;
 
     if (!title) {
       return res.status(400).json({ message: "Title is required" });
@@ -55,6 +55,8 @@ router.post("/", async (req, res) => {
 
     const habit = await Habit.create({
       title,
+      category: category || "General",
+      status: status === "archived" ? "archived" : "active",
       userId: req.user.id,
       completedDates: [],
       order: count, // 👈 NEW (append at end)
@@ -115,15 +117,20 @@ router.patch("/:id/toggle", async (req, res) => {
 });
 
 // ===============================
-// Update habit title
+// Update habit details (title, category, status)
 // ===============================
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { title } = req.body;
+    const { title, category, status } = req.body;
 
-    if (!title || !title.trim()) {
-      return res.status(400).json({ message: "Title is required" });
+    const updates = {};
+    if (title && title.trim()) updates.title = title.trim();
+    if (category && category.trim()) updates.category = category.trim();
+    if (status === "active" || status === "archived") updates.status = status;
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
     }
 
     const habit = await Habit.findOneAndUpdate(
@@ -132,9 +139,7 @@ router.put("/:id", async (req, res) => {
         userId: req.user.id,
         isDeleted: false,
       },
-      {
-        title: title.trim(),
-      },
+      updates,
       { new: true }
     );
 
@@ -146,6 +151,42 @@ router.put("/:id", async (req, res) => {
   } catch (error) {
     logger.error("❌ Error updating habit:", error);
     res.status(500).json({ message: "Failed to update habit" });
+  }
+});
+
+// ===============================
+// Add or Update Daily Note
+// ===============================
+router.patch("/:id/note", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, note } = req.body;
+
+    if (!date) {
+      return res.status(400).json({ message: "Date is required" });
+    }
+
+    const habit = await Habit.findOne({
+      _id: id,
+      userId: req.user.id,
+      isDeleted: false,
+    });
+
+    if (!habit) {
+      return res.status(404).json({ message: "Habit not found" });
+    }
+
+    if (!note || note.trim() === "") {
+      habit.notes.delete(date);
+    } else {
+      habit.notes.set(date, note);
+    }
+
+    await habit.save();
+    res.json({ success: true, habit });
+  } catch (error) {
+    logger.error("❌ Toggle note error:", error);
+    res.status(500).json({ message: "Failed to update note" });
   }
 });
 

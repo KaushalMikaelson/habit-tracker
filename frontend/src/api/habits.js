@@ -41,3 +41,9 @@ export const reorderHabits = async (orderPayload) => {
   const response = await api.post("/habits/reorder", orderPayload);
   return response.data;
 };
+
+// ✅ UPDATE NOTE
+export const updateNote = async (id, date, note) => {
+  const response = await api.patch(`/habits/${id}/note`, { date, note });
+  return response.data;
+};

@@ -7,7 +7,8 @@ import {
   deleteHabit as deleteHabitApi,
   undoDelete as undoDeleteApi,
   updateHabit as updateHabitApi,
-  reorderHabits as reorderHabitsApi, // ✅ NEW (ONLY addition)
+  reorderHabits as reorderHabitsApi,
+  updateNote as updateNoteApi,
 } from "../api/habits";
 
 export default function useHabits() {
@@ -47,9 +48,9 @@ export default function useHabits() {
   };
 
   /* ---------- Add Habit ---------- */
-  const addHabit = async (title) => {
+  const addHabit = async (title, category, status = "active") => {
     try {
-      const newHabit = await createHabit({ title });
+      const newHabit = await createHabit({ title, category, status });
       setHabits((prev) =>
         Array.isArray(prev) ? [...prev, newHabit] : [newHabit]
       );
@@ -59,23 +60,37 @@ export default function useHabits() {
     }
   };
 
-  /* ---------- Edit Habit ---------- */
-  const editHabit = async (id, newTitle) => {
+  /* ---------- Edit/Update Habit Details ---------- */
+  const editHabit = async (id, title, category, status) => {
     let snapshot = [];
+
+    // Build only the fields we're updating
+    const updateFields = {};
+    if (title !== undefined && title !== null) updateFields.title = title;
+    if (category !== undefined && category !== null) updateFields.category = category;
+    if (status !== undefined && status !== null) updateFields.status = status;
 
     setHabits((prev) => {
       snapshot = prev;
       return Array.isArray(prev)
         ? prev.map((h) =>
-            h._id === id ? { ...h, title: newTitle } : h
+            h._id === id
+              ? { ...h, ...updateFields }
+              : h
           )
         : [];
     });
 
     try {
-      const updatedHabit = await updateHabitApi(id, {
-        title: newTitle,
-      });
+      // For status-only updates (archive/unarchive), include existing title/category
+      const habitSnapshot = snapshot.find(h => h._id === id);
+      const payload = {
+        title: updateFields.title || (habitSnapshot ? habitSnapshot.title : undefined),
+        category: updateFields.category || (habitSnapshot ? habitSnapshot.category : undefined),
+        status: updateFields.status,
+      };
+
+      const updatedHabit = await updateHabitApi(id, payload);
 
       setHabits((prev) =>
         Array.isArray(prev)
@@ -86,6 +101,33 @@ export default function useHabits() {
       console.error("Failed to edit habit:", err);
       setHabits(snapshot);
       alert("Failed to update habit.");
+    }
+  };
+
+  /* ---------- Update Note ---------- */
+  const updateNote = async (id, date, note) => {
+    setHabits((prev) =>
+      Array.isArray(prev)
+        ? prev.map((h) => {
+            if (h._id === id) {
+              const notes = h.notes || {};
+              const newNotes = { ...notes };
+              if (!note || note.trim() === "") {
+                delete newNotes[date];
+              } else {
+                newNotes[date] = note;
+              }
+              return { ...h, notes: newNotes };
+            }
+            return h;
+          })
+        : []
+    );
+
+    try {
+      await updateNoteApi(id, date, note);
+    } catch (err) {
+      console.error("Failed to update note:", err);
     }
   };
 
@@ -208,5 +250,6 @@ export default function useHabits() {
     undoDelete,
     showUndo,
     reorderHabits,
+    updateNote,
   };
 }

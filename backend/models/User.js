@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+    },
+    // 🆕 THEME PREFERENCE (e.g., 'blue', 'emerald', 'rose', 'cyberpunk')
+    themeAccent: {
+        type: String,
+        default: "blue",
     }
-})
+});
 module.exports = mongoose.model("User", userSchema); 

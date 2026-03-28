@@ -24,6 +24,26 @@ const HabitSchema = new mongoose.Schema(
       default: 0,
     },
 
+    // 🆕 CATEGORIES / TAGGING
+    category: {
+      type: String,
+      default: "General",
+    },
+
+    // 🆕 ARCHIVING (active, archived)
+    status: {
+      type: String,
+      enum: ["active", "archived"],
+      default: "active",
+    },
+
+    // 🆕 DAILY NOTES (Map of Date String 'YYYY-MM-DD' to note text)
+    notes: {
+      type: Map,
+      of: String,
+      default: {},
+    },
+
     // 🆕 SOFT DELETE SUPPORT
     isDeleted: {
       type: Boolean,

@@ -30,7 +30,7 @@ function SortableHabitRow({ habit, children }) {
 
 /* ================= Habit Column ================= */
 
-function HabitNameColumn({ habits, deleteHabit, editHabit }) {
+function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
   const HEADER_HEIGHT = 115;
   const ROW_HEIGHT = 38;
 
@@ -265,14 +265,18 @@ function HabitNameColumn({ habits, deleteHabit, editHabit }) {
                           }}
                         />
                       ) : (
-                        <span style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          display: "block",
-                          color: "#cbd5e1",
-                          fontWeight: 500,
-                        }}>
+                        <span 
+                          onClick={() => onHabitClick && onHabitClick(habit)}
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
+                            color: "#cbd5e1",
+                            fontWeight: 500,
+                            cursor: "pointer",
+                          }}
+                        >
                           {habit.title}
                         </span>
                       )}
