@@ -16,6 +16,7 @@ import PrestigeBadge from "../../components/PrestigeBadge";
 import DashboardGrid from "./DashboardGrid.jsx";
 import Sidebar from "../../components/Sidebar.jsx";
 import StatsView from "./StatsView.jsx";
+import WeeklyView from "./WeeklyView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -582,6 +583,8 @@ function Dashboard({ user, logout }) {
       {/* ===== STATS VIEW ===== */}
       {activeView === "stats" ? (
         <StatsView habits={habits} />
+      ) : activeView === "weekly" ? (
+        <WeeklyView habits={habits} />
       ) : (
         <>
           {loading ? (
