@@ -14,6 +14,7 @@ import AddHabitModal from "../../components/AddHabitModal.jsx";
 import MomentumFlame from "../../components/MomentumFlame.jsx";
 import PrestigeBadge from "../../components/PrestigeBadge";
 import DashboardGrid from "./DashboardGrid.jsx";
+import Sidebar from "../../components/Sidebar.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -157,6 +158,7 @@ function Dashboard({ user, logout }) {
 
   const [theme, setTheme] = useState("dark");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 
   const kpis = calculateKPIs(
@@ -244,10 +246,13 @@ function Dashboard({ user, logout }) {
   return (
     <div
       style={{
+        display: "flex",
         minHeight: "100vh",
         background: "#0b101e",
       }}
     >
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", height: "100vh", overflowY: "auto" }}>
       <style>
         {`
         @keyframes loadingBar {
@@ -278,32 +283,63 @@ function Dashboard({ user, logout }) {
           zIndex: 100,
         }}
       >
-        {/* LEFT SIDE - BRAND */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "9px",
-            background: "linear-gradient(135deg, #2563eb, #38bdf8)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 12px rgba(37,99,235,0.4)",
-            flexShrink: 0,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontSize: "15px", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
-              Habit Tracker
+        {/* LEFT SIDE - BRAND & TOGGLE */}
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {!isSidebarOpen && (
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "#94a3b8",
+                cursor: "pointer",
+                padding: "8px",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.2s ease",
+                marginRight: "-8px"
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.05)" }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent" }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          )}
+
+          {!isSidebarOpen && (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", animation: "dropdownFadeIn 0.3s ease" }}>
+              <div style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "9px",
+                background: "linear-gradient(135deg, #2563eb, #38bdf8)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 4px 12px rgba(37,99,235,0.4)",
+                flexShrink: 0,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontSize: "15px", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
+                  Habit Tracker
+                </div>
+                <div style={{ fontSize: "11px", color: "#334155", fontWeight: 500 }}>
+                  Track your consistency
+                </div>
+              </div>
             </div>
-            <div style={{ fontSize: "11px", color: "#334155", fontWeight: 500 }}>
-              Track your consistency
-            </div>
-          </div>
+          )}
         </div>
 
         {/* RIGHT SIDE - BUTTON GROUP */}
@@ -747,8 +783,7 @@ function Dashboard({ user, logout }) {
         </div>
       )}
 
-
-
+      </div>
     </div>
   );
 }
