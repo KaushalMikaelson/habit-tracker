@@ -4,8 +4,8 @@ import html2pdf from 'html2pdf.js';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 /* ─── helpers ─────────────────────────────────────────────────── */
-const DAY_NAMES  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTH_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 function getMonthDates(monthStart) {
   const daysInMonth = monthStart.daysInMonth();
@@ -27,10 +27,10 @@ function KpiCard({ value, label, sub, accent }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
       position: 'relative', overflow: 'hidden',
     }}>
-      <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background: accent }} />
-      <div style={{ fontSize:'26px', fontWeight:800, color:'#f8fafc', lineHeight:1 }}>{value}</div>
-      {sub && <div style={{ fontSize:'11px', color: accent, fontWeight:600 }}>{sub}</div>}
-      <div style={{ fontSize:'10px', fontWeight:700, color:'#64748b', letterSpacing:'0.07em', textTransform:'uppercase', textAlign:'center' }}>{label}</div>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: accent }} />
+      <div style={{ fontSize: '26px', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: '11px', color: accent, fontWeight: 600 }}>{sub}</div>}
+      <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'center' }}>{label}</div>
     </div>
   );
 }
@@ -39,7 +39,7 @@ function KpiCard({ value, label, sub, accent }) {
 export default function MonthlyView({ habits = [] }) {
   const todayStr = dayjs().format('YYYY-MM-DD');
   const [monthStart, setMonthStart] = useState(() => dayjs().startOf('month'));
-  
+
   const monthDates = useMemo(() => getMonthDates(monthStart), [monthStart]);
   const isCurrentMonth = monthStart.isSame(dayjs().startOf('month'), 'month');
 
@@ -83,12 +83,12 @@ export default function MonthlyView({ habits = [] }) {
   /* ── month-level KPIs ── */
   const monthKpis = useMemo(() => {
     const totalPossible = dailySummary.filter(d => !d.isFuture).length * habits.length;
-    const totalDone     = dailySummary.filter(d => !d.isFuture).reduce((s, d) => s + d.count, 0);
-    const consistency   = pct(totalDone, totalPossible);
+    const totalDone = dailySummary.filter(d => !d.isFuture).reduce((s, d) => s + d.count, 0);
+    const consistency = pct(totalDone, totalPossible);
     // filter to only valid past days, sort by count descending
-    const pastDays      = dailySummary.filter(d => !d.isFuture);
-    const bestDay       = pastDays.length > 0 ? [...pastDays].sort((a, b) => b.count - a.count)[0] : null;
-    const perfectDays   = pastDays.filter(d => d.count === habits.length && habits.length > 0).length;
+    const pastDays = dailySummary.filter(d => !d.isFuture);
+    const bestDay = pastDays.length > 0 ? [...pastDays].sort((a, b) => b.count - a.count)[0] : null;
+    const perfectDays = pastDays.filter(d => d.count === habits.length && habits.length > 0).length;
     return { consistency, totalDone, totalPossible, bestDay, perfectDays };
   }, [dailySummary, habits]);
 
@@ -97,7 +97,7 @@ export default function MonthlyView({ habits = [] }) {
   const handleDownloadPDF = () => {
     if (!reportRef.current) return;
     const elem = reportRef.current;
-    
+
     // We must use 'scroll' dimensions here so the export includes the whole content height!
     const w = elem.scrollWidth || Math.max(1000, window.innerWidth);
     const h = elem.scrollHeight || 1500;
@@ -117,7 +117,7 @@ export default function MonthlyView({ habits = [] }) {
 
   /* ── calendar grid build ── */
   // pad to start on correct week day
-  const startPad     = monthStart.day(); // 0 = Sun
+  const startPad = monthStart.day(); // 0 = Sun
   const padCells = Array(startPad).fill(null);
 
   /* ─── styles ─────────────────────────────────────────────────── */
@@ -131,33 +131,33 @@ export default function MonthlyView({ habits = [] }) {
   /* ─── empty state ─────────────────────────────────────────────── */
   if (habits.length === 0) {
     return (
-      <div style={{ flex:1, padding:'40px', color:'#f8fafc', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'16px' }}>
-        <div style={{ fontSize:'48px' }}>📆</div>
-        <h3 style={{ margin:0, fontSize:'20px', fontWeight:700 }}>No habits to show</h3>
-        <p style={{ margin:0, color:'#64748b', fontSize:'14px' }}>Add habits on the Dashboard to see your monthly view.</p>
+      <div style={{ flex: 1, padding: '40px', color: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <div style={{ fontSize: '48px' }}>📆</div>
+        <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>No habits to show</h3>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Add habits on the Dashboard to see your monthly view.</p>
       </div>
     );
   }
 
   return (
-    <div ref={reportRef} style={{ flex:1, overflowY:'auto', padding:'32px', color:'#f8fafc', boxSizing:'border-box' }}>
+    <div ref={reportRef} style={{ flex: 1, overflowY: 'auto', padding: '32px', color: '#f8fafc', boxSizing: 'border-box' }}>
 
       {/* ── PAGE HEADER + NAVIGATION ── */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'28px', flexWrap:'wrap', gap:'12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <h1 style={{ margin:0, fontSize:'20px', fontWeight:700, color:'#60a5fa' }}>Monthly View</h1>
-          <div style={{ fontSize:'13px', color:'#64748b', marginTop:'4px' }}>
+          <h1 style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: '#60a5fa' }}>Monthly View</h1>
+          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
             {monthLabel}
           </div>
         </div>
 
-        <div data-html2canvas-ignore="true" style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+        <div data-html2canvas-ignore="true" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* prev month */}
           <button
             onClick={() => setMonthStart(ws => ws.subtract(1, 'month'))}
             style={navBtn}
-            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.08)'}
-            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.04)'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6" />
@@ -167,7 +167,7 @@ export default function MonthlyView({ habits = [] }) {
           {/* month indicator */}
           <div style={{
             ...navBtn,
-            padding:'6px 16px', fontSize:'13px', fontWeight:700,
+            padding: '6px 16px', fontSize: '13px', fontWeight: 700,
             color: '#f8fafc',
             cursor: 'default', pointerEvents: 'none'
           }}>
@@ -178,8 +178,8 @@ export default function MonthlyView({ habits = [] }) {
           <button
             onClick={() => setMonthStart(ws => ws.add(1, 'month'))}
             style={navBtn}
-            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.08)'}
-            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.04)'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
@@ -190,9 +190,9 @@ export default function MonthlyView({ habits = [] }) {
           {!isCurrentMonth && (
             <button
               onClick={() => setMonthStart(dayjs().startOf('month'))}
-              style={{ ...navBtn, padding:'6px 14px', fontSize:'12px', fontWeight:700, color:'#60a5fa', border:'1px solid rgba(96,165,250,0.3)', marginLeft:'8px' }}
-              onMouseEnter={e => e.currentTarget.style.background='rgba(96,165,250,0.08)'}
-              onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.04)'}
+              style={{ ...navBtn, padding: '6px 14px', fontSize: '12px', fontWeight: 700, color: '#60a5fa', border: '1px solid rgba(96,165,250,0.3)', marginLeft: '8px' }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(96,165,250,0.08)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
             >
               Current Month
             </button>
@@ -201,12 +201,12 @@ export default function MonthlyView({ habits = [] }) {
           {/* download pdf */}
           <button
             onClick={handleDownloadPDF}
-            style={{ ...navBtn, padding:'6px 12px', fontSize:'12px', fontWeight:600, marginLeft:'8px', color:'#f8fafc', background:'rgba(255,255,255,0.1)' }}
+            style={{ ...navBtn, padding: '6px 12px', fontSize: '12px', fontWeight: 600, marginLeft: '8px', color: '#f8fafc', background: 'rgba(255,255,255,0.1)' }}
             title="Download PDF Report"
-            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
-            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.1)'}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight:'6px' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
@@ -217,7 +217,7 @@ export default function MonthlyView({ habits = [] }) {
       </div>
 
       {/* ── KPI CARDS ── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:'14px', marginBottom:'24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '24px' }}>
         <KpiCard value={`${monthKpis.consistency}%`} label="Monthly Consistency" accent="#34d399" />
         <KpiCard
           value={monthKpis.totalDone}
@@ -235,83 +235,83 @@ export default function MonthlyView({ habits = [] }) {
       </div>
 
       {/* ── MONTHLY TREND CHART ── */}
-      <div style={{ ...card, marginBottom:'24px' }}>
-        <div style={{ fontSize:'11px', fontWeight:800, color:'#94a3b8', letterSpacing:'0.08em', marginBottom:'24px' }}>
+      <div style={{ ...card, marginBottom: '24px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '24px' }}>
           MONTHLY COMPLETION TREND
         </div>
         <div ref={chartContainerRef} style={{ height: '280px', width: '100%', paddingRight: '16px' }}>
-            <AreaChart 
-              width={Math.max(chartWidth, 600)} 
-              height={280} 
-              data={chartData} 
-              margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="colorMonthPct" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.4}/>
-                  <stop offset="95%" stopColor="#a78bfa" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <XAxis 
-                dataKey="name" 
-                stroke="#64748b" 
-                fontSize={12} 
-                tickLine={false} 
-                axisLine={false}
-              />
-              <YAxis 
-                stroke="#64748b" 
-                fontSize={12} 
-                tickLine={false} 
-                axisLine={false} 
-                domain={[0, 100]} 
-                tickFormatter={v => `${v}%`} 
-              />
-              <Tooltip 
-                cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
-                contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f8fafc', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
-                formatter={(value, name, props) => [`${value}% (${props.payload.count}/${habits.length})`, 'Completed']}
-                labelStyle={{ fontWeight: 800, marginBottom: '6px', color: '#94a3b8' }}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="pct" 
-                stroke="#a78bfa" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorMonthPct)" 
-                isAnimationActive={false}
-                connectNulls={false}
-              />
-            </AreaChart>
+          <AreaChart
+            width={Math.max(chartWidth, 600)}
+            height={280}
+            data={chartData}
+            margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorMonthPct" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#a78bfa" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#a78bfa" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="name"
+              stroke="#64748b"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#64748b"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              domain={[0, 100]}
+              tickFormatter={v => `${v}%`}
+            />
+            <Tooltip
+              cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
+              contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f8fafc', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+              formatter={(value, name, props) => [`${value}% (${props.payload.count}/${habits.length})`, 'Completed']}
+              labelStyle={{ fontWeight: 800, marginBottom: '6px', color: '#94a3b8' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="pct"
+              stroke="#a78bfa"
+              strokeWidth={3}
+              fillOpacity={1}
+              fill="url(#colorMonthPct)"
+              isAnimationActive={false}
+              connectNulls={false}
+            />
+          </AreaChart>
         </div>
       </div>
 
       {/* ── CALENDAR HEATMAP ── */}
       <div style={card}>
-        <div style={{ fontSize:'11px', fontWeight:800, color:'#94a3b8', letterSpacing:'0.08em', marginBottom:'20px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '20px' }}>
           MONTHLY HEATMAP
         </div>
-        
+
         {/* calendar wrapper to constrain size */}
         <div style={{ maxWidth: '560px', margin: '0 auto' }}>
           {/* day headers */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'8px', marginBottom:'8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', marginBottom: '8px' }}>
             {DAY_NAMES.map(d => (
-              <div key={d} style={{ textAlign:'center', fontSize:'11px', fontWeight:700, color:'#64748b', paddingBottom:'8px' }}>
+              <div key={d} style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, color: '#64748b', paddingBottom: '8px' }}>
                 {d.toUpperCase()}
               </div>
             ))}
           </div>
 
           {/* dates grid */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(7, 1fr)', gap:'6px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
             {padCells.map((_, i) => <div key={`pad-${i}`} />)}
-            
+
             {dailySummary.map(({ date, count, isFuture, isToday }) => {
               const dObj = dayjs(date);
               const fillPct = habits.length > 0 ? count / habits.length : 0;
-              
+
               let cellBg = 'rgba(255,255,255,0.03)';
               if (count > 0 && !isFuture) {
                 if (fillPct >= 1) cellBg = '#34d399';
@@ -321,10 +321,10 @@ export default function MonthlyView({ habits = [] }) {
               }
 
               return (
-                <div 
-                  key={date} 
-                  style={{ 
-                    aspectRatio: '1/1', 
+                <div
+                  key={date}
+                  style={{
+                    aspectRatio: '1/1',
                     borderRadius: '10px',
                     background: isFuture ? 'rgba(255,255,255,0.01)' : cellBg,
                     border: isToday ? '2px solid #60a5fa' : isFuture ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.05)',
@@ -332,16 +332,16 @@ export default function MonthlyView({ habits = [] }) {
                     position: 'relative'
                   }}
                 >
-                  <div style={{ 
-                    fontSize: '13px', 
-                    fontWeight: isToday ? 800 : 700, 
+                  <div style={{
+                    fontSize: '13px',
+                    fontWeight: isToday ? 800 : 700,
                     color: isToday ? '#60a5fa' : isFuture ? '#334155' : (fillPct >= 0.75 ? '#064e3b' : '#cbd5e1'),
                     zIndex: 2
                   }}>
                     {dObj.date()}
                   </div>
                   {!isFuture && (
-                    <div style={{ fontSize:'9px', marginTop:'2px', fontWeight:700, color: fillPct >= 0.75 ? '#064e3b' : '#64748b' }}>
+                    <div style={{ fontSize: '9px', marginTop: '2px', fontWeight: 700, color: fillPct >= 0.75 ? '#064e3b' : '#64748b' }}>
                       {count}/{habits.length}
                     </div>
                   )}

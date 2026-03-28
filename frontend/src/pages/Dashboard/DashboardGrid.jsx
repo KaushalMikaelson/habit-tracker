@@ -156,62 +156,62 @@ function DashboardGrid({
             boxSizing: "border-box",
           }}
         >
-        {/* LEFT: Empty space equivalent for centering */}
-        <div style={{ flex: 1 }} />
+          {/* LEFT: Empty space equivalent for centering */}
+          <div style={{ flex: 1 }} />
 
-        {/* CENTER: Pill navigation */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            background: isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
-            borderRadius: "14px",
-            padding: "6px",
-            gap: "16px",
-            border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
-          }}
-        >
-          <button
-            onClick={goToPreviousMonth}
-            aria-label="Previous month"
-            className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
-          >
-            ‹
-          </button>
-
+          {/* CENTER: Pill navigation */}
           <div
             style={{
-              width: "120px",
-              textAlign: "center",
-              fontSize: "13px",
-              fontWeight: 800,
-              letterSpacing: "0.12em",
-              color: isDark ? "#60a5fa" : "#1e40af",
-              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "center",
+              background: isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
+              borderRadius: "14px",
+              padding: "6px",
+              gap: "16px",
+              border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
             }}
           >
-            {monthLabel}
+            <button
+              onClick={goToPreviousMonth}
+              aria-label="Previous month"
+              className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
+            >
+              ‹
+            </button>
+
+            <div
+              style={{
+                width: "120px",
+                textAlign: "center",
+                fontSize: "13px",
+                fontWeight: 800,
+                letterSpacing: "0.12em",
+                color: isDark ? "#60a5fa" : "#1e40af",
+                textTransform: "uppercase",
+              }}
+            >
+              {monthLabel}
+            </div>
+
+            <button
+              onClick={goToNextMonth}
+              aria-label="Next month"
+              className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
+            >
+              ›
+            </button>
           </div>
 
-          <button
-            onClick={goToNextMonth}
-            aria-label="Next month"
-            className={`dash-nav-btn ${isDark ? "dash-nav-btn-dark" : "dash-nav-btn-light"}`}
-          >
-            ›
-          </button>
+          {/* RIGHT: Theme Toggle */}
+          <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", paddingRight: "4px" }}>
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className={`theme-toggle-btn ${isDark ? "theme-toggle-dark" : "theme-toggle-light"}`}
+            >
+              {isDark ? "☀ Light" : "☾ Dark"}
+            </button>
+          </div>
         </div>
-
-        {/* RIGHT: Theme Toggle */}
-        <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", paddingRight: "4px" }}>
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className={`theme-toggle-btn ${isDark ? "theme-toggle-dark" : "theme-toggle-light"}`}
-          >
-            {isDark ? "☀ Light" : "☾ Dark"}
-          </button>
-        </div>
-      </div>
 
 
         {/* SCROLLABLE DATE GRID */}
