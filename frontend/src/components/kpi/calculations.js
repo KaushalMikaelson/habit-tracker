@@ -62,6 +62,11 @@ export function calculateKPIs(habits, selectedMonth) {
   let prevPrevMonthlyTotal = 0;
 
   habits.forEach((habit) => {
+    // Exclude frozen or paused habits from negatively affecting metrics
+    if (habit.status === "archived" || habit.status === "paused") {
+      return;
+    }
+
     const completedDates = Array.isArray(habit.completedDates)
       ? habit.completedDates
       : [];

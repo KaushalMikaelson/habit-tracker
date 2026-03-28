@@ -59,35 +59,7 @@ function getTodayDate() {
 
 
 
-/* ================= Skeleton Loader ================= */
 
-function DashboardSkeleton() {
-  return (
-    <div style={{ padding: "32px" }}>
-      <div
-        style={{
-          height: "170px",
-          background: "#1f2937",
-          borderRadius: "16px",
-          marginBottom: "24px",
-          animation: "pulse 1.5s infinite",
-        }}
-      />
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            height: "48px",
-            background: "#020617",
-            borderRadius: "8px",
-            marginBottom: "12px",
-            animation: "pulse 1.5s infinite",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 /* ================= Top Loading Bar ================= */
 
@@ -201,7 +173,7 @@ function Dashboard({ user, logout }) {
 
   const [theme, setTheme] = useState("dark");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeView, setActiveView] = useState("dashboard"); // "dashboard" | "stats"
 
 
@@ -672,6 +644,10 @@ function Dashboard({ user, logout }) {
         <SettingsView
           defaultStatusFilter={statusFilter}
           onDefaultStatusFilterChange={handleDefaultStatusFilterChange}
+          habits={habits}
+          editHabit={editHabit}
+          deleteHabit={deleteHabit}
+          onHabitClick={setSelectedHabitForDetail}
         />
       ) : activeView === "notes" ? (
         <NotesView habits={habits} updateNote={updateNote} />
@@ -683,22 +659,7 @@ function Dashboard({ user, logout }) {
         <MonthlyView habits={visibleHabits} />
       ) : (
         <>
-          {loading ? (
-            <>
-              <div
-                style={{
-                  textAlign: "center",
-                  marginTop: "40px",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: "#94a3b8",
-                }}
-              >
-                Loading your habits...
-              </div>
-              <DashboardSkeleton />
-            </>
-          ) : visibleHabits.length === 0 ? (
+          {visibleHabits.length === 0 ? (
             <div style={{ marginTop: "48px", textAlign: "center" }}>
               <h2>No habits match filters</h2>
               <p style={{ color: "#6b7280" }}>

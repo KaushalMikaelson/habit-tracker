@@ -45,6 +45,22 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
     }
   }
 
+  function handleFreezeToggle(habit) {
+    const newStatus = habit.status === 'archived' ? 'active' : 'archived';
+    const actionName = habit.status === 'archived' ? 'unfreeze' : 'freeze';
+    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      editHabit(habit._id, undefined, undefined, newStatus);
+    }
+  }
+
+  function handlePauseToggle(habit) {
+    const newStatus = habit.status === 'paused' ? 'active' : 'paused';
+    const actionName = habit.status === 'paused' ? 'resume' : 'pause';
+    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      editHabit(habit._id, undefined, undefined, newStatus);
+    }
+  }
+
   function startEdit(habit) {
     setEditingId(habit._id);
     setEditValue(habit.title);
@@ -126,6 +142,38 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
         }
         .habit-delete-btn:hover {
           background: rgba(239,68,68,0.22);
+        }
+        .habit-freeze-btn {
+          background: rgba(56,189,248,0.12);
+          color: #38bdf8;
+          border: 1px solid rgba(56,189,248,0.2);
+        }
+        .habit-freeze-btn:hover {
+          background: rgba(56,189,248,0.22);
+        }
+        .habit-unfreeze-btn {
+          background: rgba(251,146,60,0.12);
+          color: #fb923c;
+          border: 1px solid rgba(251,146,60,0.2);
+        }
+        .habit-unfreeze-btn:hover {
+          background: rgba(251,146,60,0.22);
+        }
+        .habit-pause-btn {
+          background: rgba(168,162,158,0.12);
+          color: #a8a29e;
+          border: 1px solid rgba(168,162,158,0.2);
+        }
+        .habit-pause-btn:hover {
+          background: rgba(168,162,158,0.22);
+        }
+        .habit-resume-btn {
+          background: rgba(167,139,250,0.12);
+          color: #c4b5fd;
+          border: 1px solid rgba(167,139,250,0.2);
+        }
+        .habit-resume-btn:hover {
+          background: rgba(167,139,250,0.22);
         }
         .habit-confirm-btn {
           background: rgba(34,197,94,0.15);
@@ -272,12 +320,14 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             display: "block",
-                            color: "#cbd5e1",
+                            color: habit.status === 'paused' ? "#c4b5fd" : habit.status === 'archived' ? "#fb923c" : "#cbd5e1",
                             fontWeight: 500,
                             cursor: "pointer",
+                            fontStyle: habit.status === 'paused' || habit.status === 'archived' ? "italic" : "normal",
                           }}
                         >
                           {habit.title}
+                          {habit.status === 'paused' && <span style={{fontSize: '11px', marginLeft: '6px', opacity: 0.8}}>(Paused)</span>}
                         </span>
                       )}
                     </div>
@@ -309,6 +359,24 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
                             <polyline points="3 6 5 6 21 6" />
                             <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
                             <path d="M10 11v6M14 11v6" />
+                          </svg>
+                        </button>
+                        <button 
+                          className={`habit-icon-btn ${habit.status === 'paused' ? 'habit-resume-btn' : 'habit-pause-btn'}`} 
+                          onClick={(e) => { e.stopPropagation(); handlePauseToggle(habit); }} 
+                          title={habit.status === 'paused' ? "Resume" : "Pause"}
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                          </svg>
+                        </button>
+                        <button 
+                          className={`habit-icon-btn ${habit.status === 'archived' ? 'habit-unfreeze-btn' : 'habit-freeze-btn'}`} 
+                          onClick={(e) => { e.stopPropagation(); handleFreezeToggle(habit); }} 
+                          title={habit.status === 'archived' ? "Unfreeze" : "Freeze"}
+                        >
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/>
                           </svg>
                         </button>
                       </div>

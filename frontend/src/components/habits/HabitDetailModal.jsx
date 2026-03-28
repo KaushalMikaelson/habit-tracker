@@ -4,7 +4,8 @@ import { calculateHabitStreak } from '../../utils/habitUtils';
 
 export default function HabitDetailModal({ habit, monthDates, onClose, isFutureDate, toggleHabit, updateHabit, updateNote }) {
   const [archiving, setArchiving] = useState(false);
-  const [archiveSuccess, setArchiveSuccess] = useState(null); // null | 'archived' | 'active'
+  const [pausing, setPausing] = useState(false);
+  const [archiveSuccess, setArchiveSuccess] = useState(null); // null | 'archived' | 'active' | 'paused'
 
   if (!habit) return null;
 
@@ -16,6 +17,10 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
   const noteForToday = habit.notes?.[todayStr] || '';
 
   async function handleArchiveToggle() {
+    const actionName = habit.status === 'archived' ? 'unfreeze' : 'freeze';
+    if (!window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      return;
+    }
     const newStatus = habit.status === 'archived' ? 'active' : 'archived';
     setArchiving(true);
     try {
@@ -29,7 +34,26 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
     }
   }
 
+  async function handlePauseToggle() {
+    const actionName = habit.status === 'paused' ? 'resume' : 'pause';
+    if (!window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      return;
+    }
+    const newStatus = habit.status === 'paused' ? 'active' : 'paused';
+    setPausing(true);
+    try {
+      await updateHabit(habit._id, undefined, undefined, newStatus);
+      setArchiveSuccess(newStatus);
+      setTimeout(() => {
+        onClose();
+      }, 1200);
+    } catch (_) {
+      setPausing(false);
+    }
+  }
+
   const isArchived = habit.status === 'archived';
+  const isPaused = habit.status === 'paused';
 
   return (
     <div style={{
@@ -68,7 +92,21 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
             </svg>
-            Archived
+            Frozen
+          </div>
+        )}
+
+        {isPaused && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '20px', marginBottom: '12px',
+            background: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)',
+            fontSize: '12px', fontWeight: 600, color: '#c4b5fd',
+          }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+            </svg>
+            Paused
           </div>
         )}
 
@@ -96,8 +134,8 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
           </div>
           <div style={{ background: 'rgba(96,165,250,0.08)', padding: '14px 12px', borderRadius: '12px', border: '1px solid rgba(96,165,250,0.15)', textAlign: 'center' }}>
             <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Status</div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: isArchived ? '#fb923c' : '#34d399', marginTop: '4px' }}>
-              {isArchived ? 'Archived' : 'Active'}
+            <div style={{ fontSize: '14px', fontWeight: 700, color: isArchived ? '#fb923c' : isPaused ? '#c4b5fd' : '#34d399', marginTop: '4px' }}>
+              {isArchived ? 'Frozen' : isPaused ? 'Paused' : 'Active'}
             </div>
           </div>
         </div>
@@ -128,21 +166,57 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px', gap: '12px' }}>
           
           {/* Archive / Unarchive */}
-          {archiveSuccess ? (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              color: archiveSuccess === 'active' ? '#34d399' : '#fb923c',
-              fontSize: '13px', fontWeight: 600,
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              {archiveSuccess === 'active' ? 'Unarchived successfully!' : 'Archived successfully!'}
-            </div>
-          ) : (
-            <button
-              onClick={handleArchiveToggle}
-              disabled={archiving}
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {archiveSuccess === 'paused' || archiveSuccess === 'active' || archiveSuccess === 'archived' ? (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                color: archiveSuccess === 'active' ? '#34d399' : archiveSuccess === 'paused' ? '#c4b5fd' : '#fb923c',
+                fontSize: '13px', fontWeight: 600,
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                {archiveSuccess === 'active' ? 'Status updated!' : archiveSuccess === 'paused' ? 'Paused successfully!' : 'Frozen successfully!'}
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={handlePauseToggle}
+                  disabled={pausing || archiving}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                    background: isPaused ? 'rgba(52,211,153,0.1)' : 'rgba(168,162,158,0.1)',
+                    border: isPaused ? '1px solid rgba(52,211,153,0.25)' : '1px solid rgba(168,162,158,0.25)',
+                    padding: '9px 16px', borderRadius: '10px',
+                    color: isPaused ? '#34d399' : '#a8a29e',
+                    cursor: (pausing || archiving) ? 'wait' : 'pointer',
+                    fontWeight: 600, fontSize: '13px',
+                    fontFamily: 'inherit', transition: 'all 0.2s ease',
+                    opacity: (pausing || archiving) ? 0.6 : 1,
+                  }}
+                  onMouseEnter={e => { if (!(pausing || archiving)) e.currentTarget.style.opacity = '0.85'; }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+                >
+                  {isPaused ? (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      {pausing ? 'Resuming…' : 'Resume Habit'}
+                    </>
+                  ) : (
+                    <>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                      </svg>
+                      {pausing ? 'Pausing…' : 'Pause Habit'}
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={handleArchiveToggle}
+                  disabled={archiving || pausing}
               style={{
                 display: 'flex', alignItems: 'center', gap: '8px',
                 background: isArchived ? 'rgba(52,211,153,0.1)' : 'rgba(251,146,60,0.1)',
@@ -163,18 +237,20 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
                     <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
                     <polyline points="10 12 12 10 14 12"/><line x1="12" y1="10" x2="12" y2="16"/>
                   </svg>
-                  {archiving ? 'Unarchiving…' : 'Unarchive Habit'}
+                  {archiving ? 'Unfreezing…' : 'Unfreeze Habit'}
                 </>
               ) : (
                 <>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
                   </svg>
-                  {archiving ? 'Archiving…' : 'Archive Habit'}
+                  {archiving ? 'Freezing…' : 'Freeze Habit'}
                 </>
               )}
             </button>
-          )}
+          </>
+        )}
+      </div>
 
           <button
             onClick={onClose}

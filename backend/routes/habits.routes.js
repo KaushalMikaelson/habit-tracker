@@ -56,7 +56,7 @@ router.post("/", async (req, res) => {
     const habit = await Habit.create({
       title,
       category: category || "General",
-      status: status === "archived" ? "archived" : "active",
+      status: status === "archived" ? "archived" : status === "paused" ? "paused" : "active",
       userId: req.user.id,
       completedDates: [],
       order: count, // 👈 NEW (append at end)
@@ -127,7 +127,7 @@ router.put("/:id", async (req, res) => {
     const updates = {};
     if (title && title.trim()) updates.title = title.trim();
     if (category && category.trim()) updates.category = category.trim();
-    if (status === "active" || status === "archived") updates.status = status;
+    if (status === "active" || status === "archived" || status === "paused") updates.status = status;
 
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ message: "No valid fields to update" });

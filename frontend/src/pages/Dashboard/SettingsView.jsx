@@ -23,7 +23,7 @@ function saveCategories(cats) {
 
 const EMOJI_OPTIONS = ["🏃","💼","🧘","📚","🧹","📌","🎯","💪","🧠","🎨","🌿","🏋️","✍️","🎵","🍎","💧","🚀","⭐","🔥","🌙"];
 
-export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilterChange }) {
+export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilterChange, habits = [], editHabit, deleteHabit, onHabitClick }) {
   const [categories, setCategories] = useState(loadCategories);
   const [newCatName, setNewCatName] = useState("");
   const [newCatEmoji, setNewCatEmoji] = useState("🎯");
@@ -31,6 +31,28 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
   const [editLabel, setEditLabel] = useState("");
   const [editEmoji, setEditEmoji] = useState("");
   const [saved, setSaved] = useState(false);
+
+  const displayHabits = habits.filter(h => {
+    const s = h.status || "active";
+    if (defaultStatusFilter !== "all" && s !== defaultStatusFilter) return false;
+    return true;
+  });
+
+  function handleFreezeToggle(habit) {
+    const newStatus = habit.status === 'archived' ? 'active' : 'archived';
+    const actionName = habit.status === 'archived' ? 'unfreeze' : 'freeze';
+    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      editHabit(habit._id, undefined, undefined, newStatus);
+    }
+  }
+
+  function handlePauseToggle(habit) {
+    const newStatus = habit.status === 'paused' ? 'active' : 'paused';
+    const actionName = habit.status === 'paused' ? 'resume' : 'pause';
+    if (window.confirm(`Are you sure you want to ${actionName} "${habit.title}"?`)) {
+      editHabit(habit._id, undefined, undefined, newStatus);
+    }
+  }
 
   function addCategory() {
     const name = newCatName.trim();
@@ -169,7 +191,8 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           {[
             { value: "active", label: "Active", desc: "Only active habits" },
-            { value: "archived", label: "Archived", desc: "Only archived habits" },
+            { value: "paused", label: "Paused", desc: "Only paused habits" },
+            { value: "archived", label: "Frozen", desc: "Only frozen habits" },
             { value: "all", label: "All", desc: "Show every habit" },
           ].map((opt) => {
             const isSelected = defaultStatusFilter === opt.value;
@@ -209,9 +232,9 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
       <div style={cardStyle}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "20px" }}>
           <div>
-            <div style={sectionTitle}>Habit Categories</div>
+            <div style={sectionTitle}>Categories for New Habits</div>
             <div style={sectionSubtitle}>
-              Add, rename, or remove categories used when creating habits.
+              Add, rename, or remove the category tags you use when creating new habits.
             </div>
           </div>
           <button
@@ -411,6 +434,104 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
               + Add
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ── Filtered Habits List ── */}
+      <div style={cardStyle}>
+        <div style={sectionTitle}>Filtered Habits List</div>
+        <div style={sectionSubtitle}>
+          These are the habits currently matching your '{defaultStatusFilter}' default dashboard filter.
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {displayHabits.length === 0 ? (
+            <div style={{ color: "#64748b", fontSize: "13px", padding: "10px 0" }}>
+              No habits found for this filter.
+            </div>
+          ) : (
+            displayHabits.map((habit) => {
+              const isArchived = habit.status === 'archived';
+              const isPaused = habit.status === 'paused';
+              return (
+                <div key={habit._id} style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "12px 16px", borderRadius: "10px",
+                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
+                }}>
+                  <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                    {isArchived && (
+                       <span style={{ fontSize: "10px", background: "rgba(251,146,60,0.15)", color: "#fb923c", padding: "2px 6px", borderRadius: "4px", fontWeight: 700, textTransform: "uppercase" }}>Frozen</span>
+                    )}
+                    {isPaused && (
+                       <span style={{ fontSize: "10px", background: "rgba(167,139,250,0.15)", color: "#c4b5fd", padding: "2px 6px", borderRadius: "4px", fontWeight: 700, textTransform: "uppercase" }}>Paused</span>
+                    )}
+                    <span
+                      onClick={() => onHabitClick && onHabitClick(habit)}
+                      style={{ fontSize: "14px", fontWeight: 600, color: "#e2e8f0", cursor: "pointer", transition: "color 0.15s" }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = "#60a5fa"}
+                      onMouseLeave={(e) => e.currentTarget.style.color = "#e2e8f0"}
+                    >
+                      {habit.title}
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: "flex", gap: "6px" }}>
+                    <button
+                      onClick={() => handlePauseToggle(habit)}
+                      title={isPaused ? "Resume" : "Pause"}
+                      style={{
+                        padding: "6px", borderRadius: "6px", border: "none", cursor: "pointer", transition: "background 0.15s",
+                        background: "rgba(255,255,255,0.05)",
+                        color: isPaused ? "#c4b5fd" : "#a8a29e",
+                        display: "flex", alignItems: "center", justifyContent: "center"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = isPaused ? "rgba(167,139,250,0.15)" : "rgba(168,162,158,0.15)"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleFreezeToggle(habit)}
+                      title={isArchived ? "Unfreeze" : "Freeze"}
+                      style={{
+                        padding: "6px", borderRadius: "6px", border: "none", cursor: "pointer", transition: "background 0.15s",
+                        background: "rgba(255,255,255,0.05)",
+                        color: isArchived ? "#fb923c" : "#38bdf8",
+                        display: "flex", alignItems: "center", justifyContent: "center"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = isArchived ? "rgba(251,146,60,0.15)" : "rgba(56,189,248,0.15)"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/>
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete "${habit.title}"?`)) {
+                          deleteHabit(habit._id);
+                        }
+                      }}
+                      title="Delete"
+                      style={{
+                        padding: "6px", borderRadius: "6px", border: "none", cursor: "pointer", transition: "background 0.15s",
+                        background: "rgba(255,255,255,0.05)", color: "#f87171",
+                        display: "flex", alignItems: "center", justifyContent: "center"
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "rgba(239,68,68,0.15)"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
     </div>

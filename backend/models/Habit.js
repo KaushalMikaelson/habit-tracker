@@ -30,10 +30,10 @@ const HabitSchema = new mongoose.Schema(
       default: "General",
     },
 
-    // 🆕 ARCHIVING (active, archived)
+    // 🆕 ARCHIVING / PAUSING (active, archived, paused)
     status: {
       type: String,
-      enum: ["active", "archived"],
+      enum: ["active", "archived", "paused"],
       default: "active",
     },
 

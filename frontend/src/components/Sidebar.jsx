@@ -254,48 +254,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
         </div>
       </div>
 
-      {/* FOOTER SECTION: Achievements Card */}
-      <div style={{ padding: "0 16px 20px 16px", display: "flex", flexDirection: "column", gap: "16px" }}>
-        
-        {/* Border / Box for Achievements */}
-        <div style={{
-          background: "rgba(76, 29, 149, 0.15)", // dark purple tint
-          border: "1px solid rgba(139, 92, 246, 0.2)",
-          borderRadius: "14px",
-          padding: "16px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "8px",
-          cursor: "pointer",
-          transition: "background 0.2s ease, border-color 0.2s ease",
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(76, 29, 149, 0.25)"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.3)"; }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(76, 29, 149, 0.15)"; e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.2)"; }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-              <path d="M4 22h16"></path>
-              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-            </svg>
-            <span style={{ fontSize: "14px", fontWeight: 700, color: "#a78bfa" }}>Achievements</span>
-          </div>
-          <span style={{ fontSize: "12px", color: "#94a3b8", lineHeight: "1.4" }}>
-            Complete habits to unlock badges
-          </span>
-        </div>
 
-        {/* Bottom App Version / Star */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", paddingLeft: "4px" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-          <span style={{ fontSize: "12px", fontWeight: 500, color: "#64748b" }}>Habit Tracker v1.0</span>
-        </div>
-      </div>
       </div>
     </>
   );

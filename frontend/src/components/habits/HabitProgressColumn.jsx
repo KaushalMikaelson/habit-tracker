@@ -125,7 +125,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
               style={{
                 width: `${habit.percent}%`,
                 height: "100%",
-                background: "#22c55e",
+                background: habit.status === 'paused' ? '#c4b5fd' : habit.status === 'archived' ? '#fb923c' : '#22c55e',
                 transition: "width 0.4s ease",
               }}
             />

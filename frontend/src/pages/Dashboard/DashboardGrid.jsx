@@ -126,6 +126,16 @@ function DashboardGrid({
           color: transparent;
           cursor: not-allowed;
         }
+        .habit-cell-btn.paused-dark {
+          background: rgba(167,139,250,0.15);
+          color: transparent;
+          cursor: not-allowed;
+        }
+        .habit-cell-btn.paused-light {
+          background: rgba(167,139,250,0.25);
+          color: transparent;
+          cursor: not-allowed;
+        }
         .habit-cell-btn:not(:disabled):hover {
           transform: scale(1.15);
         }
@@ -323,18 +333,26 @@ function DashboardGrid({
                   const isCompleted = completedDates.includes(date);
                   const isFuture = isFutureDate(date);
                   const isBeforeCreation = !isDateAccessible(habit, date);
-                  const isDisabled = isFuture || isBeforeCreation;
+                  const isPaused = habit.status === "paused";
+                  const isDisabled = isFuture || isBeforeCreation || isPaused;
                   const isToday = date === today;
                   const isWeekend = [0, 6].includes(new Date(date).getDay());
                   const isWeekStart = new Date(date).getDay() === 0;
 
                   let cellClass = "";
-                  if (isDisabled) cellClass = isDark ? "future-dark" : "future-light";
-                  else if (isCompleted) cellClass = "completed";
-                  else cellClass = isDark ? "pending-dark" : "pending-light";
+                  if (isCompleted) {
+                    cellClass = "completed";
+                  } else if (isPaused) {
+                    cellClass = isDark ? "paused-dark" : "paused-light";
+                  } else if (isFuture || isBeforeCreation) {
+                    cellClass = isDark ? "future-dark" : "future-light";
+                  } else {
+                    cellClass = isDark ? "pending-dark" : "pending-light";
+                  }
 
                   let titleText = "Mark complete";
                   if (isCompleted) titleText = "Mark incomplete";
+                  else if (isPaused) titleText = "Habit is paused";
                   else if (isBeforeCreation) titleText = "Before creation";
                   else if (isFuture) titleText = "Future date";
 

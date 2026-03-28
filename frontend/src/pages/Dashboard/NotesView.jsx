@@ -193,7 +193,7 @@ export default function NotesView({ habits = [], updateNote }) {
             style={{
               width: "100%",
               boxSizing: "border-box",
-              padding: "10px 14px 10px 36px",
+              padding: "10px 36px 10px 36px",
               borderRadius: "10px",
               border: "1px solid rgba(255,255,255,0.1)",
               background: "rgba(255,255,255,0.05)",
@@ -204,6 +204,21 @@ export default function NotesView({ habits = [], updateNote }) {
               transition: "border 0.2s ease, box-shadow 0.2s ease",
             }}
           />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              style={{
+                position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)",
+                background: "transparent", border: "none", color: "#64748b", cursor: "pointer",
+                padding: "2px", display: "flex", alignItems: "center", justifyContent: "center"
+              }}
+              title="Clear search"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* Habit filter */}
@@ -337,6 +352,19 @@ export default function NotesView({ habits = [], updateNote }) {
                       <div style={{ display: "flex", gap: "4px" }}>
                         <button
                           className="note-action-btn"
+                          onClick={() => {
+                            navigator.clipboard.writeText(entry.note);
+                            // Optional small visual feedback can be added here
+                          }}
+                          title="Copy text"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                          </svg>
+                        </button>
+                        <button
+                          className="note-action-btn"
                           onClick={() => startEdit(entry)}
                           title="Edit note"
                         >
@@ -369,30 +397,35 @@ export default function NotesView({ habits = [], updateNote }) {
                         onChange={(e) => setEditValue(e.target.value)}
                         autoFocus
                       />
-                      <div style={{ display: "flex", gap: "8px", marginTop: "10px", justifyContent: "flex-end" }}>
-                        <button
-                          onClick={cancelEdit}
-                          style={{
-                            padding: "7px 14px", borderRadius: "8px",
-                            background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
-                            color: "#94a3b8", fontSize: "12px", fontWeight: 600,
-                            cursor: "pointer", fontFamily: "inherit",
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => saveEdit(entry)}
-                          disabled={!editValue.trim()}
-                          style={{
-                            padding: "7px 16px", borderRadius: "8px",
-                            background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-                            border: "none", color: "#fff", fontSize: "12px",
-                            fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                          }}
-                        >
-                          Save
-                        </button>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "10px" }}>
+                        <div style={{ fontSize: "11px", color: "#64748b", fontWeight: 600 }}>
+                          {editValue.length} chars • {editValue.trim() ? editValue.trim().split(/\s+/).length : 0} words
+                        </div>
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <button
+                            onClick={cancelEdit}
+                            style={{
+                              padding: "7px 14px", borderRadius: "8px",
+                              background: "transparent", border: "1px solid rgba(255,255,255,0.1)",
+                              color: "#94a3b8", fontSize: "12px", fontWeight: 600,
+                              cursor: "pointer", fontFamily: "inherit",
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => saveEdit(entry)}
+                            disabled={!editValue.trim()}
+                            style={{
+                              padding: "7px 16px", borderRadius: "8px",
+                              background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                              border: "none", color: "#fff", fontSize: "12px",
+                              fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                            }}
+                          >
+                            Save
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ) : (
