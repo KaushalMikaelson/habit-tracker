@@ -58,8 +58,8 @@ export function calculateKPIs(habits, selectedMonth) {
   let prevMonthCompleted = 0;
   let prevMonthlyTotal = 0;
 
-  let prevPrevMonthCompleted = 0;
-  let prevPrevMonthlyTotal = 0;
+  let threeDayCompleted = 0;
+  let threeDayTotal = 0;
 
   habits.forEach((habit) => {
     // Exclude frozen or paused habits from negatively affecting metrics
@@ -83,6 +83,15 @@ export function calculateKPIs(habits, selectedMonth) {
       yesterdayTotalHabits++;
       if (completedDates.includes(yesterdayStr)) {
         yesterdayCompleted++;
+      }
+    }
+
+    /* ================= 3-DAY ROLLING WINDOW ================= */
+    for (let d = 0; d < 3; d++) {
+      const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
+      if (isDateAccessible(habit, dateStr)) {
+        threeDayTotal++;
+        if (completedDates.includes(dateStr)) threeDayCompleted++;
       }
     }
 
@@ -111,14 +120,6 @@ export function calculateKPIs(habits, selectedMonth) {
     );
     prevMonthCompleted += prevM.completed;
     prevMonthlyTotal += prevM.total;
-
-    const prevPrevM = calculateMonthlyCompletion(
-      habit,
-      selectedMonth.subtract(2, "month"),
-      today
-    );
-    prevPrevMonthCompleted += prevPrevM.completed;
-    prevPrevMonthlyTotal += prevPrevM.total;
   });
 
   /* ================= DAILY ================= */
@@ -157,23 +158,20 @@ export function calculateKPIs(habits, selectedMonth) {
       ? Math.round((prevMonthCompleted / prevMonthlyTotal) * 100)
       : 0;
 
-  const prevPrevMonthly =
-    prevPrevMonthlyTotal > 0
-      ? Math.round((prevPrevMonthCompleted / prevPrevMonthlyTotal) * 100)
-      : 0;
-
   const monthlyDelta = monthly - prevMonthly;
 
-  /* ================= MOMENTUM (TREND ACCELERATION) ================= */
+  /* ================= MOMENTUM ================= */
 
-  // Previous month’s improvement trend
-  const prevMonthlyDelta = prevMonthly - prevPrevMonthly;
+  // 3-day rolling completion rate (most recent habit discipline)
+  const threeDayRate =
+    threeDayTotal > 0 ? Math.round((threeDayCompleted / threeDayTotal) * 100) : 0;
 
-  // Current improvement strength
-  const momentum = monthlyDelta;
+  // Weighted blend: last 3 days (recency) × 0.5 + this week × 0.3 + today × 0.2
+  const momentum = Math.round(threeDayRate * 0.5 + weekly * 0.3 + daily * 0.2);
 
-  // Acceleration of improvement
-  const momentumDelta = monthlyDelta - prevMonthlyDelta;
+  // Momentum delta = how much the monthly rate changed vs last month
+  // This is what the arrow indicator and MomentumFlame use to judge acceleration
+  const momentumDelta = monthlyDelta;
 
   return {
     daily,
