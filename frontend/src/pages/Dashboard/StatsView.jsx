@@ -82,11 +82,11 @@ function buildHabitStats(habits) {
   });
 }
 
-/* last-30-day activity map: date → count of habits completed */
+/* last-365-day activity map: date → count of habits completed */
 function buildActivityMap(habits) {
   const map = {};
-  for (let i = 0; i < 30; i++) {
-    const d = today.subtract(29 - i, 'day').format('YYYY-MM-DD');
+  for (let i = 0; i < 365; i++) {
+    const d = today.subtract(364 - i, 'day').format('YYYY-MM-DD');
     map[d] = 0;
   }
   habits.forEach((h) => {
@@ -96,6 +96,7 @@ function buildActivityMap(habits) {
   });
   return map;
 }
+
 
 /* ─── colour palette ──────────────────────────────────────────── */
 const PALETTE = [
@@ -482,46 +483,106 @@ export default function StatsView({ habits = [] }) {
         {/* heatmap */}
         <div style={{
           background: '#111827', border: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: '14px', padding: '24px', marginBottom: '24px',
+          borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
+          overflowX: 'auto',
         }}>
-          <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '20px' }}>
-            ACTIVITY HEATMAP — LAST 30 DAYS
+          <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '14px' }}>
+            ACTIVITY HEATMAP — LAST 12 MONTHS
           </div>
-          <div style={{ display: 'flex', gap: '6px' }}>
-            {weeks.map((week, wi) => (
-              <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
-                {week.map(([date, count]) => {
-                  const frac = count / maxCount;
-                  return (
-                    <div key={date}
-                      title={`${dayjs(date).format('MMM D')} — ${count} habit${count !== 1 ? 's' : ''} completed`}
-                      style={{
-                        aspectRatio: '1',
-                        background: heatColor(frac),
-                        borderRadius: '6px',
-                        cursor: 'default',
-                        transition: 'transform 0.15s',
-                        position: 'relative',
-                      }}
-                    >
-                      {/* date label on hover via title, tiny day number */}
-                      <span style={{
-                        position: 'absolute', bottom: '2px', right: '4px',
-                        fontSize: '9px', color: 'rgba(255,255,255,0.35)', pointerEvents: 'none',
-                      }}>
-                        {dayjs(date).date()}
-                      </span>
+
+          {/* ── build 53-week columns from the 365-day entries ── */}
+          {(() => {
+            const CELL = 13;   // px per cell
+            const GAP  = 3;    // px gap
+            const DOW_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+
+            // pad entries array so index-0 is a Sunday
+            const allEntries = Object.entries(activityMap); // oldest → newest
+            // day-of-week of first entry (0=Sun)
+            const firstDow = dayjs(allEntries[0][0]).day();
+            const padded = [
+              ...Array(firstDow).fill(null),  // empty slots before first day
+              ...allEntries,
+            ];
+            // chunk into weeks (columns of 7)
+            const weekCols = [];
+            for (let i = 0; i < padded.length; i += 7) {
+              weekCols.push(padded.slice(i, i + 7));
+            }
+
+            // month label positions
+            const monthLabels = [];
+            let lastMonth = null;
+            weekCols.forEach((col, wi) => {
+              const firstReal = col.find(Boolean);
+              if (firstReal) {
+                const m = dayjs(firstReal[0]).format('MMM');
+                if (m !== lastMonth) { monthLabels.push({ wi, label: m }); lastMonth = m; }
+              }
+            });
+
+            return (
+              <div style={{ display: 'flex', gap: `${GAP}px`, alignItems: 'flex-start' }}>
+                {/* day-of-week labels */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px`, marginTop: `${CELL + GAP + 4}px`, flexShrink: 0 }}>
+                  {DOW_LABELS.map((lbl, i) => (
+                    <div key={i} style={{ height: `${CELL}px`, lineHeight: `${CELL}px`, fontSize: '10px', color: '#475569', width: '24px', textAlign: 'right', paddingRight: '4px' }}>
+                      {lbl}
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+
+                {/* week columns + month labels */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
+                  {/* month label row */}
+                  <div style={{ display: 'flex', gap: `${GAP}px`, height: `${CELL}px`, position: 'relative' }}>
+                    {weekCols.map((_, wi) => {
+                      const hit = monthLabels.find(m => m.wi === wi);
+                      return (
+                        <div key={wi} style={{ width: `${CELL}px`, flexShrink: 0, fontSize: '10px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'visible' }}>
+                          {hit ? hit.label : ''}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* cell grid */}
+                  <div style={{ display: 'flex', gap: `${GAP}px` }}>
+                    {weekCols.map((col, wi) => (
+                      <div key={wi} style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
+                        {col.map((entry, di) => {
+                          if (!entry) {
+                            return <div key={di} style={{ width: `${CELL}px`, height: `${CELL}px` }} />;
+                          }
+                          const [date, count] = entry;
+                          const frac = count / maxCount;
+                          return (
+                            <div
+                              key={date}
+                              title={`${dayjs(date).format('MMM D, YYYY')} — ${count} habit${count !== 1 ? 's' : ''} completed`}
+                              style={{
+                                width: `${CELL}px`,
+                                height: `${CELL}px`,
+                                background: heatColor(frac),
+                                borderRadius: '2px',
+                                cursor: 'default',
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })()}
+
           {/* legend */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
             <span style={{ fontSize: '11px', color: '#64748b' }}>Less</span>
             {[0, 0.2, 0.5, 0.8, 1].map((f) => (
-              <div key={f} style={{ width: '14px', height: '14px', background: heatColor(f), borderRadius: '3px' }} />
+              <div key={f} style={{ width: '12px', height: '12px', background: heatColor(f), borderRadius: '2px' }} />
             ))}
             <span style={{ fontSize: '11px', color: '#64748b' }}>More</span>
           </div>
