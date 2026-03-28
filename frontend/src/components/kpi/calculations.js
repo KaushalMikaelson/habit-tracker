@@ -61,6 +61,9 @@ export function calculateKPIs(habits, selectedMonth) {
   let threeDayCompleted = 0;
   let threeDayTotal = 0;
 
+  let prev3DayCompleted = 0;
+  let prev3DayTotal = 0;
+
   habits.forEach((habit) => {
     // Exclude frozen or paused habits from negatively affecting metrics
     if (habit.status === "archived" || habit.status === "paused") {
@@ -92,6 +95,15 @@ export function calculateKPIs(habits, selectedMonth) {
       if (isDateAccessible(habit, dateStr)) {
         threeDayTotal++;
         if (completedDates.includes(dateStr)) threeDayCompleted++;
+      }
+    }
+
+    /* ================= PREV 3-DAY ROLLING WINDOW (days 3–5 ago) ================= */
+    for (let d = 3; d < 6; d++) {
+      const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
+      if (isDateAccessible(habit, dateStr)) {
+        prev3DayTotal++;
+        if (completedDates.includes(dateStr)) prev3DayCompleted++;
       }
     }
 
@@ -166,12 +178,19 @@ export function calculateKPIs(habits, selectedMonth) {
   const threeDayRate =
     threeDayTotal > 0 ? Math.round((threeDayCompleted / threeDayTotal) * 100) : 0;
 
-  // Weighted blend: last 3 days (recency) × 0.5 + this week × 0.3 + today × 0.2
+  // Previous 3-day rate (days 3–5 ago) — shifted window for delta comparison
+  const prev3DayRate =
+    prev3DayTotal > 0 ? Math.round((prev3DayCompleted / prev3DayTotal) * 100) : 0;
+
+  // Weighted blend: last 3 days × 0.5 + this week × 0.3 + today × 0.2
   const momentum = Math.round(threeDayRate * 0.5 + weekly * 0.3 + daily * 0.2);
 
-  // Momentum delta = how much the monthly rate changed vs last month
-  // This is what the arrow indicator and MomentumFlame use to judge acceleration
-  const momentumDelta = monthlyDelta;
+  // prevMomentum: same formula, shifted back one period
+  // prev3Day × 0.5 + prevWeek × 0.3 + yesterday × 0.2
+  const prevMomentum = Math.round(prev3DayRate * 0.5 + prevWeekly * 0.3 + yesterdayDaily * 0.2);
+
+  // Delta = how much the composite momentum score changed
+  const momentumDelta = momentum - prevMomentum;
 
   return {
     daily,
