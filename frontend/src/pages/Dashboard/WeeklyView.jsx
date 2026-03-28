@@ -8,12 +8,12 @@ dayjs.extend(weekOfYear);
 dayjs.extend(isoWeek);
 
 /* ─── helpers ─────────────────────────────────────────────────── */
-const DAY_NAMES  = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const DAY_FULL   = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAY_NAMES  = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_FULL   = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 function getWeekDates(weekStart) {
-  // weekStart is Monday (isoWeek)
+  // weekStart is Sunday
   return Array.from({ length: 7 }, (_, i) =>
     weekStart.add(i, 'day').format('YYYY-MM-DD')
   );
@@ -127,18 +127,18 @@ function CalendarPopup({ currentWeekStart, onSelect, onClose }) {
         ))}
       </div>
 
-      {/* week rows — click a row to jump to that ISO week */}
+      {/* week rows — click a row to jump to that week */}
       {rows.map((row, ri) => {
-        // find the Monday of this row's week
+        // find the Sunday of this row's week
         const firstReal = row.find(Boolean);
         if (!firstReal) return null;
-        const isoMonday = firstReal.startOf('isoWeek');
-        const isSelected = isoMonday.isSame(currentWeekStart, 'day');
+        const weekSunday = firstReal.startOf('week');
+        const isSelected = weekSunday.isSame(currentWeekStart, 'day');
 
         return (
           <div
             key={ri}
-            onClick={() => { onSelect(isoMonday); onClose(); }}
+            onClick={() => { onSelect(weekSunday); onClose(); }}
             style={{
               display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'2px',
               borderRadius:'6px', padding:'2px',
@@ -170,7 +170,7 @@ function CalendarPopup({ currentWeekStart, onSelect, onClose }) {
 
       {/* today shortcut inside popup */}
       <button
-        onClick={() => { onSelect(dayjs().startOf('isoWeek')); onClose(); }}
+        onClick={() => { onSelect(dayjs().startOf('week')); onClose(); }}
         style={{ ...popBtn, width:'100%', marginTop:'10px', justifyContent:'center', fontSize:'12px', color:'#60a5fa', padding:'7px' }}
       >
         Jump to today
@@ -189,7 +189,7 @@ const popBtn = {
 /* ════════════════════════════════════════════════════════════════ */
 export default function WeeklyView({ habits = [] }) {
   const todayStr = dayjs().format('YYYY-MM-DD');
-  const [weekStart, setWeekStart] = useState(() => dayjs().startOf('isoWeek'));
+  const [weekStart, setWeekStart] = useState(() => dayjs().startOf('week'));
   const [showPicker, setShowPicker] = useState(false);
   const pickerRef = useRef(null);
 
@@ -207,7 +207,7 @@ export default function WeeklyView({ habits = [] }) {
 
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
-  const isCurrentWeek = weekStart.isSame(dayjs().startOf('isoWeek'), 'day');
+  const isCurrentWeek = weekStart.isSame(dayjs().startOf('week'), 'day');
 
   /* ── per-habit stats for this week ── */
   const habitRows = useMemo(() => {
@@ -283,7 +283,7 @@ export default function WeeklyView({ habits = [] }) {
         <div>
           <h1 style={{ margin:0, fontSize:'20px', fontWeight:700, color:'#60a5fa' }}>Weekly View</h1>
           <div style={{ fontSize:'13px', color:'#64748b', marginTop:'4px' }}>
-            Week {weekStart.isoWeek()} · {weekLabel}
+            Week {weekStart.week()} · {weekLabel}
           </div>
         </div>
 
@@ -332,7 +332,7 @@ export default function WeeklyView({ habits = [] }) {
           {/* today shortcut */}
           {!isCurrentWeek && (
             <button
-              onClick={() => setWeekStart(dayjs().startOf('isoWeek'))}
+              onClick={() => setWeekStart(dayjs().startOf('week'))}
               style={{ ...navBtn, padding:'6px 14px', fontSize:'12px', fontWeight:600, color:'#60a5fa', border:'1px solid rgba(96,165,250,0.3)' }}
               onMouseEnter={e => e.currentTarget.style.background='rgba(96,165,250,0.08)'}
               onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.04)'}
@@ -366,7 +366,7 @@ export default function WeeklyView({ habits = [] }) {
         />
         <KpiCard value={weekKpis.perfectDays} label="Perfect Days" accent="#a78bfa" sub={weekKpis.perfectDays > 0 ? '🔥' : null} />
         <KpiCard
-          value={weekKpis.bestDay ? DAY_NAMES[dayjs(weekKpis.bestDay.date).isoWeekday() - 1] : '—'}
+          value={weekKpis.bestDay ? DAY_NAMES[dayjs(weekKpis.bestDay.date).day()] : '—'}
           label="Best Day"
           sub={weekKpis.bestDay ? `${weekKpis.bestDay.count}/${habits.length} done` : null}
           accent="#fb923c"
@@ -395,7 +395,7 @@ export default function WeeklyView({ habits = [] }) {
                   color: isToday ? '#60a5fa' : isFuture ? '#334155' : '#94a3b8',
                   letterSpacing:'0.05em',
                 }}>
-                  {DAY_NAMES[d.isoWeekday() - 1]}
+                  {DAY_NAMES[d.day()]}
                 </div>
                 <div style={{
                   width:'30px', height:'30px', borderRadius:'50%',
