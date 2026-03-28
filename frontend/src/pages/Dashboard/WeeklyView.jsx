@@ -2,6 +2,8 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import isoWeek from 'dayjs/plugin/isoWeek';
+import html2pdf from 'html2pdf.js';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { calculateHabitStreak } from '../../utils/habitUtils';
 
 dayjs.extend(weekOfYear);
@@ -205,6 +207,20 @@ export default function WeeklyView({ habits = [] }) {
     return () => document.removeEventListener('mousedown', handle);
   }, [showPicker]);
 
+  const chartContainerRef = useRef(null);
+  const [chartWidth, setChartWidth] = useState(800);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (chartContainerRef.current) {
+        setChartWidth(chartContainerRef.current.clientWidth);
+      }
+    };
+    handleResize(); // trigger on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const weekDates = useMemo(() => getWeekDates(weekStart), [weekStart]);
 
   const isCurrentWeek = weekStart.isSame(dayjs().startOf('week'), 'day');
@@ -238,6 +254,18 @@ export default function WeeklyView({ habits = [] }) {
     });
   }, [habits, weekDates, todayStr]);
 
+  const chartData = useMemo(() => {
+    return dailySummary.map(d => {
+      const dayObj = dayjs(d.date);
+      return {
+        name: DAY_NAMES[dayObj.day()],
+        pct: d.isFuture ? null : (habits.length > 0 ? pct(d.count, habits.length) : 0),
+        count: d.count,
+        isFuture: d.isFuture,
+      };
+    });
+  }, [dailySummary, habits.length]);
+
   /* ── week-level KPIs ── */
   const weekKpis = useMemo(() => {
     const totalPossible = dailySummary.filter(d => !d.isFuture).length * habits.length;
@@ -248,6 +276,27 @@ export default function WeeklyView({ habits = [] }) {
     const todayDone     = habits.filter(h => (h.completedDates || []).includes(todayStr)).length;
     return { consistency, totalDone, totalPossible, bestDay, perfectDays, todayDone };
   }, [dailySummary, habits, todayStr]);
+
+  const reportRef = useRef(null);
+
+  const handleDownloadPDF = () => {
+    if (!reportRef.current) return;
+    const elem = reportRef.current;
+    
+    // We must use 'scroll' dimensions here so the export includes the whole content height!
+    const w = elem.scrollWidth || Math.max(1000, window.innerWidth);
+    const h = elem.scrollHeight || 1500;
+
+    const opt = {
+      margin: [20, 20, 20, 20],
+      filename: `habit-tracker-week-${weekStart.format('YYYY-MM-DD')}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0b101e' },
+      // setting exact format sizes forces everything into 1 perfectly sized page
+      jsPDF: { unit: 'px', format: [w + 40, h + 40], orientation: w > h ? 'landscape' : 'portrait' }
+    };
+    html2pdf().set(opt).from(elem).save();
+  };
 
   /* ── week label ── */
   const weekEnd    = weekStart.add(6, 'day');
@@ -276,7 +325,7 @@ export default function WeeklyView({ habits = [] }) {
   }
 
   return (
-    <div style={{ flex:1, overflowY:'auto', padding:'32px', color:'#f8fafc', boxSizing:'border-box' }}>
+    <div ref={reportRef} style={{ flex:1, overflowY:'auto', padding:'32px', color:'#f8fafc', boxSizing:'border-box' }}>
 
       {/* ── PAGE HEADER + NAVIGATION ── */}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'28px', flexWrap:'wrap', gap:'12px' }}>
@@ -287,7 +336,7 @@ export default function WeeklyView({ habits = [] }) {
           </div>
         </div>
 
-        <div style={{ display:'flex', alignItems:'center', gap:'8px', position:'relative' }} ref={pickerRef}>
+        <div data-html2canvas-ignore="true" style={{ display:'flex', alignItems:'center', gap:'8px', position:'relative' }} ref={pickerRef}>
           {/* prev week */}
           <button
             onClick={() => setWeekStart(ws => ws.subtract(1, 'week'))}
@@ -351,6 +400,22 @@ export default function WeeklyView({ habits = [] }) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
+          </button>
+
+          {/* download report */}
+          <button
+            onClick={handleDownloadPDF}
+            style={{ ...navBtn, padding:'6px 12px', fontSize:'12px', fontWeight:600, marginLeft:'4px', color:'#f8fafc', background:'rgba(255,255,255,0.1)' }}
+            title="Download PDF Report"
+            onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background='rgba(255,255,255,0.1)'}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight:'6px' }}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export PDF
           </button>
         </div>
       </div>
@@ -482,36 +547,56 @@ export default function WeeklyView({ habits = [] }) {
         ))}
       </div>
 
-      {/* ── WEEKLY SUMMARY TABLE ── */}
+      {/* ── WEEKLY CHART ── */}
       <div style={card}>
-        <div style={{ fontSize:'11px', fontWeight:800, color:'#94a3b8', letterSpacing:'0.08em', marginBottom:'16px' }}>
-          WEEKLY SUMMARY
+        <div style={{ fontSize:'11px', fontWeight:800, color:'#94a3b8', letterSpacing:'0.08em', marginBottom:'24px' }}>
+          WEEKLY TREND
         </div>
-        <div style={{ display:'flex', flexDirection:'column', gap:'10px' }}>
-          {habitRows.map(({ h, doneDays, possible, weekPct, color }, i) => (
-            <div key={h._id} style={{ display:'flex', alignItems:'center', gap:'12px' }}>
-              <div style={{
-                width:'8px', height:'8px', borderRadius:'50%',
-                background: color, flexShrink:0,
-              }} />
-              <div style={{ width:'160px', fontSize:'13px', color:'#94a3b8', flexShrink:0, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
-                {h.name || h.title}
-              </div>
-              <div style={{ flex:1, height:'8px', background:'rgba(255,255,255,0.06)', borderRadius:'4px', overflow:'hidden' }}>
-                <div style={{
-                  height:'100%', width:`${weekPct}%`,
-                  background: weekPct === 100 ? '#34d399' : color,
-                  borderRadius:'4px', transition:'width 0.5s ease',
-                }} />
-              </div>
-              <div style={{ width:'80px', textAlign:'right', fontSize:'12px', color:'#64748b', flexShrink:0 }}>
-                {doneDays}/{possible} days
-              </div>
-              <div style={{ width:'36px', textAlign:'right', fontSize:'13px', fontWeight:700, color: weekPct === 100 ? '#34d399' : '#f8fafc', flexShrink:0 }}>
-                {weekPct}%
-              </div>
-            </div>
-          ))}
+        <div ref={chartContainerRef} style={{ height: '280px', width: '100%', paddingRight: '16px' }}>
+            <AreaChart 
+              width={Math.max(chartWidth, 600)} 
+              height={280} 
+              data={chartData} 
+              margin={{ top: 10, right: 0, left: -20, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="colorPct" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.4}/>
+                  <stop offset="95%" stopColor="#60a5fa" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <XAxis 
+                dataKey="name" 
+                stroke="#64748b" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false}
+              />
+              <YAxis 
+                stroke="#64748b" 
+                fontSize={12} 
+                tickLine={false} 
+                axisLine={false} 
+                domain={[0, 100]} 
+                tickFormatter={v => `${v}%`} 
+              />
+              <Tooltip 
+                cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
+                contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f8fafc', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+                formatter={(value, name, props) => [`${value}% (${props.payload.count}/${habits.length})`, 'Completed']}
+                labelStyle={{ fontWeight: 800, marginBottom: '6px', color: '#94a3b8' }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="pct" 
+                stroke="#60a5fa" 
+                strokeWidth={3}
+                fillOpacity={1} 
+                fill="url(#colorPct)" 
+                isAnimationActive={false}
+                connectNulls={false}
+              />
+            </AreaChart>
         </div>
       </div>
 
