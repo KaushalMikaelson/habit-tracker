@@ -292,6 +292,7 @@ function PredictionsTab({ habits }) {
     }
     setLoading(false);
     setFetched(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [habits]);
 
   useEffect(() => {
@@ -456,6 +457,7 @@ function MotivationTab({ habits }) {
     }
     setLoading(false);
     setFetched(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [habits]);
 
   useEffect(() => {
