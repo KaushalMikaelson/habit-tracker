@@ -420,7 +420,7 @@ export default function WeeklyView({ habits = [] }) {
       </div>
 
       {/* ── KPI CARDS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '14px', marginBottom: '24px' }}>
         <KpiCard value={`${weekKpis.consistency}%`} label="Week Consistency" accent="#34d399" />
         <KpiCard
           value={`${weekKpis.todayDone}/${habits.length}`}
@@ -438,9 +438,10 @@ export default function WeeklyView({ habits = [] }) {
       </div>
 
       {/* ── DAILY COLUMN HEADERS + MINI SUMMARY BARS ── */}
-      <div style={{ ...card, marginBottom: '20px', padding: '16px 24px' }}>
+      <div className="resp-overflow-auto" style={{ ...card, marginBottom: '20px', padding: '16px 24px' }}>
         <div style={{
           display: 'grid',
+          minWidth: '700px',
           gridTemplateColumns: `180px repeat(7, 1fr)`,
           gap: '8px',
           alignItems: 'center',
@@ -491,7 +492,8 @@ export default function WeeklyView({ habits = [] }) {
       </div>
 
       {/* ── HABIT ROWS GRID ── */}
-      <div style={{ ...card, marginBottom: '20px', padding: '0' }}>
+      <div className="resp-overflow-auto" style={{ ...card, marginBottom: '20px', padding: '0' }}>
+        <div style={{ minWidth: '700px' }}>
         {habitRows.map(({ h, days, doneDays, possible, weekPct, streak, color }, ri) => (
           <div
             key={h._id}
@@ -544,6 +546,7 @@ export default function WeeklyView({ habits = [] }) {
             ))}
           </div>
         ))}
+        </div>
       </div>
 
       {/* ── WEEKLY CHART ── */}

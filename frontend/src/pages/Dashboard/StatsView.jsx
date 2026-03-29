@@ -288,7 +288,7 @@ export default function StatsView({ habits = [] }) {
     return (
       <>
         {/* 6-card KPI row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+        <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
           <StatCard value={habitCount} label="Total Habits" accent="#60a5fa" />
           <StatCard value={totalCompletions} label="Total Completions" accent="#34d399" />
           <StatCard value={`${bestStreak} 🔥`} label="Best Streak" accent="#fb923c" />
@@ -327,7 +327,7 @@ export default function StatsView({ habits = [] }) {
         </div>
 
         {/* Two-column bottom */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {/* habit consistency list */}
           <div style={{
             background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
@@ -427,7 +427,7 @@ export default function StatsView({ habits = [] }) {
               </div>
 
               {/* mini stat row */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '16px' }}>
                 <MiniStat label="This Week" value={`${h.weeklyPct}%`} color={color} />
                 <MiniStat label="This Month" value={`${h.monthlyPct}%`} color={color} />
                 <MiniStat label="30-Day" value={`${h.consistency30}%`} color={color} />

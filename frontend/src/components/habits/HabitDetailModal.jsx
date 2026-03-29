@@ -141,7 +141,7 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+        <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           <div style={{ background: 'rgba(251,146,60,0.08)', padding: '14px 12px', borderRadius: '12px', border: '1px solid rgba(251,146,60,0.15)', textAlign: 'center' }}>
             <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Streak</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#fb923c' }}>🔥 {streak}</div>
@@ -181,7 +181,7 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px', gap: '12px' }}>
           
           {/* Archive / Unarchive */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

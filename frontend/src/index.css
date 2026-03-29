@@ -151,3 +151,74 @@ button:active {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+.m-order-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ================= RESPONSIVE UTILITIES ================= */
+
+@media (max-width: 1024px) {
+  .resp-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+  .resp-flex-row {
+    flex-direction: column !important;
+  }
+  .resp-sidebar {
+    position: fixed !important;
+    z-index: 9999 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .resp-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .resp-pad-hero {
+    padding: 3rem 1.5rem 2rem !important;
+  }
+  .resp-pad-section {
+    padding: 3rem 1.5rem !important;
+  }
+  .resp-text-hero {
+    font-size: 2.8rem !important;
+  }
+  .resp-dashboard-main {
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    padding: 12px !important;
+    gap: 16px !important;
+  }
+  .resp-dashboard-col {
+    display: contents !important;
+  }
+
+  .m-order-1 { order: 1 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-2 { order: 2 !important; height: auto !important; margin-top: 16px !important; grid-column: 1 / -1 !important; }
+  .m-order-3 { order: 3 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-4 { order: 4 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-5 { order: 5 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-6 { order: 6 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-7 { order: 7 !important; height: auto !important; grid-column: 1 / -1 !important; }
+  .m-order-8 { order: 8 !important; height: auto !important; grid-column: 1 !important; }
+  .m-order-9 { order: 9 !important; height: auto !important; min-height: 400px; grid-column: 2 !important; min-width: 0 !important; margin-top: 0 !important; }
+  .resp-kpi-stack {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+    justify-items: center !important;
+  }
+  .resp-overflow-auto {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .hide-on-mobile {
+    display: none !important;
+  }
+}

@@ -731,6 +731,7 @@ function AiCoachModal({ show, onClose, habits }) {
           <div style={{
             display: "flex", gap: "4px", padding: "14px 24px 0",
             borderBottom: "1px solid rgba(255,255,255,0.06)", flexShrink: 0,
+            overflowX: "auto", whiteSpace: "nowrap"
           }}>
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;

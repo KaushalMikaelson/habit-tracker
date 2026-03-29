@@ -2,7 +2,7 @@ import KpiRing from "./KpiRing";
 
 function KpiRingRow() {
     return (
-        <div
+        <div className="resp-kpi-stack"
             style={{
                 padding: "16px",
 

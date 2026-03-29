@@ -3,6 +3,7 @@ import KpiRing from "./KpiRing";
 function KpiRingRow({ kpis, isCurrentMonth }) {
   return (
     <div
+      className="resp-kpi-stack"
       style={{
         display: "flex",
         gap: "16px",

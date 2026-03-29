@@ -292,25 +292,68 @@ function Dashboard({ user, logout }) {
           from { opacity: 0; transform: translateY(-8px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        
+        /* Main Header Responsive Classes */
+        .app-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 60px;
+          padding: 0 20px;
+          background: rgba(11, 16, 30, 0.8);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(255,255,255,0.07);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .header-brand-text {
+          display: block;
+        }
+        .header-btn-text {
+          display: inline;
+        }
+        .header-right-group {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .header-action-group {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+        }
+        .header-btn {
+          padding: 10px 20px;
+          gap: 8px;
+        }
+        
+        .profile-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 8px 14px;
+        }
+        
+        @media (max-width: 900px) {
+          .header-brand-text { display: none; }
+          .header-btn { padding: 8px 12px; gap: 4px; }
+          .header-right-group { gap: 8px; }
+        }
+        
+        @media (max-width: 600px) {
+          .app-header { padding: 0 10px; height: 50px; }
+          .header-action-group { gap: 6px; }
+          .header-btn-text { display: none; /* Hide button labels on tiny screens to save space */ }
+          .header-btn { padding: 8px; } /* Square buttons for icons */
+          .profile-btn { padding: 6px 10px; gap: 4px; }
+          .profile-chevron { display: none; }
+        }
         `}
       </style>
 
       {/* ================= Header ================= */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          height: "60px",
-          padding: "0 20px",
-          background: "rgba(11, 16, 30, 0.8)",
-          backdropFilter: "blur(16px)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          position: "sticky",
-          top: 0,
-          zIndex: 100,
-        }}
-      >
+      <div className="app-header">
         {/* LEFT SIDE - BRAND & TOGGLE */}
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {!isSidebarOpen && (
@@ -358,7 +401,7 @@ function Dashboard({ user, logout }) {
                   <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5" />
                 </svg>
               </div>
-              <div>
+              <div className="header-brand-text">
                 <div style={{ fontSize: "15px", fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
                   Habit Tracker
                 </div>
@@ -371,7 +414,7 @@ function Dashboard({ user, logout }) {
         </div>
 
         {/* RIGHT SIDE - BUTTON GROUP */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div className="header-right-group">
           <MomentumFlame
             momentumDelta={calculatedKpis.momentumDelta}
             momentum={calculatedKpis.momentum}
@@ -387,11 +430,11 @@ function Dashboard({ user, logout }) {
 
 
 
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <div className="header-action-group">
             <button
               onClick={() => setShowAiModal(true)}
+              className="header-btn"
               style={{
-                padding: "10px 20px",
                 borderRadius: "20px",
                 border: "1px solid rgba(14, 165, 233, 0.4)",
                 background: "linear-gradient(135deg, rgba(14, 165, 233, 0.1), rgba(56, 189, 248, 0.15))",
@@ -402,7 +445,6 @@ function Dashboard({ user, logout }) {
                 transition: "all 0.2s ease",
                 display: "flex",
                 alignItems: "center",
-                gap: "8px",
                 fontFamily: "'Inter', sans-serif",
               }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(14, 165, 233, 0.3)"; }}
@@ -411,13 +453,13 @@ function Dashboard({ user, logout }) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
               </svg>
-              AI Coach
+              <span className="header-btn-text">AI Coach</span>
             </button>
 
             <button
               onClick={() => setShowModal(true)}
+              className="header-btn"
               style={{
-                padding: "10px 20px",
                 borderRadius: "20px",
                 border: "1px solid rgba(255, 255, 255, 0.12)",
                 background: "rgba(255,255,255,0.06)",
@@ -428,7 +470,6 @@ function Dashboard({ user, logout }) {
                 transition: "all 0.2s ease",
                 display: "flex",
                 alignItems: "center",
-                gap: "6px",
                 fontFamily: "'Inter', sans-serif",
               }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 18px rgba(37,99,235,0.5)"; }}
@@ -437,18 +478,15 @@ function Dashboard({ user, logout }) {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Add Habit
+              <span className="header-btn-text">Add Habit</span>
             </button>
           </div>
 
           <div style={{ position: "relative" }}>
             <button
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className="profile-btn"
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "8px 14px",
                 borderRadius: "20px",
                 border: "none",
                 background: "linear-gradient(135deg, var(--theme-1, #2563eb), var(--theme-2, #3b82f6))",
@@ -464,7 +502,7 @@ function Dashboard({ user, logout }) {
               onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,235,0.3)"; }}
             >
               <span style={{ letterSpacing: "0.5px" }}>{getInitials(user?.email || "")}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: showProfileDropdown ? "rotate(-180deg)" : "rotate(0deg)" }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="profile-chevron" style={{ transition: "transform 0.2s", transform: showProfileDropdown ? "rotate(-180deg)" : "rotate(0deg)" }}>
                 <polyline points="6 9 12 15 18 9"></polyline>
               </svg>
             </button>
@@ -719,6 +757,7 @@ function Dashboard({ user, logout }) {
                 strategy={verticalListSortingStrategy}
               >
                 <div
+                  className="resp-dashboard-main"
                   style={{
                     display: "flex",
                     gap: "24px",
@@ -730,6 +769,7 @@ function Dashboard({ user, logout }) {
                 >
                   {/* LEFT COLUMN */}
                   <div
+                    className="resp-dashboard-col"
                     style={{
                       flex: 1,
                       minWidth: 260,
@@ -738,20 +778,23 @@ function Dashboard({ user, logout }) {
                       gap: "24px",
                     }}
                   >
-                    <div style={{ height: KPI_ROW_HEIGHT }}>
+                    <div className="m-order-1" style={{ height: KPI_ROW_HEIGHT }}>
                       <KpiIntroBox habits={visibleHabits} />
                     </div>
-                    <TodayFocus habits={visibleHabits} onToggle={toggleHabit} />
-                    <HabitNameColumn
-                      habits={visibleHabits}
-                      deleteHabit={deleteHabit}
-                      editHabit={editHabit}
-                      onHabitClick={(habit) => setSelectedHabitForDetail(habit)}
-                    />
+                    <div className="m-order-4 m-order-wrapper"><TodayFocus habits={visibleHabits} onToggle={toggleHabit} /></div>
+                    <div className="m-order-8 m-order-wrapper">
+                      <HabitNameColumn
+                        habits={visibleHabits}
+                        deleteHabit={deleteHabit}
+                        editHabit={editHabit}
+                        onHabitClick={(habit) => setSelectedHabitForDetail(habit)}
+                      />
+                    </div>
                   </div>
 
                   {/* CENTER COLUMN */}
                   <div
+                    className="resp-dashboard-col"
                     style={{
                       flex: 4,
                       minWidth: 0,
@@ -760,11 +803,13 @@ function Dashboard({ user, logout }) {
                       gap: "0px",
                     }}
                   >
-                    <div style={{ height: KPI_ROW_HEIGHT, display: "flex", width: "100%" }}>
+                    <div className="m-order-2" style={{ height: KPI_ROW_HEIGHT, display: "flex", width: "100%" }}>
                       <KpiRingRow kpis={calculatedKpis} isCurrentMonth={isCurrentMonth} />
                     </div>
-                    <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
-                    <div style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0 }}>
+                    <div className="m-order-5 m-order-wrapper">
+                      <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
+                    </div>
+                    <div className="resp-overflow-auto m-order-9" style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0, flex: 4 }}>
                       <DashboardGrid
                         habits={visibleHabits}
                         monthDates={monthDates}
@@ -783,6 +828,7 @@ function Dashboard({ user, logout }) {
 
                   {/* RIGHT COLUMN */}
                   <div
+                    className="resp-dashboard-col"
                     style={{
                       flex: 1,
                       minWidth: 260,
@@ -791,11 +837,11 @@ function Dashboard({ user, logout }) {
                       gap: "24px",
                     }}
                   >
-                    <div style={{ height: KPI_ROW_HEIGHT }}>
+                    <div className="m-order-3" style={{ height: KPI_ROW_HEIGHT }}>
                       <TopHabits habits={visibleHabits} currentYear={currentYear} currentMonth={currentMonth} height={KPI_ROW_HEIGHT} />
                     </div>
-                    <TodoNotes />
-                    <HabitProgressColumn habits={visibleHabits} currentMonth={selectedMonth} />
+                    <div className="m-order-6 m-order-wrapper"><TodoNotes /></div>
+                    <div className="m-order-7 m-order-wrapper"><HabitProgressColumn habits={visibleHabits} currentMonth={selectedMonth} /></div>
                   </div>
                 </div>
               </SortableContext>

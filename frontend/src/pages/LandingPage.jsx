@@ -10,11 +10,34 @@ export default function LandingPage() {
   // Floating mockup state
   const [activeStep, setActiveStep] = useState(0);
 
+  // Live graph state
+  const [chartData, setChartData] = useState([40, 65, 30, 85, 100, 75, 90]);
+  const [currentScore, setCurrentScore] = useState(85);
+
   useEffect(() => {
-    const interval = setInterval(() => {
+    // Step animation interval
+    const stepInterval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % 3);
     }, 2500);
-    return () => clearInterval(interval);
+    
+    // Live graph update interval
+    const graphInterval = setInterval(() => {
+      setChartData(prev => {
+        return prev.map(val => {
+          const change = Math.floor(Math.random() * 40) - 20;
+          let newVal = val + change;
+          if (newVal < 15) newVal = 15;
+          if (newVal > 100) newVal = 100;
+          return newVal;
+        });
+      });
+      setCurrentScore(Math.floor(Math.random() * 15) + 80); // Keeps score looking good (80-95%)
+    }, 2000);
+
+    return () => {
+      clearInterval(stepInterval);
+      clearInterval(graphInterval);
+    };
   }, []);
 
   return (
@@ -160,8 +183,8 @@ export default function LandingPage() {
         </motion.div>
 
         {/* ================= HERO SECTION ================= */}
-        <section style={{ width: "100%", padding: "6rem 2rem 4rem", minHeight: "90vh", display: "flex", alignItems: "center" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+        <section className="resp-pad-hero" style={{ width: "100%", padding: "6rem 2rem 4rem", minHeight: "90vh", display: "flex", alignItems: "center" }}>
+          <div className="resp-grid-2" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
             
             {/* Left Content */}
             <motion.div 
@@ -178,7 +201,7 @@ export default function LandingPage() {
               }}>
                 <Sparkles size={14} /> Master Your Routine
               </div>
-              <h1 className="hero-headline" style={{ fontSize: "4.2rem", fontWeight: 900, marginBottom: "1.2rem", letterSpacing: "-0.04em", lineHeight: 1.05 }}>
+              <h1 className="hero-headline resp-text-hero" style={{ fontSize: "4.2rem", fontWeight: 900, marginBottom: "1.2rem", letterSpacing: "-0.04em", lineHeight: 1.05 }}>
                 Small Habits.<br />Massive Results.
               </h1>
               <p style={{ fontSize: "1.2rem", lineHeight: 1.6, color: "#94a3b8", marginBottom: "3rem", maxWidth: "500px" }}>
@@ -292,7 +315,7 @@ export default function LandingPage() {
         </section>
 
         {/* ================= FEATURES GRID (Replacing KPI Image) ================= */}
-        <section style={{ padding: "6rem 2rem", background: "linear-gradient(180deg, rgba(2,6,23,0) 0%, rgba(2,6,23,0.6) 100%)", position: "relative" }}>
+        <section className="resp-pad-section" style={{ padding: "6rem 2rem", background: "linear-gradient(180deg, rgba(2,6,23,0) 0%, rgba(2,6,23,0.6) 100%)", position: "relative" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ textAlign: "center", marginBottom: "4rem" }}>
               <h2 style={{ fontSize: "2.5rem", fontWeight: 800, color: "#f1f5f9", marginBottom: "1rem" }}>Built for Consistency</h2>
@@ -329,8 +352,8 @@ export default function LandingPage() {
         </section>
 
         {/* ================= DATA VISUALIZATION SECTION (Replacing Graph Image) ================= */}
-        <section style={{ padding: "8rem 2rem" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "5rem", alignItems: "center" }}>
+        <section className="resp-pad-section" style={{ padding: "8rem 2rem" }}>
+          <div className="resp-grid-2" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: "5rem", alignItems: "center" }}>
             
             {/* Animated Chart UI */}
             <motion.div 
@@ -346,24 +369,36 @@ export default function LandingPage() {
                   <h3 style={{ color: "#f8fafc", fontSize: "1.1rem", fontWeight: 600, margin: "0 0 4px 0" }}>Weekly Activity</h3>
                   <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Consistency over the last 7 days</p>
                 </div>
-                <div style={{ fontSize: "2rem", fontWeight: 800, color: "#22c55e" }}>85%</div>
+                <motion.div 
+                  key={currentScore}
+                  initial={{ opacity: 0.5, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{ fontSize: "2rem", fontWeight: 800, color: "#22c55e" }}
+                >
+                  {currentScore}%
+                </motion.div>
               </div>
 
               <div style={{ display: "flex", alignItems: "flex-end", height: "200px", gap: "12px", paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                {[40, 65, 30, 85, 100, 75, 90].map((height, i) => (
-                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-                    <motion.div 
-                      initial={{ height: 0 }}
-                      whileInView={{ height: `${height}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, delay: i * 0.1, type: "spring", stiffness: 50 }}
-                      style={{ 
-                        width: "100%", background: height === 100 ? "linear-gradient(180deg, #38bdf8, #2563eb)" : "rgba(255,255,255,0.1)", 
-                        borderRadius: "8px 8px 4px 4px", position: "relative"
-                      }}
-                    />
-                  </div>
-                ))}
+                {chartData.map((height, i) => {
+                  const isMax = height === Math.max(...chartData);
+                  return (
+                    <div key={i} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}>
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${height}%` }}
+                        transition={{ duration: 1.5, type: "spring", stiffness: 60, bounce: 0.2 }}
+                        style={{ 
+                          width: "100%", 
+                          background: isMax ? "linear-gradient(180deg, #38bdf8, #2563eb)" : "rgba(255,255,255,0.15)", 
+                          borderRadius: "8px 8px 4px 4px", 
+                          position: "relative",
+                          minHeight: "4px" /* ensures even at 0% or low values it has a little bump */
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "12px", color: "#64748b", fontSize: "0.8rem", fontWeight: 600 }}>
                 {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => <span key={day} style={{ flex: 1, textAlign: "center" }}>{day}</span>)}
@@ -394,7 +429,7 @@ export default function LandingPage() {
         </section>
 
         {/* ================= FINAL CTA (Replacing Top Image) ================= */}
-        <section style={{ padding: "5rem 2rem 8rem" }}>
+        <section className="resp-pad-section" style={{ padding: "5rem 2rem 8rem" }}>
           <motion.div 
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -424,8 +459,8 @@ export default function LandingPage() {
         </section>
 
         {/* ================= FOOTER ================= */}
-        <footer style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: "#020617", padding: "4rem 2rem" }}>
-          <div style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr", gap: "3rem" }}>
+        <footer className="resp-pad-section" style={{ borderTop: "1px solid rgba(255,255,255,0.05)", background: "#020617", padding: "4rem 2rem" }}>
+          <div className="resp-grid-3" style={{ maxWidth: "1200px", margin: "0 auto", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr", gap: "3rem" }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "1rem" }}>
                 <CheckCircle2 color="#38bdf8" size={20} />

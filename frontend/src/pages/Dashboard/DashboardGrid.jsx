@@ -139,6 +139,85 @@ function DashboardGrid({
         .habit-cell-btn:not(:disabled):hover {
           transform: scale(1.15);
         }
+        
+        /* RESPONSIVE HEADER CLASSES */
+        .dash-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          height: 53px;
+          padding: 0 24px;
+          background: transparent;
+          box-sizing: border-box;
+        }
+        .dash-nav-pill {
+          display: flex;
+          align-items: center;
+          border-radius: 14px;
+          padding: 6px;
+          gap: 16px;
+        }
+        .dash-month-label {
+          width: 120px;
+          text-align: center;
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+          .dash-header {
+            padding: 0 8px;
+          }
+          .dash-nav-pill {
+            gap: 6px;
+            padding: 4px;
+          }
+          .dash-nav-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+          }
+          .dash-month-label {
+            width: auto;
+            min-width: 50px;
+            font-size: 11px; /* Slightly larger than 10px if we drop the year */
+            letter-spacing: 0.05em;
+          }
+          .dash-year-text {
+            display: none; /* Hide the year on small screens */
+          }
+          .theme-toggle-btn {
+            padding: 6px 10px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .theme-text {
+            display: none; /* Hide 'Light' or 'Dark' strings on mobile */
+          }
+          .theme-icon {
+            font-size: 14px; /* Slightly larger icon */
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .header-spacer {
+            display: none; /* Let pill align left to prevent squishing */
+          }
+          .dash-month-label {
+            font-size: 11px;
+            min-width: 40px;
+          }
+          .theme-toggle-btn {
+            padding: 5px 8px;
+          }
+        }
       `}</style>
 
       <div
@@ -155,29 +234,15 @@ function DashboardGrid({
         }}
       >
         {/* INTEGRATED HEADER */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "53px",
-            padding: "0 24px",
-            background: "transparent",
-            boxSizing: "border-box",
-          }}
-        >
+        <div className="dash-header">
           {/* LEFT: Empty space equivalent for centering */}
-          <div style={{ flex: 1 }} />
+          <div style={{ flex: 1 }} className="header-spacer" />
 
           {/* CENTER: Pill navigation */}
           <div
+            className="dash-nav-pill"
             style={{
-              display: "flex",
-              alignItems: "center",
               background: isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
-              borderRadius: "14px",
-              padding: "6px",
-              gap: "16px",
               border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
             }}
           >
@@ -190,17 +255,19 @@ function DashboardGrid({
             </button>
 
             <div
+              className="dash-month-label"
               style={{
-                width: "120px",
-                textAlign: "center",
-                fontSize: "13px",
-                fontWeight: 800,
-                letterSpacing: "0.12em",
                 color: isDark ? "#60a5fa" : "#1e40af",
-                textTransform: "uppercase",
               }}
             >
-              {monthLabel}
+              {typeof monthLabel === 'string' && monthLabel.includes(' ') ? (
+                <>
+                  <span>{monthLabel.split(' ')[0]}</span>
+                  <span className="dash-year-text"> {monthLabel.split(' ').slice(1).join(' ')}</span>
+                </>
+              ) : (
+                monthLabel
+              )}
             </div>
 
             <button
@@ -218,7 +285,8 @@ function DashboardGrid({
               onClick={() => setTheme(isDark ? "light" : "dark")}
               className={`theme-toggle-btn ${isDark ? "theme-toggle-dark" : "theme-toggle-light"}`}
             >
-              {isDark ? "☀ Light" : "☾ Dark"}
+              <span className="theme-icon">{isDark ? "☀" : "☾"}</span>
+              <span className="theme-text"> {isDark ? "Light" : "Dark"}</span>
             </button>
           </div>
         </div>

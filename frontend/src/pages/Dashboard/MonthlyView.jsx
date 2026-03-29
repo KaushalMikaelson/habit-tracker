@@ -217,7 +217,7 @@ export default function MonthlyView({ habits = [] }) {
       </div>
 
       {/* ── KPI CARDS ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '14px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '14px', marginBottom: '24px' }}>
         <KpiCard value={`${monthKpis.consistency}%`} label="Monthly Consistency" accent="#34d399" />
         <KpiCard
           value={monthKpis.totalDone}
