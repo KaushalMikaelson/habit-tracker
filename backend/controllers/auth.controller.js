@@ -71,8 +71,63 @@ const login = async (req, res) => {
         }
     });
 }
+const googleLogin = async (req, res) => {
+    try {
+        const { access_token } = req.body;
+        if (!access_token) {
+            return res.status(400).json({ error: "Access token required" });
+        }
+
+        // Fetch user info from Google
+        const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${access_token}` },
+        });
+
+        if (!response.ok) {
+            return res.status(401).json({ error: "Invalid Google token" });
+        }
+
+        const data = await response.json();
+        const { email } = data;
+
+        if (!email) {
+             return res.status(400).json({ error: "Google account must have an email" });
+        }
+
+        // Check if user exists
+        let user = await User.findOne({ email });
+        
+        // If no user, implicitly register them
+        if (!user) {
+            const randomPassword = await bcrypt.hash(Math.random().toString(36).slice(-8) + "!1Aa", 10);
+            user = await User.create({
+                email,
+                password: randomPassword,
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "7d" }
+        );
+
+        res.status(200).json({
+            message: "Google Login Successful",
+            token,
+            user: {
+                id: user._id,
+                email: user.email
+            }
+        });
+    } catch (err) {
+        console.error("Google Auth Error:", err);
+        res.status(500).json({ error: "Server error during Google auth" });
+    }
+};
 
 module.exports = {
     login,
     register,
+    googleLogin,
 };
