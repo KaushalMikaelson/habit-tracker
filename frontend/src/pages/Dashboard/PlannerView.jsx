@@ -268,7 +268,7 @@ export default function PlannerView({ user, habits }) {
             </span>
             Planner
           </h1>
-          <div style={{ display: "flex", background: "rgba(0,0,0,0.2)", padding: "4px", borderRadius: "10px", display: "inline-flex" }}>
+          <div style={{ background: "rgba(0,0,0,0.2)", padding: "4px", borderRadius: "10px", display: "inline-flex" }}>
             <button className={`planner-tab ${activeTab === 'daily' ? 'active' : ''}`} onClick={() => { setActiveTab('daily'); setDatePivot(dayjs()); }}>Daily</button>
             <button className={`planner-tab ${activeTab === 'weekly' ? 'active' : ''}`} onClick={() => { setActiveTab('weekly'); setDatePivot(dayjs()); }}>Weekly</button>
             <button className={`planner-tab ${activeTab === 'monthly' ? 'active' : ''}`} onClick={() => { setActiveTab('monthly'); setDatePivot(dayjs()); }}>Monthly</button>
@@ -477,7 +477,7 @@ export default function PlannerView({ user, habits }) {
                    
                    return mWeeks.map(wk => {
                      const wData = data.weekly && data.weekly[wk.key];
-                     const hasWData = wData && wData.goals && wData.goals.some(g => g.trim());
+
                      return (
                        <div key={wk.key} style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "12px", padding: "16px" }}>
                          <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 700, marginBottom: "8px", textTransform: "uppercase" }}>{wk.label}</div>
