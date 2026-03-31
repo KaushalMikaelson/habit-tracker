@@ -8,6 +8,7 @@ const authRoutes = require("./routes/auth.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const habitsRoutes = require("./routes/habits.routes");
 const aiRoutes = require("./routes/ai.routes");
+const userDataRoutes = require("./routes/userdata.routes");
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/habits", habitsRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/userdata", userDataRoutes);
 
 // Health check
 app.get("/", (req, res) => {
