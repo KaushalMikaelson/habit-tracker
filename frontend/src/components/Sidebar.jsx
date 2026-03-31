@@ -247,6 +247,20 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
             </svg>
             My Space
           </div>
+
+          <div 
+            style={activeView === "planner" ? activeLinkStyle : linkStyle}
+            onClick={() => { if (onNavigate) onNavigate("planner"); if (onClose) onClose(); }}
+            onMouseEnter={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
+            onMouseLeave={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+          >
+            {activeView === "planner" && <div style={activeIndicatorStyle} />}
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+            </svg>
+            Planner
+          </div>
         </div>
 
         {/* ACCOUNT SECTION */}

@@ -22,6 +22,7 @@ import MonthlyView from "./MonthlyView.jsx";
 import SettingsView from "./SettingsView.jsx";
 import NotesView from "./NotesView.jsx";
 import JournalView from "./JournalView.jsx";
+import PlannerView from "./PlannerView.jsx";
 
 import KpiRingRow from "../../components/kpi/KpiRingRow.jsx";
 import KpiIntroBox from "../../components/kpi/KpiIntroBox.jsx";
@@ -735,6 +736,8 @@ function Dashboard({ user, logout }) {
         <WeeklyView habits={visibleHabits} />
       ) : activeView === "monthly" ? (
         <MonthlyView habits={visibleHabits} />
+      ) : activeView === "planner" ? (
+        <PlannerView user={user} habits={visibleHabits} />
       ) : (
         <>
           {/* MotivationBanner — AI-powered daily greeting above the habit grid */}
