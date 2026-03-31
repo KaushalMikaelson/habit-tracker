@@ -191,9 +191,9 @@ code {
   }
   .resp-dashboard-main {
     display: grid !important;
-    grid-template-columns: auto 1fr !important;
-    padding: 12px !important;
-    gap: 16px !important;
+    grid-template-columns: minmax(0, 130px) 1fr !important;
+    padding: 8px !important;
+    gap: 8px !important;
   }
   .resp-dashboard-col {
     display: contents !important;
@@ -219,6 +219,17 @@ code {
     -webkit-overflow-scrolling: touch !important;
   }
   .hide-on-mobile {
+    display: none !important;
+  }
+  /* Habit name column on mobile: truncate long names, hide action buttons */
+  .habit-action-group {
+    display: none !important;
+  }
+  .habit-name-row {
+    font-size: 11px !important;
+    padding: 0 4px 0 6px !important;
+  }
+  .drag-handle-dots {
     display: none !important;
   }
 }
