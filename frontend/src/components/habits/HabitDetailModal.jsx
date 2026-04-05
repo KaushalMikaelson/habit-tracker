@@ -8,6 +8,7 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
   const [pausing, setPausing] = useState(false);
   const [archiveSuccess, setArchiveSuccess] = useState(null); // null | 'archived' | 'active' | 'paused'
   const [confirmState, setConfirmState] = useState({ isOpen: false, action: null });
+  const [selectedNoteDate, setSelectedNoteDate] = useState(dayjs().format("YYYY-MM-DD"));
 
   if (!habit) return null;
 
@@ -16,7 +17,7 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
   
   const totalCompleted = (habit.completedDates || []).length;
   const startedOn = habit.createdAt ? dayjs(habit.createdAt).format('MMM D, YYYY') : 'Unknown';
-  const noteForToday = habit.notes?.[todayStr] || '';
+  const currentNote = habit.notes?.[selectedNoteDate] || '';
 
   function requestConfirm(action) {
     setConfirmState({ isOpen: true, action });
@@ -158,16 +159,36 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
           </div>
         </div>
 
-        {/* Journal Note for Today */}
+        {/* Journal Note */}
         <div style={{ marginBottom: '24px', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-            Today's journal note
+          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Journal note
+            </div>
+            <input 
+              type="date"
+              value={selectedNoteDate}
+              max={todayStr}
+              onChange={(e) => setSelectedNoteDate(e.target.value)}
+              style={{
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#f1f5f9',
+                borderRadius: '6px',
+                padding: '4px 8px',
+                fontSize: '12px',
+                fontFamily: 'inherit',
+                outline: 'none',
+                colorScheme: 'dark'
+              }}
+            />
           </div>
           <textarea
-            placeholder="How did this habit go today?"
-            defaultValue={noteForToday}
-            onBlur={(e) => updateNote(habit._id, todayStr, e.target.value)}
+            key={selectedNoteDate}
+            placeholder={`How did this habit go ${selectedNoteDate === todayStr ? 'today' : 'on ' + selectedNoteDate}?`}
+            defaultValue={currentNote}
+            onBlur={(e) => updateNote(habit._id, selectedNoteDate, e.target.value)}
             style={{
               width: '100%', boxSizing: 'border-box', height: '80px',
               background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',

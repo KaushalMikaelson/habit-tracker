@@ -283,7 +283,7 @@ export default function PlannerView({ user, habits }) {
           
           <div style={{ textAlign: "center", minWidth: "160px" }}>
             <div style={{ fontSize: "16px", fontWeight: 700, color: "#f8fafc" }}>
-              {activeTab === "daily" && datePivot.format("MMMM D, YYYY")}
+              {activeTab === "daily" && datePivot.format("dddd, MMMM D, YYYY")}
               {activeTab === "weekly" && `Week ${datePivot.isoWeek()}, ${datePivot.format("YYYY")}`}
               {activeTab === "monthly" && datePivot.format("MMMM YYYY")}
             </div>

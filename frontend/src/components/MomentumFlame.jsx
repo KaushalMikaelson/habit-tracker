@@ -379,7 +379,7 @@ function HeatBloom({ glow, duration, intensity }) {
 }
 
 /* ── Main component ──────────────────────────────────────────────────────── */
-function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
+function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCompleted = true }) {
     const computed = useMemo(() => {
         // Balanced growth formula: discipline + improvement + acceleration
         const score = Math.max(0, Math.min(100, monthly));
@@ -390,7 +390,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
         const norm = score / 100;
         const level = Math.max(1, Math.ceil(norm * 10));
         const stage = getStage(score);
-        const palette = PALETTES[stage];
+        const palette = !isTodayCompleted ? PALETTES[4] : PALETTES[stage];
         const { outer: blurOuter, mid: blurMid } = getBlur(stage);
 
         const flameW = Math.round(20 + norm * 24);
@@ -403,7 +403,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0 }) {
             duration: 2.2 - norm * 1.3,
         };
 
-    }, [monthly]); // 🔥 dependency updated
+    }, [monthly, isTodayCompleted]); // 🔥 dependency updated
 
     const { stage, level, normalized, palette, blurOuter, blurMid, flameW, flameH, glowPx, duration } = computed;
 

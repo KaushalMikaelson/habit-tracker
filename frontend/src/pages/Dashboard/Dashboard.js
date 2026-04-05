@@ -420,6 +420,7 @@ function Dashboard({ user, logout }) {
             momentumDelta={calculatedKpis.momentumDelta}
             momentum={calculatedKpis.momentum}
             monthly={calculatedKpis.monthly}
+            isTodayCompleted={habits.some(h => Array.isArray(h.completedDates) && h.completedDates.includes(today))}
           />
           <style>{`
             :root {
