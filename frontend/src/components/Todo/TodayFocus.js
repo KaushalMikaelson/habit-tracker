@@ -40,9 +40,12 @@ export default function TodayFocus() {
         const todayItems = all.filter((i) => i.date === todayKey);
         const yItems = all.filter((i) => i.date === yesterdayKey && !i.done);
 
+        const existingTexts = new Set(todayItems.map((i) => i.text));
+        const uncarriedYItems = yItems.filter((i) => !existingTexts.has(i.text));
+
         setItems(todayItems);
-        setYesterdayItems(yItems);
-        setHasCarryFromYesterday(yItems.length > 0);
+        setYesterdayItems(uncarriedYItems);
+        setHasCarryFromYesterday(uncarriedYItems.length > 0);
       } catch (err) {
         setError("Failed to load focus items.");
       } finally {
