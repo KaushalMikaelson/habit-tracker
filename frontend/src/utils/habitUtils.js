@@ -136,8 +136,20 @@ export function calculateHabitStreak(habit, todayDateStr) {
     );
 
     let streak = 0;
-    let cursor = todayDateStr ? dayjs(todayDateStr).startOf("day") : dayjs().startOf("day");
+    let today = todayDateStr ? dayjs(todayDateStr).startOf("day") : dayjs().startOf("day");
+    let cursor = today;
 
+    // Check if today is completed
+    if (completedSet.has(today.format("YYYY-MM-DD"))) {
+        streak++;
+        cursor = cursor.subtract(1, "day");
+    } else {
+        // If today is not completed yet, the streak shouldn't break immediately.
+        // It only breaks if *yesterday* was missed. Move cursor to yesterday.
+        cursor = cursor.subtract(1, "day");
+    }
+
+    // Traverse backwards for continuous completion
     while (isDateAccessible(habit, cursor.format("YYYY-MM-DD")) && completedSet.has(cursor.format("YYYY-MM-DD"))) {
         streak++;
         cursor = cursor.subtract(1, "day");
