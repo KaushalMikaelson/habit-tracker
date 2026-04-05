@@ -11,7 +11,7 @@ export default function LandingPage() {
   const [activeStep, setActiveStep] = useState(0);
 
   // Live graph state
-  const [chartData, setChartData] = useState([40, 65, 30, 85, 100, 75, 90]);
+  const [chartData, setChartData] = useState(() => Array.from({ length: 30 }, () => Math.floor(Math.random() * 60) + 40));
   const [currentScore, setCurrentScore] = useState(85);
 
   useEffect(() => {
@@ -39,6 +39,8 @@ export default function LandingPage() {
       clearInterval(graphInterval);
     };
   }, []);
+
+  const avgConsistency = chartData.reduce((a, b) => a + b, 0) / chartData.length;
 
   return (
     <AuthLayout>
@@ -366,8 +368,8 @@ export default function LandingPage() {
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
                 <div>
-                  <h3 style={{ color: "#f8fafc", fontSize: "1.1rem", fontWeight: 600, margin: "0 0 4px 0" }}>Weekly Activity</h3>
-                  <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Consistency over the last 7 days</p>
+                  <h3 style={{ color: "#f8fafc", fontSize: "1.1rem", fontWeight: 600, margin: "0 0 4px 0" }}>Monthly Activity</h3>
+                  <p style={{ color: "#64748b", fontSize: "0.85rem", margin: 0 }}>Consistency over the last 30 days</p>
                 </div>
                 <motion.div 
                   key={currentScore}
@@ -379,29 +381,48 @@ export default function LandingPage() {
                 </motion.div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "flex-end", height: "200px", gap: "12px", paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-                {chartData.map((height, i) => {
-                  const isMax = height === Math.max(...chartData);
-                  return (
-                    <div key={i} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: "10px" }}>
-                      <motion.div 
-                        initial={{ height: 0 }}
-                        animate={{ height: `${height}%` }}
-                        transition={{ duration: 1.5, type: "spring", stiffness: 60, bounce: 0.2 }}
-                        style={{ 
-                          width: "100%", 
-                          background: isMax ? "linear-gradient(180deg, #38bdf8, #2563eb)" : "rgba(255,255,255,0.15)", 
-                          borderRadius: "8px 8px 4px 4px", 
-                          position: "relative",
-                          minHeight: "4px" /* ensures even at 0% or low values it has a little bump */
-                        }}
-                      />
-                    </div>
-                  );
-                })}
+              <div style={{ paddingBottom: "10px", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
+                <div style={{ position: "relative", display: "flex", alignItems: "flex-end", height: "200px", gap: "4px" }}>
+                  {/* Average Line */}
+                  <motion.div
+                    animate={{ bottom: `${avgConsistency}%` }}
+                    transition={{ duration: 1.5, type: "spring", stiffness: 60, bounce: 0.2 }}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      right: 0,
+                      height: "0px",
+                      borderTop: "2px dashed rgba(244, 63, 94, 0.6)",
+                      zIndex: 10,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <span style={{ position: "absolute", right: "0", top: "-22px", color: "#f43f5e", fontSize: "0.85rem", fontWeight: "700" }}>Avg {Math.round(avgConsistency)}%</span>
+                  </motion.div>
+
+                  {chartData.map((height, i) => {
+                    const isMax = height === Math.max(...chartData);
+                    return (
+                      <div key={i} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center" }}>
+                        <motion.div 
+                          initial={{ height: 0 }}
+                          animate={{ height: `${height}%` }}
+                          transition={{ duration: 1.5, type: "spring", stiffness: 60, bounce: 0.2 }}
+                          style={{ 
+                            width: "100%", 
+                            background: isMax ? "linear-gradient(180deg, #38bdf8, #2563eb)" : "rgba(255,255,255,0.15)", 
+                            borderRadius: "4px 4px 2px 2px", 
+                            minHeight: "4px"
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "12px", color: "#64748b", fontSize: "0.8rem", fontWeight: 600 }}>
-                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => <span key={day} style={{ flex: 1, textAlign: "center" }}>{day}</span>)}
+                <span>30 Days Ago</span>
+                <span>Today</span>
               </div>
             </motion.div>
 

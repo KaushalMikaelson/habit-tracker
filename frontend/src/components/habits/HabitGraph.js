@@ -5,57 +5,27 @@ import { useState, useMemo } from "react";
    HELPERS
 ================================ */
 
-function normalizeMonth(month) {
-  if (!month) return dayjs();
-  if (dayjs.isDayjs(month)) return month;
-  if (month instanceof Date) return dayjs(month);
-  if (typeof month === "string") return dayjs(month);
-
-  if (
-    typeof month === "object" &&
-    month.year != null &&
-    month.month != null
-  ) {
-    return dayjs().year(month.year).month(month.month);
-  }
-
-  return dayjs();
-}
-
-/* ===============================
-   DATA
-================================ */
-
-function getMonthlyProgress(habits, baseMonth, isCurrentMonth) {
-  const end = baseMonth.endOf("month");
+function getLast30DaysProgress(habits) {
+  const data = [];
   const today = dayjs();
 
-  const lastDay = isCurrentMonth
-    ? Math.min(today.date(), end.date())
-    : end.date();
-
-  const data = [];
-
-  for (let day = 1; day <= lastDay; day++) {
-    const dateObj = baseMonth.date(day);
-    let completed = 0;
-
-    habits.forEach((habit) => {
-      if (!Array.isArray(habit.completedDates)) return;
-      habit.completedDates.forEach((d) => {
-        if (
-          dayjs(d).isSame(dateObj, "day") &&
-          dayjs(d).isSame(baseMonth, "month")
-        ) {
-          completed++;
-        }
-      });
+  // Precompute habit counts per day
+  const dailyCounts = {};
+  habits.forEach((habit) => {
+    if (!Array.isArray(habit.completedDates)) return;
+    habit.completedDates.forEach((d) => {
+      const dateStr = dayjs(d).format("YYYY-MM-DD");
+      dailyCounts[dateStr] = (dailyCounts[dateStr] || 0) + 1;
     });
+  });
 
+  for (let i = 29; i >= 0; i--) {
+    const dateObj = today.subtract(i, "day");
+    const dateStr = dateObj.format("YYYY-MM-DD");
     data.push({
-      date: dateObj.format("YYYY-MM-DD"),
-      label: dateObj.format("DD"),
-      value: completed,
+      date: dateStr,
+      label: dateObj.format("DD MMM"),
+      value: dailyCounts[dateStr] || 0,
     });
   }
 
@@ -87,10 +57,9 @@ function buildCrispPath(points) {
 ================================ */
 
 function HabitGraphs({ habits = [], month, isCurrentMonth }) {
-  const baseMonth = useMemo(() => normalizeMonth(month), [month]);
   const daily = useMemo(
-    () => getMonthlyProgress(habits, baseMonth, isCurrentMonth),
-    [habits, baseMonth, isCurrentMonth]
+    () => getLast30DaysProgress(habits),
+    [habits]
   );
 
   const maxValue = Math.max(...daily.map(d => d.value), 1);
@@ -119,7 +88,32 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
     return { ...d, x: Math.round(x), y: Math.round(y) };
   });
 
+  // Calculate 7-day moving average curve
+  const avgPoints = daily.map((d, i) => {
+    let sum = 0;
+    let count = 0;
+    for (let j = Math.max(0, i - 6); j <= i; j++) {
+      sum += daily[j].value;
+      count++;
+    }
+    const smaValue = sum / count;
+
+    const x =
+      paddingX +
+      (i / Math.max(daily.length - 1, 1)) *
+        (width - paddingX * 2);
+
+    const y =
+      height -
+      paddingBottom -
+      (smaValue / maxValue) *
+        (height - paddingTop - paddingBottom);
+
+    return { x: Math.round(x), y: Math.round(y), value: smaValue.toFixed(1), date: d.date, isAvg: true };
+  });
+
   const linePath = buildCrispPath(points);
+  const avgLinePath = buildCrispPath(avgPoints);
   const areaPath =
     `${linePath} L ${width - paddingX} ${height - paddingBottom}` +
     ` L ${paddingX} ${height - paddingBottom} Z`;
@@ -147,7 +141,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
       </div>
 
       <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "14px" }}>
-        {baseMonth.format("MMMM YYYY")} • DAILY PROGRESS
+        LAST 30 DAYS • DAILY PROGRESS
       </div>
 
       {/* GRAPH */}
@@ -166,10 +160,10 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
               pointerEvents: "none",
             }}
           >
-            <div style={{ color: "#93c5fd" }}>
-              {dayjs(hover.date).format("DD MMM")}
+            <div style={{ color: hover.isAvg ? "#f59e0b" : "#93c5fd" }}>
+              {dayjs(hover.date).format("DD MMM")} {hover.isAvg && "(7d Avg)"}
             </div>
-            <div>{hover.value} habits</div>
+            <div>{hover.value} {hover.isAvg ? "avg / day" : "habits"}</div>
           </div>
         )}
 
@@ -241,6 +235,25 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
             ) : null
           )}
 
+          {/* AVERAGE LINE */}
+          <path
+            d={avgLinePath}
+            fill="none"
+            stroke="#f59e0b"
+            strokeWidth="1.5"
+            strokeDasharray="4 4"
+          />
+          {avgPoints.length > 0 && (
+            <text
+              x={width - paddingX + 8}
+              y={avgPoints[avgPoints.length - 1].y + 4}
+              fontSize="10"
+              fill="#f59e0b"
+            >
+              7d Avg
+            </text>
+          )}
+
           {/* AREA */}
           <path d={areaPath} fill="url(#areaFill)" />
 
@@ -257,7 +270,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
 
           {/* POINTS */}
           {points.map((p, i) => {
-            const isToday = isCurrentMonth && p.date === todayKey;
+            const isToday = p.date === todayKey;
             return (
               <g key={i}>
                 {isToday && (
@@ -288,12 +301,28 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
                   fill={isToday ? "#60a5fa" : "#22c55e"}
                   stroke="#020617"
                   strokeWidth="1.2"
+                  style={{ cursor: "pointer", pointerEvents: "all" }}
                   onMouseEnter={() => setHover(p)}
                   onMouseLeave={() => setHover(null)}
                 />
               </g>
             );
           })}
+
+          {/* AVG POINTS (Hover Targets) */}
+          {avgPoints.map((p, i) => (
+            <circle
+              key={`avg-${i}`}
+              cx={p.x}
+              cy={p.y}
+              r="8"
+              fill="transparent"
+              stroke="transparent"
+              style={{ cursor: "pointer", pointerEvents: "all" }}
+              onMouseEnter={() => setHover(p)}
+              onMouseLeave={() => setHover(null)}
+            />
+          ))}
         </svg>
       </div>
     </div>
