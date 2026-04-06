@@ -90,10 +90,10 @@ const PALETTES = {
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
 function getStage(score) {
-    if (score >= 91) return 5;
-    if (score >= 71) return 4;
-    if (score >= 51) return 3;
-    if (score >= 11) return 2;
+    if (score > 90) return 5;
+    if (score > 70) return 4;
+    if (score >= 50) return 3;
+    if (score >= 20) return 2;
     return 1;
 }
 
@@ -390,7 +390,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
         const norm = score / 100;
         const level = Math.max(1, Math.ceil(norm * 10));
         const stage = getStage(score);
-        const palette = !isTodayCompleted ? PALETTES[4] : PALETTES[stage];
+        const palette = PALETTES[stage];
         const { outer: blurOuter, mid: blurMid } = getBlur(stage);
 
         const flameW = Math.round(20 + norm * 24);
@@ -403,7 +403,7 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
             duration: 2.2 - norm * 1.3,
         };
 
-    }, [monthly, isTodayCompleted]); // 🔥 dependency updated
+    }, [monthly]); // 🔥 dependency updated
 
     const { stage, level, normalized, palette, blurOuter, blurMid, flameW, flameH, glowPx, duration } = computed;
 
