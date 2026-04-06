@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { motion } from "framer-motion";
+import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * MomentumFlame — 6-Stage Growth Reactor
@@ -315,35 +315,45 @@ const SPARK_DEFS = [
     { sx: 16, sy: 22, ex: 21, ey: 9, delay: 1.35 },
     { sx: 14, sy: 17, ex: 11, ey: 4, delay: 1.80 },
     { sx: 13, sy: 15, ex: 17, ey: 3, delay: 0.65 },
+    { sx: 15, sy: 25, ex: 20, ey: 5, delay: 0.20 },
+    { sx: 11, sy: 22, ex: 6, ey: 2, delay: 1.10 },
+    { sx: 14, sy: 28, ex: 14, ey: 0, delay: 0.50 },
 ];
 
-function SparkParticles({ color, count }) {
+function SparkParticles({ color, count, isHovered }) {
+    const activeCount = isHovered ? Math.min(SPARK_DEFS.length, count + 3) : count;
     return (
         <svg
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none" }}
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", overflow: "visible", pointerEvents: "none", zIndex: 10 }}
             viewBox="0 0 28 38"
         >
-            {SPARK_DEFS.slice(0, count).map((s, i) => (
-                <motion.circle
-                    key={i} cx={s.sx} cy={s.sy} r={0.65}
-                    fill={color}
-                    animate={{
-                        cx: [s.sx, s.ex],
-                        cy: [s.sy, s.ey],
-                        opacity: [0, 1, 0],
-                        r: [0.65, 0.28, 0],
-                    }}
-                    transition={{ delay: s.delay, duration: 1.1, repeat: Infinity, ease: "easeOut" }}
-                />
-            ))}
+            <AnimatePresence>
+                {SPARK_DEFS.slice(0, activeCount).map((s, i) => (
+                    <motion.circle
+                        key={i} cx={s.sx} cy={s.sy} r={isHovered ? 1.0 : 0.65}
+                        fill={color}
+                        initial={{ opacity: 0 }}
+                        animate={{
+                            cx: [s.sx, isHovered ? s.ex + (i % 2 === 0 ? 3 : -3) : s.ex],
+                            cy: [s.sy, isHovered ? s.ey - 6 : s.ey],
+                            opacity: [0, isHovered ? 1 : 0.8, 0],
+                            r: [isHovered ? 1.0 : 0.65, isHovered ? 0.4 : 0.28, 0],
+                        }}
+                        exit={{ opacity: 0 }}
+                        transition={{ delay: isHovered ? s.delay * 0.5 : s.delay, duration: isHovered ? 0.6 : 1.1, repeat: Infinity, ease: "easeOut" }}
+                    />
+                ))}
+            </AnimatePresence>
         </svg>
     );
 }
 
 /* ── Heat bloom ripples (replaces rotating ring) ────────────────────────── */
 // Real flames radiate heat outward in expanding pulses, not spinning rings.
-function HeatBloom({ glow, duration, intensity }) {
+function HeatBloom({ glow, duration, intensity, isHovered }) {
     const delays = [0, duration * 0.4, duration * 0.8];
+    const hoverMult = isHovered ? 1.25 : 1;
+    const durHover = isHovered ? duration * 0.6 : duration * 1.8;
     return (
         <>
             {delays.map((delay, i) => (
@@ -363,12 +373,12 @@ function HeatBloom({ glow, duration, intensity }) {
                     }}
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{
-                        scale: [0.8, 1.5 + intensity * 0.6, 1.9 + intensity * 0.6],
-                        opacity: [intensity * 0.6, intensity * 0.3, 0],
+                        scale: [0.8, (1.5 + intensity * 0.6) * hoverMult, (1.9 + intensity * 0.6) * hoverMult],
+                        opacity: [intensity * 0.6 * hoverMult, intensity * 0.3 * hoverMult, 0],
                     }}
                     transition={{
-                        delay,
-                        duration: duration * 1.8,
+                        delay: isHovered ? delay * 0.3 : delay,
+                        duration: durHover,
                         repeat: Infinity,
                         ease: "easeOut",
                     }}
@@ -380,6 +390,7 @@ function HeatBloom({ glow, duration, intensity }) {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCompleted = true }) {
+    const [isHovered, setIsHovered] = useState(false);
     const computed = useMemo(() => {
         // Balanced growth formula: discipline + improvement + acceleration
         const score = Math.max(0, Math.min(100, monthly));
@@ -420,12 +431,8 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
     const wrapH = flameH + 16;
 
     const baseGlow = Math.max(12, glowPx); // ensures minimum glow
-    const glowFilter = `
-  drop-shadow(0 0 ${baseGlow}px ${palette.glow})
-  drop-shadow(0 0 ${baseGlow * 0.6}px ${palette.glow})
-  brightness(1.15)
-`;
-    const glowFilterHot = `drop-shadow(0 0 ${glowPx * 1.8}px ${palette.glow})`;
+    const glowFilter = `drop-shadow(0 0 ${baseGlow}px ${palette.glow}) drop-shadow(0 0 ${baseGlow * 0.6}px ${palette.glow}) brightness(1.15)`;
+    const glowFilterHot = `drop-shadow(0 0 ${glowPx * 1.5}px ${palette.glow}) drop-shadow(0 0 ${glowPx * 1.0}px ${palette.glow}) brightness(1.35)`;
     const bloomIntensity = 0.5 + normalized * 0.5;
 
     return (
@@ -443,23 +450,37 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
                 glow={withAlpha(palette.glow, 0.22)}
                 duration={duration}
                 intensity={bloomIntensity}
+                isHovered={isHovered}
             />
 
-            {isPlasma && (
-                <SparkParticles color={palette.hotcore} count={isApex ? 6 : 4} />
+            {(isPlasma || isHovered) && stage >= 2 && (
+                <SparkParticles color={palette.hotcore || palette.tip} count={isApex ? 6 : (isPlasma ? 4 : 2)} isHovered={isHovered} />
             )}
 
             <motion.div
                 style={{
                     filter: glowFilter,
                     display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer",
+                    transformOrigin: "bottom center"
                 }}
+                onHoverStart={() => setIsHovered(true)}
+                onHoverEnd={() => setIsHovered(false)}
+                whileTap={{ scale: 0.9 }}
                 animate={{
-                    y: [0, -1.5, -0.5, -2, 0],
-                    x: [0, 0.9, -0.7, 0.4, 0],
-                    scaleX: [1, 0.96, 1.03, 0.97, 1],
+                    y: isHovered ? [0, -3, -1, -4, 0] : [0, -1.5, -0.5, -2, 0],
+                    x: isHovered ? [0, 1.5, -1.2, 0.8, 0] : [0, 0.9, -0.7, 0.4, 0],
+                    scaleY: isHovered ? [1, 1.12, 0.96, 1.08, 1] : [1, 1.02, 0.98, 1.01, 1],
+                    scaleX: isHovered ? [1, 0.92, 1.05, 0.94, 1] : [1, 0.96, 1.03, 0.97, 1],
                     opacity: [1, 0.95, 0.98, 0.94, 1],
-                    filter: [glowFilter, glowFilterHot, glowFilter, glowFilterHot, glowFilter],
+                    filter: isHovered 
+                        ? [glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot] 
+                        : [glowFilter, glowFilterHot, glowFilter, glowFilterHot, glowFilter],
+                }}
+                transition={{
+                    duration: isHovered ? duration * 0.4 : duration,
+                    repeat: Infinity,
+                    ease: "easeInOut"
                 }}
 
             >
