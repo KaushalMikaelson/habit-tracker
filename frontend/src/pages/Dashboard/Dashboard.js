@@ -744,33 +744,25 @@ function Dashboard({ user, logout }) {
           {/* MotivationBanner — AI-powered daily greeting above the habit grid */}
           <MotivationBanner habits={habits} />
 
-          {visibleHabits.length === 0 ? (
-            <div style={{ marginTop: "48px", textAlign: "center" }}>
-              <h2>No habits match filters</h2>
-              <p style={{ color: "#6b7280" }}>
-                Try changing your category or status filters, or add a new habit.
-              </p>
-            </div>
-          ) : (
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={visibleHabits.map(h => h._id)}
+              strategy={verticalListSortingStrategy}
             >
-              <SortableContext
-                items={visibleHabits.map(h => h._id)}
-                strategy={verticalListSortingStrategy}
+              <div
+                className="resp-dashboard-main"
+                style={{
+                  display: "flex",
+                  gap: "24px",
+                  padding: "24px",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  alignItems: "start",
+                }}
               >
-                <div
-                  className="resp-dashboard-main"
-                  style={{
-                    display: "flex",
-                    gap: "24px",
-                    padding: "24px",
-                    width: "100%",
-                    boxSizing: "border-box",
-                    alignItems: "start",
-                  }}
-                >
                   {/* LEFT COLUMN */}
                   <div
                     className="resp-dashboard-col"
@@ -848,9 +840,8 @@ function Dashboard({ user, logout }) {
                     <div className="m-order-7 m-order-wrapper"><HabitProgressColumn habits={visibleHabits} currentMonth={selectedMonth} /></div>
                   </div>
                 </div>
-              </SortableContext>
-            </DndContext>
-          )}
+            </SortableContext>
+          </DndContext>
         </>
       )}
 
