@@ -244,7 +244,7 @@ export default function StatsView({ habits = [] }) {
   const currentStage = getStage(overallMonthly);
   const activePalette = PALETTES[currentStage];
   
-  const usePremium = overallMonthly >= 80 || overallMonthly < 50;
+  const usePremium = overallMonthly < 50;
   
   const defaultMain = '#10b981';
   const defaultTip = '#06b6d4';

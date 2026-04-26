@@ -77,7 +77,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
   const stage = getStage(computedScore);
   const palette = PALETTES[stage];
   
-  const usePremium = computedScore >= 80 || computedScore < 50;
+  const usePremium = computedScore < 50;
   
   const defaultMain = "#22c55e";
   const defaultGlow = "rgba(34,197,94,0.35)";
