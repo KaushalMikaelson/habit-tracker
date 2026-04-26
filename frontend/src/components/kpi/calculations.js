@@ -65,10 +65,8 @@ export function calculateKPIs(habits, selectedMonth) {
   let prev3DayTotal = 0;
 
   habits.forEach((habit) => {
-    // Exclude frozen or paused habits from negatively affecting metrics
-    if (habit.status === "archived" || habit.status === "paused") {
-      return;
-    }
+    // Process all habits (including paused and archived) for historical accuracy.
+    // The bounds checking in isDateAccessible will prevent future days from negatively affecting metrics.
 
     const completedDates = Array.isArray(habit.completedDates)
       ? habit.completedDates

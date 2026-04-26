@@ -36,7 +36,31 @@ export function getEffectiveStartDate(habit) {
 export function isDateAccessible(habit, dateStr) {
     const d = dayjs(dateStr).startOf("day");
     const startDate = getEffectiveStartDate(habit);
-    return d.isSame(startDate, "day") || d.isAfter(startDate, "day");
+    
+    // Check start bounds
+    if (d.isBefore(startDate, "day")) {
+        return false;
+    }
+    
+    // Check end bounds for deleted habits
+    if (habit.isDeleted && habit.deletedAt) {
+        const deletedDate = dayjs(habit.deletedAt).startOf("day");
+        if (d.isAfter(deletedDate, "day")) {
+            return false;
+        }
+    }
+    
+    // Check end bounds for paused/archived habits
+    if (habit.status === "archived" || habit.status === "paused") {
+        if (habit.updatedAt) {
+            const updatedDate = dayjs(habit.updatedAt).startOf("day");
+            if (d.isAfter(updatedDate, "day")) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
 }
 
 /**

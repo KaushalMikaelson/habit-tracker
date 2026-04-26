@@ -177,8 +177,10 @@ export default function useHabits() {
     const habitToDelete = habits.find((h) => h._id === id);
     if (!habitToDelete) return;
 
-    setHabits((prev) => prev.filter((h) => h._id !== id));
-    setRecentlyDeleted(habitToDelete);
+    const deletedHabit = { ...habitToDelete, isDeleted: true, deletedAt: new Date().toISOString() };
+    
+    setHabits((prev) => prev.map((h) => h._id === id ? deletedHabit : h));
+    setRecentlyDeleted(deletedHabit);
     setShowUndo(true);
 
     try {
@@ -188,9 +190,7 @@ export default function useHabits() {
         setRecentlyDeleted(null);
       }, 10000);
     } catch (err) {
-      setHabits((prev) =>
-        Array.isArray(prev) ? [...prev, habitToDelete] : [habitToDelete]
-      );
+      setHabits((prev) => prev.map((h) => h._id === id ? habitToDelete : h));
       setRecentlyDeleted(null);
       setShowUndo(false);
     }
@@ -201,7 +201,7 @@ export default function useHabits() {
     if (!recentlyDeleted) return;
 
     setHabits((prev) =>
-      Array.isArray(prev) ? [...prev, recentlyDeleted] : [recentlyDeleted]
+      prev.map((h) => h._id === recentlyDeleted._id ? { ...h, isDeleted: false, deletedAt: null } : h)
     );
 
     setRecentlyDeleted(null);
@@ -215,8 +215,9 @@ export default function useHabits() {
     try {
       await undoDeleteApi(recentlyDeleted._id);
     } catch (err) {
+      // Revert the undo if API fails
       setHabits((prev) =>
-        prev.filter((h) => h._id !== recentlyDeleted._id)
+        prev.map((h) => h._id === recentlyDeleted._id ? recentlyDeleted : h)
       );
     }
   };

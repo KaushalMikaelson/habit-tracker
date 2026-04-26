@@ -234,7 +234,7 @@ export default function StatsView({ habits = [] }) {
   );
 
   const sorted30 = useMemo(
-    () => [...habitStats].sort((a, b) => b.consistency30 - a.consistency30),
+    () => [...habitStats].filter(h => !h.isDeleted).sort((a, b) => b.consistency30 - a.consistency30),
     [habitStats]
   );
 
@@ -419,7 +419,7 @@ export default function StatsView({ habits = [] }) {
   function PerHabitTab() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        {habitStats.map((h, i) => {
+        {habitStats.filter(h => !h.isDeleted).map((h, i) => {
           const color = habitColor(i);
           const monthDelta = h.monthlyPct - h.prevMonthlyPct;
           const weekDelta  = h.weeklyPct  - h.prevWeeklyPct;

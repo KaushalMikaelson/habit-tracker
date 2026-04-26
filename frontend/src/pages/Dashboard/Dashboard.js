@@ -138,12 +138,14 @@ function Dashboard({ user, logout }) {
     localStorage.setItem("habitDefaultStatusFilter", val);
   }
 
-  const visibleHabits = Array.isArray(habits) ? habits.filter(h => {
+  const kpiHabits = Array.isArray(habits) ? habits.filter(h => {
     const s = h.status || "active";
     if (statusFilter !== "all" && s !== statusFilter) return false;
     if (categoryFilter !== "All" && h.category !== categoryFilter) return false;
     return true;
   }) : [];
+
+  const visibleHabits = kpiHabits.filter(h => !h.isDeleted);
 
   const initialYearMonth = getCurrentYearMonth();
   const [currentYear, setCurrentYear] = useState(initialYearMonth.year);
@@ -185,7 +187,7 @@ function Dashboard({ user, logout }) {
 
 
   const calculatedKpis = calculateKPIs(
-    visibleHabits,
+    kpiHabits,
     selectedMonth
   );
 
@@ -732,7 +734,7 @@ function Dashboard({ user, logout }) {
       ) : activeView === "journal" ? (
         <JournalView user={user} />
       ) : activeView === "stats" ? (
-        <StatsView habits={visibleHabits} />
+        <StatsView habits={kpiHabits} />
       ) : activeView === "weekly" ? (
         <WeeklyView habits={visibleHabits} />
       ) : activeView === "monthly" ? (
@@ -803,7 +805,7 @@ function Dashboard({ user, logout }) {
                       <KpiRingRow kpis={calculatedKpis} isCurrentMonth={isCurrentMonth} />
                     </div>
                     <div className="m-order-5 m-order-wrapper">
-                      <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} monthlyScore={calculatedKpis.monthly} />
+                      <HabitGraphs habits={kpiHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} monthlyScore={calculatedKpis.monthly} />
                     </div>
                     <div className="resp-overflow-auto m-order-9" style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0, flex: 4 }}>
                       <DashboardGrid

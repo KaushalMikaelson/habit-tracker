@@ -16,9 +16,8 @@ router.get("/", async (req, res) => {
   try {
     const habits = await Habit.find({
       userId: req.user.id,
-      isDeleted: false,
     }).sort({ order: 1 }); // 👈 SORT BY ORDER
-    // ⚠️ unchanged for now
+    // ⚠️ fetched all (including deleted) to preserve past KPI calculations
 
     logger.debug(
       "📋 Returning habits:",
