@@ -80,14 +80,10 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
   const usePremium = computedScore < 50;
   
   const defaultMain = "#22c55e";
-  const defaultGlow = "rgba(34,197,94,0.35)";
   const defaultAvg = "#f59e0b";
   const defaultToday = "#60a5fa";
   
   const mainColor = usePremium ? (palette.mid || defaultMain) : defaultMain;
-  const glowColor = usePremium 
-    ? (palette.glow ? palette.glow.replace(/,[\d.]+\)/, ', 0.35)') : defaultGlow) 
-    : defaultGlow;
   const avgColor = usePremium ? (palette.tip || defaultAvg) : defaultAvg;
   const todayColor = usePremium ? (palette.core || defaultToday) : defaultToday;
 
