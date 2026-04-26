@@ -98,15 +98,21 @@ export function calculateWeeklyCompletion(habit, targetDate = dayjs(), todayDate
         return { percent: 0, completed: 0, total: 0 };
     }
 
-    const totalPossible = activeEnd.diff(computeStart, "day") + 1;
     const completedDates = Array.isArray(habit.completedDates) ? habit.completedDates : [];
 
+    let totalPossible = 0;
     let completed = 0;
-    for (let i = 0; i < totalPossible; i++) {
-        const dStr = computeStart.add(i, "day").format("YYYY-MM-DD");
-        if (completedDates.includes(dStr)) {
-            completed++;
+    let curr = computeStart;
+    
+    while (!curr.isAfter(activeEnd, "day")) {
+        const dStr = curr.format("YYYY-MM-DD");
+        if (isDateAccessible(habit, dStr)) {
+            totalPossible++;
+            if (completedDates.includes(dStr)) {
+                completed++;
+            }
         }
+        curr = curr.add(1, "day");
     }
 
     const percent = totalPossible > 0 ? Math.round((completed / totalPossible) * 100) : 0;
@@ -140,15 +146,21 @@ export function calculateMonthlyCompletion(habit, targetMonth = dayjs(), todayDa
         return { percent: 0, completed: 0, total: 0 };
     }
 
-    const totalPossible = activeEnd.diff(computeStart, "day") + 1;
     const completedDates = Array.isArray(habit.completedDates) ? habit.completedDates : [];
 
+    let totalPossible = 0;
     let completed = 0;
-    for (let i = 0; i < totalPossible; i++) {
-        const dStr = computeStart.add(i, "day").format("YYYY-MM-DD");
-        if (completedDates.includes(dStr)) {
-            completed++;
+    let curr = computeStart;
+    
+    while (!curr.isAfter(activeEnd, "day")) {
+        const dStr = curr.format("YYYY-MM-DD");
+        if (isDateAccessible(habit, dStr)) {
+            totalPossible++;
+            if (completedDates.includes(dStr)) {
+                completed++;
+            }
         }
+        curr = curr.add(1, "day");
     }
 
     const percent = totalPossible > 0 ? Math.round((completed / totalPossible) * 100) : 0;
