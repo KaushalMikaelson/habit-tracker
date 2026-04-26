@@ -744,7 +744,7 @@ function Dashboard({ user, logout }) {
       ) : (
         <>
           {/* MotivationBanner — AI-powered daily greeting above the habit grid */}
-          <MotivationBanner habits={habits} />
+          <MotivationBanner habits={habits.filter(h => !h.isDeleted)} />
 
           <DndContext
             collisionDetection={closestCenter}
