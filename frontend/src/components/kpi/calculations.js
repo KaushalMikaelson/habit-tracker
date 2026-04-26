@@ -70,6 +70,15 @@ export function calculateKPIs(habits, selectedMonth) {
       return;
     }
 
+    // For deleted habits: If they have absolutely zero completions, completely erase them 
+    // from history so their misses don't drag down the score. If they have completions, 
+    // keep them so we preserve the hard work!
+    if (habit.isDeleted) {
+      if (!habit.completedDates || habit.completedDates.length === 0) {
+        return;
+      }
+    }
+
     const completedDates = Array.isArray(habit.completedDates)
       ? habit.completedDates
       : [];
