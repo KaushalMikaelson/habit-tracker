@@ -149,7 +149,7 @@ function getStage(score) {
 
 function getBlur(stage) {
     const OUTER = [1.6, 1.5, 1.0, 0.85, 0.7, 0.45, 0.3, 0.15, 0.08];
-    const MID   = [0.9, 0.8, 0.7, 0.6, 0.4, 0.25, 0.15, 0.07, 0.02];
+    const MID = [0.9, 0.8, 0.7, 0.6, 0.4, 0.25, 0.15, 0.07, 0.02];
     const i = Math.min(stage - 1, 8);
     return { outer: OUTER[i], mid: MID[i] };
 }
@@ -384,13 +384,18 @@ function SparkParticles({ color, count, isHovered }) {
                         fill={color}
                         initial={{ opacity: 0 }}
                         animate={{
-                            cx: [s.sx, isHovered ? s.ex + (i % 2 === 0 ? 3 : -3) : s.ex],
-                            cy: [s.sy, isHovered ? s.ey - 6 : s.ey],
+                            cx: [s.sx, s.ex + (i % 2 === 0 ? 4 : -4), s.ex + (i % 2 === 0 ? -2 : 2)],
+                            cy: [s.sy, s.ey - 3, s.ey - 8],
                             opacity: [0, isHovered ? 1 : 0.8, 0],
-                            r: [isHovered ? 1.0 : 0.65, isHovered ? 0.4 : 0.28, 0],
+                            scale: [0, isHovered ? 1.5 : 1, 0],
                         }}
                         exit={{ opacity: 0 }}
-                        transition={{ delay: isHovered ? s.delay * 0.5 : s.delay, duration: isHovered ? 0.6 : 1.1, repeat: Infinity, ease: "easeOut" }}
+                        transition={{
+                            delay: isHovered ? s.delay * 0.4 : s.delay,
+                            duration: isHovered ? 0.7 : 1.3,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
                     />
                 ))}
             </AnimatePresence>
@@ -518,13 +523,13 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
                 onHoverEnd={() => setIsHovered(false)}
                 whileTap={{ scale: 0.9 }}
                 animate={{
-                    y: isHovered ? [0, -3, -1, -4, 0] : [0, -1.5, -0.5, -2, 0],
-                    x: isHovered ? [0, 1.5, -1.2, 0.8, 0] : [0, 0.9, -0.7, 0.4, 0],
-                    scaleY: isHovered ? [1, 1.12, 0.96, 1.08, 1] : [1, 1.02, 0.98, 1.01, 1],
-                    scaleX: isHovered ? [1, 0.92, 1.05, 0.94, 1] : [1, 0.96, 1.03, 0.97, 1],
-                    opacity: [1, 0.95, 0.98, 0.94, 1],
-                    filter: isHovered 
-                        ? [glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot] 
+                    y: isHovered ? [0, -4, -1.5, -5, 0] : [0, -2, -0.8, -2.5, 0],
+                    x: isHovered ? [0, 2, -1.5, 1.2, 0] : [0, 1, -0.8, 0.5, 0],
+                    scaleY: isHovered ? [1, 1.15, 0.95, 1.12, 1] : [1, 1.04, 0.97, 1.02, 1],
+                    scaleX: isHovered ? [1, 0.90, 1.08, 0.92, 1] : [1, 0.95, 1.04, 0.96, 1],
+                    opacity: [1, 0.92, 0.98, 0.90, 1],
+                    filter: isHovered
+                        ? [glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot, glowFilterHot]
                         : [glowFilter, glowFilterHot, glowFilter, glowFilterHot, glowFilter],
                 }}
                 transition={{
@@ -624,14 +629,54 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
                 </svg>
             </motion.div>
 
+            {/* Premium Plasma Energy Ring */}
+            {isPlasma && (
+                <motion.div
+                    style={{
+                        position: "absolute",
+                        width: "160%", height: "160%",
+                        borderRadius: "50%",
+                        border: `1px solid ${withAlpha(palette.tip, 0.15)}`,
+                        borderTopColor: "transparent",
+                        borderBottomColor: "transparent",
+                        boxShadow: `0 0 15px ${withAlpha(palette.core, 0.15)} inset, 0 0 15px ${withAlpha(palette.core, 0.15)}`,
+                        pointerEvents: "none",
+                        mixBlendMode: "screen",
+                    }}
+                    animate={{
+                        rotate: [0, 360],
+                        scale: isHovered ? [1.05, 1.15, 1.05] : [0.95, 1.05, 0.95],
+                        opacity: isHovered ? [0.6, 0.9, 0.6] : [0.2, 0.5, 0.2],
+                    }}
+                    transition={{
+                        rotate: { duration: duration * 6, repeat: Infinity, ease: "linear" },
+                        scale: { duration: duration * 1.5, repeat: Infinity, ease: "easeInOut" },
+                        opacity: { duration: duration * 1.5, repeat: Infinity, ease: "easeInOut" },
+                    }}
+                />
+            )}
+
+            {/* Apex Cosmic Aura */}
             {isApex && (
                 <motion.div
                     style={{
-                        position: "absolute", inset: 0, borderRadius: "4px", pointerEvents: "none",
-                        background: `radial-gradient(ellipse at 50% 62%, ${palette.core}28 0%, transparent 70%)`,
+                        position: "absolute",
+                        width: "190%", height: "190%",
+                        borderRadius: "50%",
+                        border: `2px dashed ${withAlpha(palette.accent || palette.core, 0.2)}`,
+                        pointerEvents: "none",
+                        mixBlendMode: "screen",
                     }}
-                    animate={{ opacity: [0.3, 1, 0.3] }}
-                    transition={{ duration: 2.2, ease: "easeInOut", repeat: Infinity, repeatType: "mirror" }}
+                    animate={{
+                        rotate: [360, 0],
+                        scale: isHovered ? [1.1, 1.2, 1.1] : [1, 1.1, 1],
+                        opacity: isHovered ? [0.5, 0.8, 0.5] : [0.15, 0.4, 0.15],
+                    }}
+                    transition={{
+                        rotate: { duration: duration * 8, repeat: Infinity, ease: "linear" },
+                        scale: { duration: duration * 2, repeat: Infinity, ease: "easeInOut" },
+                        opacity: { duration: duration * 2, repeat: Infinity, ease: "easeInOut" },
+                    }}
                 />
             )}
         </div>
