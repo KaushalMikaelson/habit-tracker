@@ -65,8 +65,8 @@ export function calculateKPIs(habits, selectedMonth) {
   let prev3DayTotal = 0;
 
   habits.forEach((habit) => {
-    // Exclude frozen, paused, or deleted habits from negatively affecting metrics
-    if (habit.status === "archived" || habit.status === "paused" || habit.isDeleted) {
+    // Exclude frozen or paused habits from negatively affecting metrics
+    if (habit.status === "archived" || habit.status === "paused") {
       return;
     }
 
