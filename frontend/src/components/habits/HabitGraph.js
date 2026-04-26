@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { useState, useMemo } from "react";
+import { PALETTES, getStage } from "../MomentumFlame";
 
 /* ===============================
    HELPERS
@@ -56,7 +57,7 @@ function buildCrispPath(points) {
    COMPONENT
 ================================ */
 
-function HabitGraphs({ habits = [], month, isCurrentMonth }) {
+function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
   const daily = useMemo(
     () => getLast30DaysProgress(habits),
     [habits]
@@ -65,6 +66,30 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
   const maxValue = Math.max(...daily.map(d => d.value), 1);
   const [hover, setHover] = useState(null);
   const todayKey = dayjs().format("YYYY-MM-DD");
+
+  let computedScore = monthlyScore;
+  if (computedScore === undefined) {
+    const totalCompleted = daily.reduce((sum, d) => sum + d.value, 0);
+    const totalPossible = Math.max(habits.length * 30, 1);
+    computedScore = Math.round((totalCompleted / totalPossible) * 100);
+  }
+
+  const stage = getStage(computedScore);
+  const palette = PALETTES[stage];
+  
+  const usePremium = computedScore >= 80 || computedScore < 50;
+  
+  const defaultMain = "#22c55e";
+  const defaultGlow = "rgba(34,197,94,0.35)";
+  const defaultAvg = "#f59e0b";
+  const defaultToday = "#60a5fa";
+  
+  const mainColor = usePremium ? (palette.mid || defaultMain) : defaultMain;
+  const glowColor = usePremium 
+    ? (palette.glow ? palette.glow.replace(/,[\d.]+\)/, ', 0.35)') : defaultGlow) 
+    : defaultGlow;
+  const avgColor = usePremium ? (palette.tip || defaultAvg) : defaultAvg;
+  const todayColor = usePremium ? (palette.core || defaultToday) : defaultToday;
 
   /* GEOMETRY (UNCHANGED) */
   const width = 1000;
@@ -175,8 +200,8 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
         >
           <defs>
             <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#22c55e" stopOpacity="0.35" />
-              <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+              <stop offset="0%" stopColor={mainColor} stopOpacity="0.35" />
+              <stop offset="100%" stopColor={mainColor} stopOpacity="0" />
             </linearGradient>
 
             {/* subtle line glow */}
@@ -239,16 +264,17 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
           <path
             d={avgLinePath}
             fill="none"
-            stroke="#f59e0b"
+            stroke={avgColor}
             strokeWidth="1.5"
             strokeDasharray="4 4"
+            opacity="0.8"
           />
           {avgPoints.length > 0 && (
             <text
               x={width - paddingX + 8}
               y={avgPoints[avgPoints.length - 1].y + 4}
               fontSize="10"
-              fill="#f59e0b"
+              fill={avgColor}
             >
               7d Avg
             </text>
@@ -261,7 +287,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
           <path
             d={linePath}
             fill="none"
-            stroke="#22c55e"
+            stroke={mainColor}
             strokeWidth="2.8"
             strokeLinecap="round"
             filter="url(#softGlow)"
@@ -280,7 +306,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
                       cy={p.y}
                       r="10"
                       fill="none"
-                      stroke="#60a5fa"
+                      stroke={todayColor}
                       strokeWidth="2"
                       opacity="0.6"
                     />
@@ -288,7 +314,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
                       x={p.x + 10}
                       y={p.y - 10}
                       fontSize="10"
-                      fill="#60a5fa"
+                      fill={todayColor}
                     >
                       Today
                     </text>
@@ -298,7 +324,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth }) {
                   cx={p.x}
                   cy={p.y}
                   r={isToday ? 6 : 4.5}
-                  fill={isToday ? "#60a5fa" : "#22c55e"}
+                  fill={isToday ? todayColor : mainColor}
                   stroke="#020617"
                   strokeWidth="1.2"
                   style={{ cursor: "pointer", pointerEvents: "all" }}

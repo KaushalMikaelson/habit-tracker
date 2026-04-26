@@ -6,6 +6,7 @@ import {
   calculateHabitStreak,
   getEffectiveStartDate,
 } from '../../utils/habitUtils';
+import { PALETTES, getStage } from '../../components/MomentumFlame';
 
 /* ─── tiny helpers ────────────────────────────────────────────── */
 const today = dayjs().startOf('day');
@@ -161,12 +162,20 @@ function ConsistencyBar({ label, pct: p, color = '#34d399' }) {
   );
 }
 
-/* heatmap cell colour based on fraction 0-1 */
-function heatColor(fraction) {
+/* heatmap cell colour based on fraction 0-1 and active palette */
+function heatColor(fraction, paletteColor = '#10b981') {
   if (fraction === 0) return 'rgba(255,255,255,0.04)';
-  if (fraction < 0.34) return 'rgba(16,185,129,0.35)';
-  if (fraction < 0.67) return 'rgba(16,185,129,0.60)';
-  return '#10b981';
+  
+  // convert hex to rgba
+  let hex = paletteColor.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(c => c+c).join('');
+  const r = parseInt(hex.substring(0, 2), 16) || 16;
+  const g = parseInt(hex.substring(2, 4), 16) || 185;
+  const b = parseInt(hex.substring(4, 6), 16) || 129;
+
+  if (fraction < 0.34) return `rgba(${r},${g},${b},0.35)`;
+  if (fraction < 0.67) return `rgba(${r},${g},${b},0.60)`;
+  return paletteColor;
 }
 
 /* ─── Tab labels ──────────────────────────────────────────────── */
@@ -231,6 +240,17 @@ export default function StatsView({ habits = [] }) {
 
   const mostConsistent = sorted30[0];
   const needsWork = sorted30[sorted30.length - 1];
+
+  const currentStage = getStage(overallMonthly);
+  const activePalette = PALETTES[currentStage];
+  
+  const usePremium = overallMonthly >= 80 || overallMonthly < 50;
+  
+  const defaultMain = '#10b981';
+  const defaultTip = '#06b6d4';
+  
+  const activeMainColor = usePremium ? (activePalette.mid || defaultMain) : defaultMain;
+  const activeTipColor = usePremium ? (activePalette.tip || defaultTip) : defaultTip;
 
   /* ─── shared tab-bar ─── */
   function TabBar() {
@@ -314,14 +334,14 @@ export default function StatsView({ habits = [] }) {
             <div style={{
               height: '100%',
               width: `${clamp(overallConsistency, 1, 100)}%`,
-              background: 'linear-gradient(90deg, #10b981, #06b6d4)',
+              background: `linear-gradient(90deg, ${activeMainColor}, ${activeTipColor})`,
               borderRadius: '7px',
               transition: 'width 0.6s ease',
             }} />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
             <span style={{ fontSize: '12px', color: '#64748b' }}>0%</span>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#34d399' }}>{overallConsistency}%</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: activeMainColor }}>{overallConsistency}%</span>
             <span style={{ fontSize: '12px', color: '#64748b' }}>100%</span>
           </div>
         </div>
@@ -563,7 +583,7 @@ export default function StatsView({ habits = [] }) {
                               style={{
                                 width: `${CELL}px`,
                                 height: `${CELL}px`,
-                                background: heatColor(frac),
+                                background: heatColor(frac, activeMainColor),
                                 borderRadius: '2px',
                                 cursor: 'default',
                               }}
@@ -582,7 +602,7 @@ export default function StatsView({ habits = [] }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px' }}>
             <span style={{ fontSize: '11px', color: '#64748b' }}>Less</span>
             {[0, 0.2, 0.5, 0.8, 1].map((f) => (
-              <div key={f} style={{ width: '12px', height: '12px', background: heatColor(f), borderRadius: '2px' }} />
+              <div key={f} style={{ width: '12px', height: '12px', background: heatColor(f, activeMainColor), borderRadius: '2px' }} />
             ))}
             <span style={{ fontSize: '11px', color: '#64748b' }}>More</span>
           </div>
@@ -606,14 +626,14 @@ export default function StatsView({ habits = [] }) {
                   background: isToday ? 'rgba(52,211,153,0.06)' : 'transparent',
                   border: isToday ? '1px solid rgba(52,211,153,0.15)' : '1px solid transparent',
                 }}>
-                  <div style={{ width: '80px', fontSize: '13px', color: isToday ? '#34d399' : '#94a3b8', fontWeight: isToday ? 700 : 400, flexShrink: 0 }}>
+                  <div style={{ width: '80px', fontSize: '13px', color: isToday ? activeMainColor : '#94a3b8', fontWeight: isToday ? 700 : 400, flexShrink: 0 }}>
                     {isToday ? 'Today' : dayjs(date).format('MMM D')}
                   </div>
                   <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{
                       height: '100%',
                       width: `${pct(count, habitCount)}%`,
-                      background: count === habitCount ? '#34d399' : count > 0 ? '#60a5fa' : 'transparent',
+                      background: count === habitCount ? activeMainColor : count > 0 ? activeTipColor : 'transparent',
                       borderRadius: '3px',
                       transition: 'width 0.5s ease',
                     }} />

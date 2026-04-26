@@ -803,7 +803,7 @@ function Dashboard({ user, logout }) {
                       <KpiRingRow kpis={calculatedKpis} isCurrentMonth={isCurrentMonth} />
                     </div>
                     <div className="m-order-5 m-order-wrapper">
-                      <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} />
+                      <HabitGraphs habits={visibleHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} monthlyScore={calculatedKpis.monthly} />
                     </div>
                     <div className="resp-overflow-auto m-order-9" style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0, flex: 4 }}>
                       <DashboardGrid

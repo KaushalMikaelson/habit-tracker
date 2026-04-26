@@ -22,7 +22,7 @@ function withAlpha(rgba, alpha) {
 }
 
 /* ── Palettes ────────────────────────────────────────────────────────────── */
-const PALETTES = {
+export const PALETTES = {
 
     // 1 — Radiant Ignition (White + Yellow)
     1: {
@@ -135,7 +135,7 @@ const PALETTES = {
 };
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
-function getStage(score) {
+export function getStage(score) {
     if (score > 90) return 9;
     if (score >= 85) return 8;
     if (score > 80) return 7;
