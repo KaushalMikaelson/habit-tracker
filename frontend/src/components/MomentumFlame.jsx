@@ -36,21 +36,32 @@ const PALETTES = {
         accent: null,
     },
 
-    // 2 — Solar Combustion (Yellow + Red)
+    // 2 — Solar Combustion (Orange)
     2: {
         outer: "#3b0d02",
-        mid: "#ef4444",
-        core: "#f59e0b",
+        mid: "#ea580c",
+        core: "#fb923c",
         tip: "#fff7ed",
         hotcore: "#ffffff",
         base: "#1a0502",
-        glow: "rgba(239,68,68,0.55)",
+        glow: "rgba(234, 88, 12, 0.75)",
         accent: null,
     },
 
-
-    // 4 — Electric Acceleration (Blue)
+    // 3 — Premium Crimson (Deep Red)
     3: {
+        outer: "#3f000f",
+        mid: "#dc2626",
+        core: "#f87171",
+        tip: "#fef2f2",
+        hotcore: "#ffffff",
+        base: "#1a0006",
+        glow: "rgba(220, 38, 38, 0.75)",
+        accent: null,
+    },
+
+    // 4 — Electric Acceleration (Deep Blue)
+    4: {
         outer: "#0a1124",
         mid: "#2563eb",
         core: "#60a5fa",
@@ -61,8 +72,20 @@ const PALETTES = {
         accent: null,
     },
 
-    // 5 — Apex Plasma (Purple)
-    4: {
+    // 5 — Emerald Blaze (Green)
+    5: {
+        outer: "#022c16",
+        mid: "#10b981",
+        core: "#34d399",
+        tip: "#ecfdf5",
+        hotcore: "#ffffff",
+        base: "#021c0b",
+        glow: "rgba(16,185,129,0.65)",
+        accent: null,
+    },
+
+    // 6 — Apex Plasma (Purple)
+    6: {
         outer: "#1e0033",
         mid: "#7c3aed",
         core: "#c084fc",
@@ -73,34 +96,61 @@ const PALETTES = {
         accent: "#a78bfa",
     },
 
-    // 6 — Quantum Reactor (Cosmic Violet + Magenta)
-    // 6 — Obsidian Apex (Premium Black)
-    5: {
-        outer: "#050505",        // deep matte black
-        mid: "#1c1c1c",          // graphite layer
-        core: "#2a2a2a",         // dense inner black
-        tip: "#e5e5e5",          // subtle silver highlight
-        hotcore: "#ffffff",      // white center (controlled energy)
-        base: "#000000",         // pure black base
-        glow: "rgba(212,175,55,0.8)", // subtle gold aura // dark shadow aura
-        accent: "#d4af37",       // premium gold accent (optional)
+    // 7 — Sovereign Gold (Metallic Gold)
+    7: {
+        outer: "#332000",
+        mid: "#d4af37",
+        core: "#fde047",
+        tip: "#fffbeb",
+        hotcore: "#ffffff",
+        base: "#1a1000",
+        glow: "rgba(212, 175, 55, 0.80)",
+        accent: null,
+    },
+
+    // 8 — Crystal Diamond (Luminous Silver)
+    8: {
+        outer: "#0f172a",
+        mid: "#94a3b8",
+        core: "#e2e8f0",
+        tip: "#f8fafc",
+        hotcore: "#ffffff",
+        base: "#020617",
+        glow: "rgba(148, 163, 184, 0.85)",
+        accent: null,
+    },
+
+    // 9 — Obsidian Apex (Premium Black)
+    9: {
+        outer: "#050505",
+        mid: "#1c1c1c",
+        core: "#2a2a2a",
+        tip: "#e5e5e5",
+        hotcore: "#ffffff",
+        base: "#000000",
+        glow: "rgba(212,175,55,0.8)",
+        accent: "#d4af37",
     }
 
 };
 
 /* ── Stage mapping ───────────────────────────────────────────────────────── */
 function getStage(score) {
-    if (score > 90) return 5;
-    if (score > 70) return 4;
-    if (score >= 50) return 3;
+    if (score > 90) return 9;
+    if (score >= 85) return 8;
+    if (score > 80) return 7;
+    if (score > 70) return 6;
+    if (score > 60) return 5;
+    if (score >= 50) return 4;
+    if (score >= 40) return 3;
     if (score >= 20) return 2;
     return 1;
 }
 
 function getBlur(stage) {
-    const OUTER = [1.6, 1.5, 1.0, 0.45, 0.2, 0.08];
-    const MID = [0.9, 0.8, 0.5, 0.18, 0.07, 0.02];
-    const i = Math.min(stage - 1, 5);
+    const OUTER = [1.6, 1.5, 1.0, 0.85, 0.7, 0.45, 0.3, 0.15, 0.08];
+    const MID   = [0.9, 0.8, 0.7, 0.6, 0.4, 0.25, 0.15, 0.07, 0.02];
+    const i = Math.min(stage - 1, 8);
     return { outer: OUTER[i], mid: MID[i] };
 }
 
@@ -422,10 +472,10 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
     if (stage === 0) return <SmokeState />;
     if (stage === 1) return <SparkState />;
 
-    /* Stage 2–6: Full flame */
+    /* Stage 2–9: Full flame */
     const id = `fg_s${stage}`;
-    const isApex = stage === 6;
-    const isPlasma = stage >= 5;
+    const isApex = stage === 9;
+    const isPlasma = stage >= 7;
 
     const wrapW = flameW + 20;
     const wrapH = flameH + 16;
@@ -538,8 +588,8 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
                             <stop offset="100%" stopColor={palette.hotcore} stopOpacity="0" />
                         </linearGradient>
 
-                        {/* Radial inner core (Stage 4+) */}
-                        {stage >= 4 && (
+                        {/* Radial inner core (Stage 6+) */}
+                        {stage >= 6 && (
                             <radialGradient id={`${id}_rc`} cx="50%" cy="72%" r="28%" gradientUnits="objectBoundingBox">
                                 <stop offset="0%" stopColor={palette.core} stopOpacity={Math.min(0.98, 0.35 + (normalized - 0.55) * 1.6)} />
                                 <stop offset="100%" stopColor="transparent" stopOpacity="0" />
@@ -567,8 +617,8 @@ function MomentumFlame({ momentumDelta = 0, momentum = 0, monthly = 0, isTodayCo
                     <path d={P_MID} fill={`url(#${id}_base)`} />
                     {/* L6: white-hot needle — visual gravity anchor */}
                     <path d={P_HOTCORE} fill={`url(#${id}_hc)`} style={{ mixBlendMode: "screen" }} />
-                    {/* L7: radial inner core (Stage 4+) */}
-                    {stage >= 4 && <path d={P_CORE} fill={`url(#${id}_rc)`} />}
+                    {/* L7: radial inner core (Stage 6+) */}
+                    {stage >= 6 && <path d={P_CORE} fill={`url(#${id}_rc)`} />}
                     {/* L8: apex violet accent */}
                     {isApex && <path d={P_MID} fill={`url(#${id}_acc)`} />}
                 </svg>
