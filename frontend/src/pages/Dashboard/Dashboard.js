@@ -430,7 +430,7 @@ function Dashboard({ user, logout }) {
               --theme-2: ${themeColors[accentTheme].c2};
             }
           `}</style>
-          <PrestigeBadge habits={habits} />
+          <PrestigeBadge habits={habits.filter(h => !h.isDeleted)} />
 
 
 
@@ -724,13 +724,13 @@ function Dashboard({ user, logout }) {
         <SettingsView
           defaultStatusFilter={statusFilter}
           onDefaultStatusFilterChange={handleDefaultStatusFilterChange}
-          habits={habits}
+          habits={habits.filter(h => !h.isDeleted)}
           editHabit={editHabit}
           deleteHabit={deleteHabit}
           onHabitClick={setSelectedHabitForDetail}
         />
       ) : activeView === "notes" ? (
-        <NotesView habits={habits} updateNote={updateNote} />
+        <NotesView habits={habits.filter(h => !h.isDeleted)} updateNote={updateNote} />
       ) : activeView === "journal" ? (
         <JournalView user={user} />
       ) : activeView === "stats" ? (
