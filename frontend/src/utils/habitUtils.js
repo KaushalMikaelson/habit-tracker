@@ -43,9 +43,15 @@ export function isDateAccessible(habit, dateStr) {
     }
     
     // Check end bounds for deleted habits
-    if (habit.isDeleted && habit.deletedAt) {
-        const deletedDate = dayjs(habit.deletedAt).startOf("day");
-        if (d.isAfter(deletedDate, "day")) {
+    if (habit.isDeleted) {
+        const boundaryDateStr = habit.deletedAt || habit.updatedAt;
+        if (boundaryDateStr) {
+            const deletedDate = dayjs(boundaryDateStr).startOf("day");
+            if (!d.isBefore(deletedDate, "day")) {
+                return false;
+            }
+        } else {
+            // Extreme legacy fallback: if no dates exist, exclude entirely
             return false;
         }
     }
@@ -54,7 +60,7 @@ export function isDateAccessible(habit, dateStr) {
     if (habit.status === "archived" || habit.status === "paused") {
         if (habit.updatedAt) {
             const updatedDate = dayjs(habit.updatedAt).startOf("day");
-            if (d.isAfter(updatedDate, "day")) {
+            if (!d.isBefore(updatedDate, "day")) {
                 return false;
             }
         }
