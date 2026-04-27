@@ -183,12 +183,23 @@ function Dashboard({ user, logout }) {
   const [theme, setTheme] = useState("dark");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeView, setActiveView] = useState("dashboard"); // "dashboard" | "stats"
+  const [activeView, setActiveView] = useState("dashboard");
 
+  // ── Dashboard KPI / Graph mode toggle ────────────────────────────
+  // 'current' → active habits only (default, can reach 100%)
+  // 'alltime' → all habits including deleted (shows historical performance)
+  const [dashboardMode, setDashboardMode] = useState('current');
+
+
+  // kpiHabitsForCalc respects dashboardMode:
+  // 'current' → pass visibleHabits (active only); calculateKPIs skips deleted via early return
+  // 'alltime' → pass kpiHabits (includes deleted); calculateKPIs includes them via includeArchived flag
+  const kpiHabitsForCalc = dashboardMode === 'alltime' ? kpiHabits : visibleHabits;
 
   const calculatedKpis = calculateKPIs(
-    kpiHabits,
-    selectedMonth
+    kpiHabitsForCalc,
+    selectedMonth,
+    dashboardMode === 'alltime'
   );
 
   /* ---------- Auto-scroll to Today ---------- */
@@ -431,6 +442,39 @@ function Dashboard({ user, logout }) {
             }
           `}</style>
           <PrestigeBadge habits={habits.filter(h => !h.isDeleted)} />
+
+          {/* ── KPI / Graph Mode Toggle ── */}
+          <div style={{
+            display: 'inline-flex',
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '24px',
+            padding: '3px',
+            gap: '2px',
+          }}>
+            {[['current', '🟢 Current'], ['alltime', '📜 All-Time']].map(([mode, label]) => (
+              <button
+                key={mode}
+                onClick={() => setDashboardMode(mode)}
+                style={{
+                  padding: '5px 13px',
+                  borderRadius: '20px',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  fontFamily: "'Inter', sans-serif",
+                  background: dashboardMode === mode
+                    ? 'linear-gradient(135deg, #34d399, #059669)'
+                    : 'transparent',
+                  color: dashboardMode === mode ? '#020617' : '#64748b',
+                  boxShadow: dashboardMode === mode ? '0 2px 8px rgba(52,211,153,0.35)' : 'none',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap',
+                }}
+              >{label}</button>
+            ))}
+          </div>
 
 
 
@@ -805,7 +849,12 @@ function Dashboard({ user, logout }) {
                       <KpiRingRow kpis={calculatedKpis} isCurrentMonth={isCurrentMonth} />
                     </div>
                     <div className="m-order-5 m-order-wrapper">
-                      <HabitGraphs habits={kpiHabits} month={selectedMonth} isCurrentMonth={isCurrentMonth} monthlyScore={calculatedKpis.monthly} />
+                      <HabitGraphs
+                        habits={kpiHabitsForCalc}
+                        month={selectedMonth}
+                        isCurrentMonth={isCurrentMonth}
+                        monthlyScore={calculatedKpis.monthly}
+                      />
                     </div>
                     <div className="resp-overflow-auto m-order-9" style={{ marginTop: "24px", borderRadius: "12px", overflow: "hidden", minWidth: 0, flex: 4 }}>
                       <DashboardGrid

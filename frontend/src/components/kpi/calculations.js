@@ -28,7 +28,7 @@ function getDirection(delta) {
   return "neutral";
 }
 
-export function calculateKPIs(habits, selectedMonth) {
+export function calculateKPIs(habits, selectedMonth, includeArchived = false) {
   if (!Array.isArray(habits) || !selectedMonth) {
     return defaultKPIs();
   }
@@ -65,48 +65,41 @@ export function calculateKPIs(habits, selectedMonth) {
   let prev3DayTotal = 0;
 
   habits.forEach((habit) => {
+    // ─── RULE: Only ACTIVE habits drive KPI metrics ───────────────────────
+    // Unless includeArchived=true (All-Time mode), skip inactive habits.
+    if (!includeArchived && (habit.isDeleted || habit.status === "archived" || habit.status === "paused")) {
+      return;
+    }
+
     const completedDates = Array.isArray(habit.completedDates)
       ? habit.completedDates
       : [];
 
-    // Inactive habits (deleted/paused/archived) still contribute their
-    // earned historical completions up to their end date via isDateAccessible.
-    // We skip them from DAILY / 3-day windows only (no point counting
-    // yesterday's deleted habit for today's score), but include them in
-    // weekly and monthly so the month's real history is preserved.
-    const isInactive = habit.isDeleted || habit.status === "archived" || habit.status === "paused";
-
     /* ================= DAILY ================= */
-    // Only active habits affect today's / yesterday's daily score
-    if (!isInactive) {
-      if (isDateAccessible(habit, todayStr)) {
-        dailyTotalHabits++;
-        if (completedDates.includes(todayStr)) todayCompleted++;
-      }
-      if (isDateAccessible(habit, yesterdayStr)) {
-        yesterdayTotalHabits++;
-        if (completedDates.includes(yesterdayStr)) yesterdayCompleted++;
-      }
+    if (isDateAccessible(habit, todayStr)) {
+      dailyTotalHabits++;
+      if (completedDates.includes(todayStr)) todayCompleted++;
+    }
+    if (isDateAccessible(habit, yesterdayStr)) {
+      yesterdayTotalHabits++;
+      if (completedDates.includes(yesterdayStr)) yesterdayCompleted++;
     }
 
     /* ================= 3-DAY ROLLING WINDOW ================= */
-    // Only active habits affect the 3-day momentum window
-    if (!isInactive) {
-      for (let d = 0; d < 3; d++) {
-        const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
-        if (isDateAccessible(habit, dateStr)) {
-          threeDayTotal++;
-          if (completedDates.includes(dateStr)) threeDayCompleted++;
-        }
+    for (let d = 0; d < 3; d++) {
+      const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
+      if (isDateAccessible(habit, dateStr)) {
+        threeDayTotal++;
+        if (completedDates.includes(dateStr)) threeDayCompleted++;
       }
+    }
 
-      /* ================= PREV 3-DAY ROLLING WINDOW (days 3–5 ago) ================= */
-      for (let d = 3; d < 6; d++) {
-        const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
-        if (isDateAccessible(habit, dateStr)) {
-          prev3DayTotal++;
-          if (completedDates.includes(dateStr)) prev3DayCompleted++;
-        }
+    /* ================= PREV 3-DAY ROLLING WINDOW (days 3–5 ago) ================= */
+    for (let d = 3; d < 6; d++) {
+      const dateStr = today.subtract(d, "day").format("YYYY-MM-DD");
+      if (isDateAccessible(habit, dateStr)) {
+        prev3DayTotal++;
+        if (completedDates.includes(dateStr)) prev3DayCompleted++;
       }
     }
 

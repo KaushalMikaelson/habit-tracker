@@ -184,14 +184,25 @@ const TABS = ['Overview', 'Per-Habit Detail', 'Activity'];
 /* ═══════════════════════════════════════════════════════════════ */
 export default function StatsView({ habits = [] }) {
   const [tab, setTab] = useState('Overview');
+  const [perfMode, setPerfMode] = useState('current'); // 'current' | 'alltime'
 
-  const habitStats = useMemo(() => buildHabitStats(habits), [habits]);
-  const activityMap = useMemo(() => buildActivityMap(habits), [habits]);
-  
-  const activeHabits = useMemo(() => habits.filter(h => !h.isDeleted && h.status !== 'archived' && h.status !== 'paused'), [habits]);
+  const activeHabits = useMemo(
+    () => habits.filter(h => !h.isDeleted && h.status !== 'archived' && h.status !== 'paused'),
+    [habits]
+  );
+
+  // ── viewHabits drives ALL stats based on the toggle ──────────────
+  const viewHabits = useMemo(
+    () => perfMode === 'current' ? activeHabits : habits,
+    [perfMode, activeHabits, habits]
+  );
+
+  const habitStats = useMemo(() => buildHabitStats(viewHabits), [viewHabits]);
+  const activityMap = useMemo(() => buildActivityMap(habits), [habits]); // heatmap always full
+
   const activeHabitCount = activeHabits.length;
 
-  /* ── global aggregates ── */
+  /* ── global aggregates (all driven by viewHabits) ── */
   const totalCompletions = useMemo(
     () => habitStats.reduce((s, h) => s + h.totalCompletions, 0),
     [habitStats]
@@ -202,44 +213,38 @@ export default function StatsView({ habits = [] }) {
     [habitStats]
   );
 
-  /* overall 30-day consistency */
   const overallConsistency = useMemo(() => {
     const totalPoss = habitStats.reduce((s, h) => s + h.possible30, 0);
     const totalDone = habitStats.reduce((s, h) => s + h.done30, 0);
     return pct(totalDone, totalPoss);
   }, [habitStats]);
 
-  /* overall weekly — active habits only (deleted habits don't affect today's week score) */
   const overallWeekly = useMemo(() => {
     let wC = 0, wT = 0;
-    activeHabits.forEach((h) => {
+    viewHabits.forEach((h) => {
       const { completed, total } = calculateWeeklyCompletion(h, today, today);
       wC += completed; wT += total;
     });
     return pct(wC, wT);
-  }, [activeHabits]);
+  }, [viewHabits]);
 
-  /* overall monthly — ALL habits contribute proportionally:
-     active habits count all days this month,
-     deleted/paused/archived habits count only days up to their end date
-     (isDateAccessible inside calculateMonthlyCompletion handles this automatically) */
   const overallMonthly = useMemo(() => {
     let mC = 0, mT = 0;
-    habits.forEach((h) => {
+    viewHabits.forEach((h) => {
       const { completed, total } = calculateMonthlyCompletion(h, today, today);
       mC += completed; mT += total;
     });
     return pct(mC, mT);
-  }, [habits]);
+  }, [viewHabits]);
 
-  /* today completed */
+  // Today completed always from active habits (makes no sense to show deleted)
   const todayCompleted = useMemo(
     () => activeHabits.filter((h) => (h.completedDates || []).includes(todayStr)).length,
     [activeHabits]
   );
 
   const sorted30 = useMemo(
-    () => [...habitStats].filter(h => !h.isDeleted).sort((a, b) => b.consistency30 - a.consistency30),
+    () => [...habitStats].sort((a, b) => b.consistency30 - a.consistency30),
     [habitStats]
   );
 
@@ -283,6 +288,42 @@ export default function StatsView({ habits = [] }) {
           >
             {t}
           </button>
+        ))}
+      </div>
+    );
+  }
+
+  /* ─── page-level toggle component ────────────────────────────── */
+  function PerfToggle() {
+    return (
+      <div style={{
+        display: 'inline-flex',
+        background: 'rgba(255,255,255,0.05)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: '24px',
+        padding: '4px',
+        gap: '2px',
+      }}>
+        {[['current', '🟢 Current Habits'], ['alltime', '📜 All-Time']].map(([mode, label]) => (
+          <button
+            key={mode}
+            onClick={() => setPerfMode(mode)}
+            style={{
+              padding: '6px 16px',
+              borderRadius: '20px',
+              border: 'none',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              background: perfMode === mode
+                ? 'linear-gradient(135deg, #34d399, #059669)'
+                : 'transparent',
+              color: perfMode === mode ? '#020617' : '#64748b',
+              boxShadow: perfMode === mode ? '0 2px 8px rgba(52,211,153,0.35)' : 'none',
+              transition: 'all 0.2s ease',
+            }}
+          >{label}</button>
         ))}
       </div>
     );
@@ -360,9 +401,18 @@ export default function StatsView({ habits = [] }) {
           }}>
             <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
               HABIT CONSISTENCY (30 DAYS)
+              {perfMode === 'alltime' && (
+                <span style={{ marginLeft: '8px', fontWeight: 600, color: '#f59e0b', fontSize: '10px' }}>
+                  — Including archived
+                </span>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {sorted30.map((h, i) => (
+              {sorted30.length === 0 ? (
+                <div style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', padding: '12px 0' }}>
+                  No habits to show
+                </div>
+              ) : sorted30.map((h, i) => (
                 <ConsistencyBar
                   key={h._id}
                   label={h.name}
@@ -664,9 +714,13 @@ export default function StatsView({ habits = [] }) {
       color: '#f8fafc',
       boxSizing: 'border-box',
     }}>
-      <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#34d399', margin: '0 0 24px 0' }}>
-        Stats &amp; Insights
-      </h1>
+      {/* ── Page Header: title + Current / All-Time toggle ── */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', flexWrap: 'wrap', gap: '12px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#34d399', margin: 0 }}>
+          Stats &amp; Insights
+        </h1>
+        <PerfToggle />
+      </div>
 
       <TabBar />
 
