@@ -187,7 +187,9 @@ export default function StatsView({ habits = [] }) {
 
   const habitStats = useMemo(() => buildHabitStats(habits), [habits]);
   const activityMap = useMemo(() => buildActivityMap(habits), [habits]);
-  const habitCount = habits.length;
+  
+  const activeHabits = useMemo(() => habits.filter(h => !h.isDeleted && h.status !== 'archived' && h.status !== 'paused'), [habits]);
+  const activeHabitCount = activeHabits.length;
 
   /* ── global aggregates ── */
   const totalCompletions = useMemo(
@@ -210,27 +212,27 @@ export default function StatsView({ habits = [] }) {
   /* overall weekly */
   const overallWeekly = useMemo(() => {
     let wC = 0, wT = 0;
-    habits.forEach((h) => {
+    activeHabits.forEach((h) => {
       const { completed, total } = calculateWeeklyCompletion(h, today, today);
       wC += completed; wT += total;
     });
     return pct(wC, wT);
-  }, [habits]);
+  }, [activeHabits]);
 
   /* overall monthly */
   const overallMonthly = useMemo(() => {
     let mC = 0, mT = 0;
-    habits.forEach((h) => {
+    activeHabits.forEach((h) => {
       const { completed, total } = calculateMonthlyCompletion(h, today, today);
       mC += completed; mT += total;
     });
     return pct(mC, mT);
-  }, [habits]);
+  }, [activeHabits]);
 
   /* today completed */
   const todayCompleted = useMemo(
-    () => habits.filter((h) => (h.completedDates || []).includes(todayStr)).length,
-    [habits]
+    () => activeHabits.filter((h) => (h.completedDates || []).includes(todayStr)).length,
+    [activeHabits]
   );
 
   const sorted30 = useMemo(
@@ -284,7 +286,7 @@ export default function StatsView({ habits = [] }) {
   }
 
   /* ─── empty state ─────────────────────────────────────────────── */
-  if (habitCount === 0) {
+  if (activeHabitCount === 0 && habits.length === 0) {
     return (
       <div style={{ padding: '40px', color: '#f8fafc', flex: 1 }}>
         <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#34d399', margin: '0 0 8px 0' }}>
@@ -309,15 +311,15 @@ export default function StatsView({ habits = [] }) {
       <>
         {/* 6-card KPI row */}
         <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <StatCard value={habitCount} label="Total Habits" accent="#60a5fa" />
+          <StatCard value={activeHabitCount} label="Total Habits" accent="#60a5fa" />
           <StatCard value={totalCompletions} label="Total Completions" accent="#34d399" />
           <StatCard value={`${bestStreak} 🔥`} label="Best Streak" accent="#fb923c" />
           <StatCard value={`${overallConsistency}%`} label="30-Day Consistency" accent="#34d399" />
           <StatCard value={`${overallWeekly}%`} label="This Week" accent="#a78bfa" />
           <StatCard
-            value={`${todayCompleted}/${habitCount}`}
+            value={`${todayCompleted}/${activeHabitCount}`}
             label="Done Today"
-            sub={todayCompleted === habitCount ? '🎉 Perfect day!' : null}
+            sub={todayCompleted === activeHabitCount && activeHabitCount > 0 ? '🎉 Perfect day!' : null}
             accent="#f472b6"
           />
         </div>
@@ -632,14 +634,14 @@ export default function StatsView({ habits = [] }) {
                   <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{
                       height: '100%',
-                      width: `${pct(count, habitCount)}%`,
-                      background: count === habitCount ? activeMainColor : count > 0 ? activeTipColor : 'transparent',
+                      width: `${pct(count, habits.length)}%`,
+                      background: count > 0 ? activeTipColor : 'transparent',
                       borderRadius: '3px',
                       transition: 'width 0.5s ease',
                     }} />
                   </div>
                   <div style={{ width: '60px', textAlign: 'right', fontSize: '12px', color: '#64748b', flexShrink: 0 }}>
-                    {count}/{habitCount}
+                    {count}
                   </div>
                 </div>
               );

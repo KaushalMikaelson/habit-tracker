@@ -65,18 +65,11 @@ export function calculateKPIs(habits, selectedMonth) {
   let prev3DayTotal = 0;
 
   habits.forEach((habit) => {
-    // Exclude frozen or paused habits from negatively affecting metrics
-    if (habit.status === "archived" || habit.status === "paused") {
+    // Completely exclude inactive habits from the KPI percentages
+    // so that the current active habits accurately dictate the score.
+    // Their historical completions still appear on the Daily Progress graph.
+    if (habit.isDeleted || habit.status === "archived" || habit.status === "paused") {
       return;
-    }
-
-    // For deleted habits: If they have absolutely zero completions, completely erase them 
-    // from history so their misses don't drag down the score. If they have completions, 
-    // keep them so we preserve the hard work!
-    if (habit.isDeleted) {
-      if (!habit.completedDates || habit.completedDates.length === 0) {
-        return;
-      }
     }
 
     const completedDates = Array.isArray(habit.completedDates)
