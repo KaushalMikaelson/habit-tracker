@@ -209,7 +209,7 @@ export default function StatsView({ habits = [] }) {
     return pct(totalDone, totalPoss);
   }, [habitStats]);
 
-  /* overall weekly */
+  /* overall weekly — active habits only (deleted habits don't affect today's week score) */
   const overallWeekly = useMemo(() => {
     let wC = 0, wT = 0;
     activeHabits.forEach((h) => {
@@ -219,15 +219,18 @@ export default function StatsView({ habits = [] }) {
     return pct(wC, wT);
   }, [activeHabits]);
 
-  /* overall monthly */
+  /* overall monthly — ALL habits contribute proportionally:
+     active habits count all days this month,
+     deleted/paused/archived habits count only days up to their end date
+     (isDateAccessible inside calculateMonthlyCompletion handles this automatically) */
   const overallMonthly = useMemo(() => {
     let mC = 0, mT = 0;
-    activeHabits.forEach((h) => {
+    habits.forEach((h) => {
       const { completed, total } = calculateMonthlyCompletion(h, today, today);
       mC += completed; mT += total;
     });
     return pct(mC, mT);
-  }, [activeHabits]);
+  }, [habits]);
 
   /* today completed */
   const todayCompleted = useMemo(
