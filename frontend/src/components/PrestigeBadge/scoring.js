@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import isBetween from "dayjs/plugin/isBetween";
-import { getEffectiveStartDate, calculateMonthlyCompletion } from "../../utils/habitUtils";
+import { getEffectiveStartDate, calculateMonthlyCompletion, isDateAccessible } from "../../utils/habitUtils";
 
 dayjs.extend(isBetween);
 
@@ -45,19 +45,27 @@ export function calculateLifetimeStats(habits) {
         // Count all completed tasks for this habit
         totalCompleted += completedDates.length;
 
-        // Calculate days since habit was started (earliest of creation date or any completed date)
+        // Calculate lifetime possible days correctly using isDateAccessible
         const startDate = getEffectiveStartDate(habit);
-        const daysSinceCreation = today.diff(startDate, "day") + 1;
-
-        let possibleForHabit = Math.max(daysSinceCreation, 1);
-        possibleForHabit = Math.max(possibleForHabit, completedDates.length); // Safety net to prevent >100% per habit
+        let possibleForHabit = 0;
+        let curr = startDate;
+        while (!curr.isAfter(today, "day")) {
+            const dStr = curr.format("YYYY-MM-DD");
+            if (isDateAccessible(habit, dStr)) {
+                possibleForHabit++;
+            }
+            curr = curr.add(1, "day");
+        }
 
         totalPossible += possibleForHabit;
 
-        // Calculate exact monthly possible and completed
-        const m = calculateMonthlyCompletion(habit, today, today);
-        monthlyCompleted += m.completed;
-        monthlyPossible += m.total;
+        // Calculate exact monthly possible and completed ONLY for active habits
+        const isInactive = habit.isDeleted || habit.status === "archived" || habit.status === "paused";
+        if (!isInactive) {
+            const m = calculateMonthlyCompletion(habit, today, today);
+            monthlyCompleted += m.completed;
+            monthlyPossible += m.total;
+        }
     });
 
     // Lifetime completion percentage

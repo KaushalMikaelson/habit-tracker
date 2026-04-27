@@ -159,7 +159,7 @@ export default function PrestigeBadge({ habits }) {
                                 <StatRow
                                     icon="📈"
                                     label="Total Tasks Completed"
-                                    value={`${stats.monthlyCompleted.toLocaleString()} / ${stats.monthlyPossible.toLocaleString()}`}
+                                    value={`${stats.totalCompleted.toLocaleString()} / ${stats.totalPossible.toLocaleString()}`}
                                 />
                                 <StatRow
                                     icon="🔥"
