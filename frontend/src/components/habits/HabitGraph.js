@@ -76,13 +76,13 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
 
   const stage = getStage(computedScore);
   const palette = PALETTES[stage];
-  
+
   const usePremium = computedScore < 50;
-  
+
   const defaultMain = "#22c55e";
   const defaultAvg = "#f59e0b";
   const defaultToday = "#60a5fa";
-  
+
   const mainColor = usePremium ? (palette.mid || defaultMain) : defaultMain;
   const avgColor = usePremium ? (palette.tip || defaultAvg) : defaultAvg;
   const todayColor = usePremium ? (palette.core || defaultToday) : defaultToday;
@@ -98,13 +98,13 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
     const x =
       paddingX +
       (i / Math.max(daily.length - 1, 1)) *
-        (width - paddingX * 2);
+      (width - paddingX * 2);
 
     const y =
       height -
       paddingBottom -
       (d.value / maxValue) *
-        (height - paddingTop - paddingBottom);
+      (height - paddingTop - paddingBottom);
 
     return { ...d, x: Math.round(x), y: Math.round(y) };
   });
@@ -122,13 +122,13 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
     const x =
       paddingX +
       (i / Math.max(daily.length - 1, 1)) *
-        (width - paddingX * 2);
+      (width - paddingX * 2);
 
     const y =
       height -
       paddingBottom -
       (smaValue / maxValue) *
-        (height - paddingTop - paddingBottom);
+      (height - paddingTop - paddingBottom);
 
     return { x: Math.round(x), y: Math.round(y), value: smaValue.toFixed(1), date: d.date, isAvg: true };
   });

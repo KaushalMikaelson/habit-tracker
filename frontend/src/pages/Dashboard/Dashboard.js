@@ -776,7 +776,7 @@ function Dashboard({ user, logout }) {
                     <div className="m-order-1" style={{ height: KPI_ROW_HEIGHT }}>
                       <KpiIntroBox habits={visibleHabits} />
                     </div>
-                    <div className="m-order-4 m-order-wrapper"><TodayFocus habits={visibleHabits} onToggle={toggleHabit} /></div>
+                    <div className="m-order-4 m-order-wrapper"><TodayFocus habits={visibleHabits} onToggle={toggleHabit} user={user} activeView={activeView} /></div>
                     <div className="m-order-8 m-order-wrapper">
                       <HabitNameColumn
                         habits={visibleHabits}
@@ -835,7 +835,7 @@ function Dashboard({ user, logout }) {
                     <div className="m-order-3" style={{ height: KPI_ROW_HEIGHT }}>
                       <TopHabits habits={visibleHabits} currentYear={currentYear} currentMonth={currentMonth} height={KPI_ROW_HEIGHT} />
                     </div>
-                    <div className="m-order-6 m-order-wrapper"><TodoNotes /></div>
+                    <div className="m-order-6 m-order-wrapper"><TodoNotes user={user} activeView={activeView} /></div>
                     <div className="m-order-7 m-order-wrapper"><HabitProgressColumn habits={visibleHabits} currentMonth={selectedMonth} /></div>
                   </div>
                 </div>

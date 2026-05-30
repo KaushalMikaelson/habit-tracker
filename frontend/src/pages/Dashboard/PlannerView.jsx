@@ -32,6 +32,7 @@ export default function PlannerView({ user, habits }) {
   function saveData(updatedData) {
     setData(updatedData);
     localStorage.setItem(storageKey, JSON.stringify(updatedData));
+    window.dispatchEvent(new Event("plannerDataChanged"));
   }
 
   // --- Helpers for Keys ---

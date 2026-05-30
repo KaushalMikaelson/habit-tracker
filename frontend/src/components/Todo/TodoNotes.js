@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchUserData, saveReminders } from "../../api/userdata";
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
 
-export default function TodoNotes() {
+dayjs.extend(isoWeek);
+
+export default function TodoNotes({ user, activeView }) {
   /* ===============================
      STATE
   ================================ */
@@ -11,24 +15,109 @@ export default function TodoNotes() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+  const weekKey = `${dayjs().format("YYYY")}-W${dayjs().isoWeek()}`;
+
+  /* ===============================
+     LOAD WEEKLY PLANNER TASKS
+  ================================ */
+  const getWeeklyTasks = useCallback(() => {
+    try {
+      const storageKey = `planner_data_${user?.email || "guest"}`;
+      const rawData = localStorage.getItem(storageKey);
+      if (!rawData) return [];
+      const data = JSON.parse(rawData);
+      const weekData = data.weekly?.[weekKey];
+      if (!weekData || !weekData.quadrants) return [];
+
+      const completedKey = `completed_weekly_tasks_${user?.email || "guest"}`;
+      const completedList = JSON.parse(localStorage.getItem(completedKey) || "[]");
+
+      const tasks = [];
+      const quadTitles = [
+        "Q1: Do First",
+        "Q2: Schedule",
+        "Q3: Delegate",
+        "Q4: Don't Do"
+      ];
+      const quadColors = ["#ef4444", "#3b82f6", "#f59e0b", "#94a3b8"];
+
+      weekData.quadrants.forEach((quadText, qIdx) => {
+        if (!quadText || !quadText.trim()) return;
+        const lines = quadText.split("\n");
+        let validLineIdx = 0;
+
+        lines.forEach((lineText) => {
+          const trimmed = lineText.trim();
+          if (!trimmed) return;
+
+          // Strip leading "- ", "* ", number lists like "1. ", or custom checks
+          let cleanText = trimmed.replace(/^[-*•\s\d.]+\s*/, "");
+          if (!cleanText) return;
+
+          const taskId = `weekly-${weekKey}-${qIdx}-${validLineIdx}`;
+          const isDone = completedList.includes(taskId);
+
+          tasks.push({
+            id: taskId,
+            text: cleanText,
+            done: isDone,
+            isFromWeeklyPlanner: true,
+            quadrantIndex: qIdx,
+            quadrantLabel: quadTitles[qIdx],
+            quadrantColor: quadColors[qIdx],
+            lineIndex: validLineIdx,
+            rawLineText: lineText // Store original line for deletion matching
+          });
+          validLineIdx++;
+        });
+      });
+
+      return tasks;
+    } catch (e) {
+      console.error("Failed to load weekly planner reminders", e);
+      return [];
+    }
+  }, [user?.email, weekKey]);
+
   /* ===============================
      LOAD FROM BACKEND ON MOUNT
   ================================ */
+  const loadData = useCallback(async () => {
+    try {
+      const data = await fetchUserData();
+      const customReminders = data.reminders || [];
+      const weeklyTasks = getWeeklyTasks();
+      setItems([...customReminders, ...weeklyTasks]);
+    } catch {
+      setError("Failed to load reminders.");
+    } finally {
+      setLoading(false);
+    }
+  }, [getWeeklyTasks]);
+
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchUserData();
-        setItems(data.reminders || []);
-      } catch {
-        setError("Failed to load reminders.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    loadData();
+
+    // Listen for custom planner updates
+    const handlePlannerUpdate = () => {
+      const wTasks = getWeeklyTasks();
+      setItems(prevItems => {
+        const customOnly = prevItems.filter(i => !i.isFromWeeklyPlanner);
+        return [...customOnly, ...wTasks];
+      });
+    };
+
+    window.addEventListener("plannerDataChanged", handlePlannerUpdate);
+    window.addEventListener("storage", handlePlannerUpdate);
+
+    return () => {
+      window.removeEventListener("plannerDataChanged", handlePlannerUpdate);
+      window.removeEventListener("storage", handlePlannerUpdate);
+    };
+  }, [loadData, getWeeklyTasks, activeView]);
 
   /* ===============================
-     DEBOUNCED SAVE TO BACKEND
+     DEBOUNCED SAVE TO BACKEND (CUSTOM REMINDERS ONLY)
   ================================ */
   const saveTimer = useRef(null);
 
@@ -55,7 +144,10 @@ export default function TodoNotes() {
     const updated = [...items, newItem];
     setItems(updated);
     setText("");
-    persistItems(updated);
+    
+    // Save only custom reminders to backend database
+    const customOnly = updated.filter(i => !i.isFromWeeklyPlanner);
+    persistItems(customOnly);
   }
 
   function toggleItem(id) {
@@ -63,13 +155,78 @@ export default function TodoNotes() {
       item.id === id ? { ...item, done: !item.done } : item
     );
     setItems(updated);
-    persistItems(updated);
+
+    const clickedItem = items.find(item => item.id === id);
+    if (clickedItem && clickedItem.isFromWeeklyPlanner) {
+      try {
+        const completedKey = `completed_weekly_tasks_${user?.email || "guest"}`;
+        let completedList = JSON.parse(localStorage.getItem(completedKey) || "[]");
+        if (completedList.includes(id)) {
+          completedList = completedList.filter(item => item !== id);
+        } else {
+          completedList.push(id);
+        }
+        localStorage.setItem(completedKey, JSON.stringify(completedList));
+        window.dispatchEvent(new Event("plannerDataChanged"));
+      } catch (e) {
+        console.error("Failed to toggle weekly task", e);
+      }
+    } else {
+      const customOnly = updated.filter(i => !i.isFromWeeklyPlanner);
+      persistItems(customOnly);
+    }
   }
 
   function removeItem(id) {
     const updated = items.filter((item) => item.id !== id);
     setItems(updated);
-    persistItems(updated);
+
+    const clickedItem = items.find(item => item.id === id);
+    if (clickedItem && clickedItem.isFromWeeklyPlanner) {
+      try {
+        const storageKey = `planner_data_${user?.email || "guest"}`;
+        const rawData = localStorage.getItem(storageKey);
+        if (rawData) {
+          const data = JSON.parse(rawData);
+          const weekly = data.weekly || {};
+          const weekData = weekly[weekKey] || {};
+          const quadrants = weekData.quadrants || ["", "", "", ""];
+          
+          const quadText = quadrants[clickedItem.quadrantIndex] || "";
+          
+          // Surgically find the line in the quadrant's text block
+          const lines = quadText.split("\n");
+          let validLineIdx = 0;
+          const filteredLines = lines.filter((lineText) => {
+            const trimmed = lineText.trim();
+            if (!trimmed) return true; // Keep empty lines
+            
+            let cleanText = trimmed.replace(/^[-*•\s\d.]+\s*/, "");
+            if (!cleanText) return true; // Keep empty/non-task lines
+            
+            const isMatch = validLineIdx === clickedItem.lineIndex;
+            validLineIdx++;
+            return !isMatch; // Exclude matching task line
+          });
+
+          quadrants[clickedItem.quadrantIndex] = filteredLines.join("\n");
+          localStorage.setItem(storageKey, JSON.stringify(data));
+          
+          // Remove from completed list if there
+          const completedKey = `completed_weekly_tasks_${user?.email || "guest"}`;
+          let completedList = JSON.parse(localStorage.getItem(completedKey) || "[]");
+          completedList = completedList.filter(item => item !== id);
+          localStorage.setItem(completedKey, JSON.stringify(completedList));
+
+          window.dispatchEvent(new Event("plannerDataChanged"));
+        }
+      } catch (e) {
+        console.error("Failed to delete line from weekly quadrant", e);
+      }
+    } else {
+      const customOnly = updated.filter(i => !i.isFromWeeklyPlanner);
+      persistItems(customOnly);
+    }
   }
 
   /* ===============================
@@ -128,9 +285,30 @@ export default function TodoNotes() {
                 ...styles.itemText,
                 textDecoration: item.done ? "line-through" : "none",
                 opacity: item.done ? 0.45 : 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px"
               }}
             >
-              {item.text}
+              <span>{item.text}</span>
+              {item.isFromWeeklyPlanner && (
+                <span style={{
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  color: item.quadrantColor,
+                  background: `${item.quadrantColor}16`,
+                  border: `1px solid ${item.quadrantColor}32`,
+                  padding: "1px 6px",
+                  borderRadius: "6px",
+                  width: "fit-content",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  marginTop: "2px",
+                  display: "inline-block"
+                }}>
+                  {item.quadrantLabel}
+                </span>
+              )}
             </span>
 
             <button

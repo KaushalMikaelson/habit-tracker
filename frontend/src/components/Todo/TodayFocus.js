@@ -11,7 +11,7 @@ const yesterdayDate = new Date(todayDate);
 yesterdayDate.setDate(todayDate.getDate() - 1);
 const yesterdayKey = yesterdayDate.toISOString().split("T")[0];
 
-export default function TodayFocus() {
+export default function TodayFocus({ user, activeView }) {
   /* ===============================
      STATE
   ================================ */
@@ -28,34 +28,119 @@ export default function TodayFocus() {
   const allFocusRef = useRef([]);
 
   /* ===============================
-     LOAD FROM BACKEND ON MOUNT
+     LOAD PLANNER FOCUS ITEMS
   ================================ */
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await fetchUserData();
-        const all = data.focusItems || [];
-        allFocusRef.current = all;
+  const getPlannerTasks = useCallback(() => {
+    try {
+      const storageKey = `planner_data_${user?.email || "guest"}`;
+      const rawData = localStorage.getItem(storageKey);
+      if (!rawData) return [];
+      const data = JSON.parse(rawData);
+      const todayData = data.daily?.[todayKey];
+      if (!todayData) return [];
 
-        const todayItems = all.filter((i) => i.date === todayKey);
-        const yItems = all.filter((i) => i.date === yesterdayKey && !i.done);
+      const smart = todayData.smartTasks || { deepWork: [], important: [], quick: [] };
+      const blocks = todayData.timeBlocks || { morning: [], afternoon: [], evening: [] };
 
-        const existingTexts = new Set(todayItems.map((i) => i.text));
-        const uncarriedYItems = yItems.filter((i) => !existingTexts.has(i.text));
+      const tasks = [];
+      
+      // Add smart tasks
+      ["deepWork", "important", "quick"].forEach(cat => {
+        const list = smart[cat] || [];
+        const catLabel = cat === "deepWork" ? "🔴 Deep Work" : cat === "important" ? "🟡 Important" : "⚪ Quick Task";
+        const catColor = cat === "deepWork" ? "#ef4444" : cat === "important" ? "#eab308" : "#94a3b8";
+        list.forEach(t => {
+          tasks.push({
+            id: t.id,
+            text: t.text,
+            done: t.done,
+            date: todayKey,
+            isFromPlanner: true,
+            plannerType: "smart",
+            plannerCategory: cat,
+            categoryLabel: catLabel,
+            categoryColor: catColor
+          });
+        });
+      });
 
-        setItems(todayItems);
-        setYesterdayItems(uncarriedYItems);
-        setHasCarryFromYesterday(uncarriedYItems.length > 0);
-      } catch (err) {
-        setError("Failed to load focus items.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+      // Add time block tasks
+      ["morning", "afternoon", "evening"].forEach(bk => {
+        const list = blocks[bk] || [];
+        const bkLabel = bk === "morning" ? "🌅 Morning" : bk === "afternoon" ? "☀️ Afternoon" : "🌇 Evening";
+        const bkColor = "#10b981"; // Emerald green for time blocks
+        list.forEach(t => {
+          tasks.push({
+            id: t.id,
+            text: `[${t.time}] ${t.text}`,
+            done: t.done,
+            date: todayKey,
+            isFromPlanner: true,
+            plannerType: "timeBlock",
+            plannerCategory: bk,
+            categoryLabel: bkLabel,
+            categoryColor: bkColor
+          });
+        });
+      });
+
+      return tasks;
+    } catch (e) {
+      console.error("Failed to load planner focus items", e);
+      return [];
+    }
+  }, [user?.email]);
 
   /* ===============================
-     DEBOUNCED SAVE TO BACKEND
+     LOAD FROM BACKEND + PLANNER
+  ================================ */
+  const loadData = useCallback(async () => {
+    try {
+      const data = await fetchUserData();
+      const all = data.focusItems || [];
+      allFocusRef.current = all;
+
+      const todayItems = all.filter((i) => i.date === todayKey);
+      const yItems = all.filter((i) => i.date === yesterdayKey && !i.done);
+
+      const existingTexts = new Set(todayItems.map((i) => i.text));
+      const uncarriedYItems = yItems.filter((i) => !existingTexts.has(i.text));
+
+      const plannerTasks = getPlannerTasks();
+
+      setItems([...todayItems, ...plannerTasks]);
+      setYesterdayItems(uncarriedYItems);
+      setHasCarryFromYesterday(uncarriedYItems.length > 0);
+    } catch (err) {
+      setError("Failed to load focus items.");
+    } finally {
+      setLoading(false);
+    }
+  }, [getPlannerTasks]);
+
+  useEffect(() => {
+    loadData();
+
+    // Set up local storage listeners
+    const handlePlannerUpdate = () => {
+      const pTasks = getPlannerTasks();
+      setItems(prevItems => {
+        const customItems = prevItems.filter(i => !i.isFromPlanner);
+        return [...customItems, ...pTasks];
+      });
+    };
+
+    window.addEventListener("plannerDataChanged", handlePlannerUpdate);
+    window.addEventListener("storage", handlePlannerUpdate);
+
+    return () => {
+      window.removeEventListener("plannerDataChanged", handlePlannerUpdate);
+      window.removeEventListener("storage", handlePlannerUpdate);
+    };
+  }, [loadData, getPlannerTasks, activeView]);
+
+  /* ===============================
+     DEBOUNCED SAVE TO BACKEND (CUSTOM ITEMS ONLY)
   ================================ */
   const saveTimer = useRef(null);
 
@@ -82,7 +167,10 @@ export default function TodayFocus() {
     const updated = [...items, newItem];
     setItems(updated);
     setText("");
-    persistItems(updated);
+    
+    // Save only custom focus items to the backend
+    const customOnly = updated.filter(i => !i.isFromPlanner);
+    persistItems(customOnly);
   }
 
   function toggleItem(id) {
@@ -90,13 +178,83 @@ export default function TodayFocus() {
       item.id === id ? { ...item, done: !item.done } : item
     );
     setItems(updated);
-    persistItems(updated);
+
+    const clickedItem = items.find(item => item.id === id);
+    if (clickedItem && clickedItem.isFromPlanner) {
+      try {
+        const storageKey = `planner_data_${user?.email || "guest"}`;
+        const rawData = localStorage.getItem(storageKey);
+        if (rawData) {
+          const data = JSON.parse(rawData);
+          const daily = data.daily || {};
+          const todayData = daily[todayKey] || {};
+
+          if (clickedItem.plannerType === "smart") {
+            const smart = todayData.smartTasks || {};
+            const list = smart[clickedItem.plannerCategory] || [];
+            const taskIndex = list.findIndex(t => t.id === id);
+            if (taskIndex !== -1) {
+              list[taskIndex].done = !list[taskIndex].done;
+              localStorage.setItem(storageKey, JSON.stringify(data));
+              window.dispatchEvent(new Event("plannerDataChanged"));
+            }
+          } else if (clickedItem.plannerType === "timeBlock") {
+            const blocks = todayData.timeBlocks || {};
+            const list = blocks[clickedItem.plannerCategory] || [];
+            const taskIndex = list.findIndex(t => t.id === id);
+            if (taskIndex !== -1) {
+              list[taskIndex].done = !list[taskIndex].done;
+              localStorage.setItem(storageKey, JSON.stringify(data));
+              window.dispatchEvent(new Event("plannerDataChanged"));
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Failed to update planner task toggle", e);
+      }
+    } else {
+      const customOnly = updated.filter(i => !i.isFromPlanner);
+      persistItems(customOnly);
+    }
   }
 
   function removeItem(id) {
     const updated = items.filter((item) => item.id !== id);
     setItems(updated);
-    persistItems(updated);
+
+    const clickedItem = items.find(item => item.id === id);
+    if (clickedItem && clickedItem.isFromPlanner) {
+      try {
+        const storageKey = `planner_data_${user?.email || "guest"}`;
+        const rawData = localStorage.getItem(storageKey);
+        if (rawData) {
+          const data = JSON.parse(rawData);
+          const daily = data.daily || {};
+          const todayData = daily[todayKey] || {};
+
+          if (clickedItem.plannerType === "smart") {
+            const smart = todayData.smartTasks || {};
+            const list = smart[clickedItem.plannerCategory] || [];
+            const filtered = list.filter(t => t.id !== id);
+            smart[clickedItem.plannerCategory] = filtered;
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            window.dispatchEvent(new Event("plannerDataChanged"));
+          } else if (clickedItem.plannerType === "timeBlock") {
+            const blocks = todayData.timeBlocks || {};
+            const list = blocks[clickedItem.plannerCategory] || [];
+            const filtered = list.filter(t => t.id !== id);
+            blocks[clickedItem.plannerCategory] = filtered;
+            localStorage.setItem(storageKey, JSON.stringify(data));
+            window.dispatchEvent(new Event("plannerDataChanged"));
+          }
+        }
+      } catch (e) {
+        console.error("Failed to remove planner task", e);
+      }
+    } else {
+      const customOnly = updated.filter(i => !i.isFromPlanner);
+      persistItems(customOnly);
+    }
   }
 
   /* ===============================
@@ -116,7 +274,9 @@ export default function TodayFocus() {
     const updated = [...items, ...toCarry];
     setItems(updated);
     setHasCarryFromYesterday(false);
-    persistItems(updated);
+    
+    const customOnly = updated.filter(i => !i.isFromPlanner);
+    persistItems(customOnly);
   }
 
   /* ===============================
@@ -193,9 +353,30 @@ export default function TodayFocus() {
                 ...styles.itemText,
                 textDecoration: item.done ? "line-through" : "none",
                 opacity: item.done ? 0.45 : 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: "2px"
               }}
             >
-              {item.text}
+              <span>{item.text}</span>
+              {item.isFromPlanner && (
+                <span style={{
+                  fontSize: "9px",
+                  fontWeight: 700,
+                  color: item.categoryColor,
+                  background: `${item.categoryColor}16`,
+                  border: `1px solid ${item.categoryColor}32`,
+                  padding: "1px 6px",
+                  borderRadius: "6px",
+                  width: "fit-content",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  marginTop: "2px",
+                  display: "inline-block"
+                }}>
+                  {item.categoryLabel}
+                </span>
+              )}
             </span>
 
             <button
