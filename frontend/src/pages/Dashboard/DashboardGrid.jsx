@@ -341,11 +341,17 @@ function DashboardGrid({
             >
               {safeMonthDates.map((date) => {
                 const isToday = date === today;
+                
+                // Calculate if all active habits are completed for this date
+                const activeHabitsOnDate = safeHabits.filter(h => h.status === 'active' && isDateAccessible(h, date));
+                const isPerfect = activeHabitsOnDate.length > 0 && activeHabitsOnDate.every(h => Array.isArray(h.completedDates) && h.completedDates.includes(date));
+
                 return (
                   <div
                     key={date}
                     style={{
                       display: "flex",
+                      flexDirection: "column",
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "12px",
@@ -364,13 +370,28 @@ function DashboardGrid({
                       height: "100%",
                       position: "relative",
                       boxSizing: "border-box",
+                      gap: "2px"
                     }}
                   >
-                    {date.slice(8, 10)}
-                    {isToday && (
+                    <span>{date.slice(8, 10)}</span>
+                    {isPerfect && (
+                      <span 
+                        title="Perfect day! All habits completed." 
+                        style={{ 
+                          fontSize: "9px", 
+                          color: "#eab308", 
+                          lineHeight: 1, 
+                          marginTop: "-2px",
+                          textShadow: "0 0 4px rgba(234,179,8,0.5)"
+                        }}
+                      >
+                        ⭐
+                      </span>
+                    )}
+                    {isToday && !isPerfect && (
                       <div style={{
                         position: "absolute",
-                        bottom: "-2px",
+                        bottom: "2px",
                         left: "50%",
                         transform: "translateX(-50%)",
                         width: "4px",

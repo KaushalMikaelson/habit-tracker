@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import { useState, useMemo } from "react";
 import { PALETTES, getStage } from "../MomentumFlame";
+import { isDateAccessible } from "../../utils/habitUtils";
 
 /* ===============================
    HELPERS
@@ -293,6 +294,11 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
           {/* POINTS */}
           {points.map((p, i) => {
             const isToday = p.date === todayKey;
+            
+            // Calculate if perfect day (all active habits completed)
+            const activeHabitsOnDate = habits.filter(h => h.status === 'active' && isDateAccessible(h, p.date));
+            const isPerfect = activeHabitsOnDate.length > 0 && activeHabitsOnDate.every(h => Array.isArray(h.completedDates) && h.completedDates.includes(p.date));
+
             return (
               <g key={i}>
                 {isToday && (
@@ -315,6 +321,17 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
                       Today
                     </text>
                   </>
+                )}
+                {isPerfect && (
+                  <text
+                    x={p.x}
+                    y={p.y - 10}
+                    textAnchor="middle"
+                    fontSize="13"
+                    style={{ pointerEvents: "none", userSelect: "none" }}
+                  >
+                    ⭐
+                  </text>
                 )}
                 <circle
                   cx={p.x}
