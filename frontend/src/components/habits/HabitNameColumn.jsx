@@ -341,11 +341,12 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
                         />
                       ) : (
                         <span 
+                          className="hide-scrollbar"
                           onClick={() => onHabitClick && onHabitClick(habit)}
                           style={{
                             whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
+                            overflowX: "auto",
+                            overflowY: "hidden",
                             display: "block",
                             color: habit.status === 'paused' ? "#c4b5fd" : habit.status === 'archived' ? "#fb923c" : "#cbd5e1",
                             fontWeight: 500,
