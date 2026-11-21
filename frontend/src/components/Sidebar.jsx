@@ -1,6 +1,9 @@
 import React from "react";
+import { useTheme } from "../context/ThemeContext";
 
 function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
+  const { setIsThemeModalOpen } = useTheme();
+
   const linkStyle = {
     display: "flex",
     alignItems: "center",
@@ -10,15 +13,15 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
     cursor: "pointer",
     fontSize: "15px",
     fontWeight: 500,
-    color: "#94a3b8",
+    color: "var(--color-text-muted, #94a3b8)",
     transition: "all 0.2s ease",
     textDecoration: "none",
   };
 
   const activeLinkStyle = {
     ...linkStyle,
-    color: "var(--theme-2, #34d399)",
-    background: "rgba(255, 255, 255, 0.06)",
+    color: "var(--color-accent, #2563eb)",
+    background: "var(--color-surface-2, rgba(255, 255, 255, 0.06))",
     position: "relative",
   };
 
@@ -29,7 +32,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
     transform: "translateY(-50%)",
     width: "4px",
     height: "20px",
-    background: "var(--theme-1, #34d399)",
+    background: "var(--theme-1, #2563eb)",
     borderTopRightRadius: "4px",
     borderBottomRightRadius: "4px",
   };
@@ -37,7 +40,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
   const sectionHeaderStyle = {
     fontSize: "11px",
     fontWeight: 700,
-    color: "#64748b",
+    color: "var(--color-text-muted, #64748b)",
     textTransform: "uppercase",
     letterSpacing: "0.06em",
     marginTop: "24px",
@@ -70,8 +73,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
         style={{
           width: "260px",
           height: "100vh",
-          background: "#0b101e",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
+          background: "var(--color-sidebar-bg, #0b101e)",
+          borderRight: "1px solid var(--color-border, rgba(255,255,255,0.06))",
           position: "fixed",
           top: 0,
           left: isOpen ? "0" : "-260px",
@@ -79,7 +82,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           flexDirection: "column",
           flexShrink: 0,
           zIndex: 9999,
-          transition: "left 0.3s ease-in-out",
+          transition: "left 0.3s ease-in-out, background-color 0.25s ease",
           boxShadow: isOpen ? "4px 0 24px rgba(0,0,0,0.5)" : "none",
         }}
       >
@@ -91,7 +94,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           alignItems: "center",
           height: "80px",
           padding: "0 20px",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.06))",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -113,8 +116,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
             </svg>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "16px", fontWeight: 800, color: "#f8fafc", letterSpacing: "-0.02em" }}>Habit Tracker</span>
-            <span style={{ fontSize: "10px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em", marginTop: "2px" }}>Track Your Journey</span>
+            <span style={{ fontSize: "16px", fontWeight: 800, color: "var(--color-text, #f8fafc)", letterSpacing: "-0.02em" }}>Habit Tracker</span>
+            <span style={{ fontSize: "10px", fontWeight: 600, color: "var(--color-text-muted, #94a3b8)", textTransform: "uppercase", letterSpacing: "0.04em", marginTop: "2px" }}>Track Your Journey</span>
           </div>
         </div>
 
@@ -124,7 +127,7 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           style={{
             background: "transparent",
             border: "none",
-            color: "#64748b",
+            color: "var(--color-text-muted, #64748b)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -132,8 +135,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
             padding: "4px",
             borderRadius: "6px",
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = "#f8fafc"}
-          onMouseLeave={(e) => e.currentTarget.style.color = "#64748b"}
+          onMouseEnter={(e) => e.currentTarget.style.color = "var(--color-text, #f8fafc)"}
+          onMouseLeave={(e) => e.currentTarget.style.color = "var(--color-text-muted, #64748b)"}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -151,8 +154,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div
             style={activeView === "dashboard" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("dashboard"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "dashboard") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "dashboard" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -167,8 +170,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "stats" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("stats"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "stats") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "stats" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -182,8 +185,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "weekly" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("weekly"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "weekly") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "weekly" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -198,8 +201,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "monthly" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("monthly"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "monthly") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "monthly" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -220,8 +223,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "notes" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("notes"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "notes") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "notes" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -237,8 +240,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "journal" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("journal"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "journal") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "journal" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -251,8 +254,8 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
           <div 
             style={activeView === "planner" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("planner"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.05))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "planner") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "planner" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -264,13 +267,13 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
         </div>
 
         {/* ACCOUNT SECTION */}
-        <div style={sectionHeaderStyle}>Account</div>
+        <div style={sectionHeaderStyle}>Account & Appearance</div>
         <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
           <div 
             style={activeView === "settings" ? activeLinkStyle : linkStyle}
             onClick={() => { if (onNavigate) onNavigate("settings"); if (onClose) onClose(); }}
-            onMouseEnter={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "#f8fafc"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; } }}
-            onMouseLeave={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "#94a3b8"; e.currentTarget.style.background = "transparent"; } }}
+            onMouseEnter={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.03))"; } }}
+            onMouseLeave={(e) => { if (activeView !== "settings") { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; } }}
           >
             {activeView === "settings" && <div style={activeIndicatorStyle} />}
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -278,6 +281,26 @@ function Sidebar({ isOpen, onClose, activeView = "dashboard", onNavigate }) {
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
             Settings
+          </div>
+
+          <div 
+            style={linkStyle}
+            onClick={() => { setIsThemeModalOpen(true); if (onClose) onClose(); }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-text, #f8fafc)"; e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.03))"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--color-text-muted, #94a3b8)"; e.currentTarget.style.background = "transparent"; }}
+          >
+            <span style={{ fontSize: "16px" }}>🎨</span>
+            Theme & Colors
+            <span
+              style={{
+                marginLeft: "auto",
+                width: "9px",
+                height: "9px",
+                borderRadius: "50%",
+                background: "var(--color-accent, #2563eb)",
+                boxShadow: "0 0 8px var(--color-accent, #2563eb)",
+              }}
+            />
           </div>
         </div>
       </div>

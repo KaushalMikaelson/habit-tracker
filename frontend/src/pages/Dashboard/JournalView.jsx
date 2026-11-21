@@ -188,17 +188,17 @@ export default function JournalView({ user }) {
               onClick={() => openDocument(entry)}
               style={{
                 aspectRatio: "1 / 1.1",
-                background: "linear-gradient(180deg, #0f172a 0%, #020617 100%)",
-                border: "1px solid rgba(255,255,255,0.08)",
+                background: "linear-gradient(180deg, var(--color-surface, #0f172a) 0%, var(--color-surface-2, #020617) 100%)",
+                border: "1px solid var(--color-border, rgba(255,255,255,0.08))",
                 borderRadius: "16px",
                 padding: "24px",
                 display: "flex", flexDirection: "column",
                 cursor: "pointer", position: "relative",
                 transition: "all 0.2s ease",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+                boxShadow: "var(--color-card-shadow, 0 4px 12px rgba(0,0,0,0.2))"
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.4)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)" }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)" }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.2)"; e.currentTarget.style.borderColor = "var(--color-accent, rgba(255,255,255,0.15))" }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "var(--color-card-shadow, 0 4px 12px rgba(0,0,0,0.2))"; e.currentTarget.style.borderColor = "var(--color-border, rgba(255,255,255,0.08))" }}
             >
               {/* Doc Header Icon + Mood */}
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
@@ -275,7 +275,7 @@ export default function JournalView({ user }) {
       <div style={{ 
         display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", 
         borderBottom: "1px solid rgba(255,255,255,0.06)",
-        position: "sticky", top: 0, zIndex: 10, background: "#0b101e"
+        position: "sticky", top: 0, zIndex: 10, background: "var(--color-bg, #0b101e)"
       }}>
         <button
           onClick={closeDocument}
@@ -310,7 +310,7 @@ export default function JournalView({ user }) {
         {/* Document Page Canvas */}
         <div style={{ 
           maxWidth: "800px", margin: "0 auto", minHeight: "80vh",
-          background: "#020617", borderRadius: "16px", border: "1px solid rgba(255,255,255,0.05)",
+          background: "var(--color-surface, #020617)", borderRadius: "16px", border: "1px solid var(--color-border, rgba(255,255,255,0.05))",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.5)", padding: "60px 80px",
           display: "flex", flexDirection: "column"
         }}>

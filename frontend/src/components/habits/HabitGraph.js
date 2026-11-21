@@ -146,9 +146,10 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
         marginTop: "28px",
         padding: "22px",
         borderRadius: "20px",
-        background: "#020617",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
-        color: "#e5e7eb",
+        background: "var(--color-surface, #020617)",
+        border: "var(--color-card-border, none)",
+        boxShadow: "var(--color-card-shadow, none)",
+        color: "var(--color-text, #e5e7eb)",
       }}
     >
       {/* HEADER */}
@@ -156,13 +157,13 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
         fontSize: "16px",
         fontWeight: 800,
         letterSpacing: "0.14em",
-        color: "#93c5fd",
+        color: "var(--color-accent, #38bdf8)",
         marginBottom: "6px",
       }}>
         HABIT ANALYTICS
       </div>
 
-      <div style={{ fontSize: "12px", color: "#9ca3af", marginBottom: "14px" }}>
+      <div style={{ fontSize: "12px", color: "var(--color-text-muted, #9ca3af)", marginBottom: "14px" }}>
         LAST 30 DAYS • DAILY PROGRESS
       </div>
 
@@ -174,15 +175,17 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
               position: "absolute",
               left: hover.x - 42,
               top: hover.y - 60,
-              background: "#1A2031",
-              border: "1px solid rgba(255,255,255,0.2)",
+              background: "var(--color-surface-2, #1A2031)",
+              border: "1px solid var(--color-border, rgba(255,255,255,0.2))",
+              color: "var(--color-text, #ffffff)",
               padding: "6px 8px",
               borderRadius: "8px",
               fontSize: "11px",
               pointerEvents: "none",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
             }}
           >
-            <div style={{ color: hover.isAvg ? "#f59e0b" : "#93c5fd" }}>
+            <div style={{ color: hover.isAvg ? "#f59e0b" : "var(--color-accent, #93c5fd)" }}>
               {dayjs(hover.date).format("DD MMM")} {hover.isAvg && "(7d Avg)"}
             </div>
             <div>{hover.value} {hover.isAvg ? "avg / day" : "habits"}</div>
@@ -225,7 +228,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
                   x2={width - paddingX}
                   y1={y}
                   y2={y}
-                  stroke="rgba(255,255,255,0.1)"
+                  stroke="var(--color-border, rgba(255,255,255,0.1))"
                   strokeDasharray="4 6"
                 />
                 <text
@@ -233,7 +236,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
                   y={y + 4}
                   textAnchor="end"
                   fontSize="11"
-                  fill="#9ca3af"
+                  fill="var(--color-text-muted, #9ca3af)"
                 >
                   {Math.round(g * maxValue)}
                 </text>
@@ -250,7 +253,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
                 y={height - 16}
                 textAnchor="middle"
                 fontSize="11"
-                fill="#9ca3af"
+                fill="var(--color-text-muted, #9ca3af)"
               >
                 {daily[i].label}
               </text>
@@ -338,7 +341,7 @@ function HabitGraphs({ habits = [], month, isCurrentMonth, monthlyScore }) {
                   cy={p.y}
                   r={isToday ? 6 : 4.5}
                   fill={isToday ? todayColor : mainColor}
-                  stroke="#020617"
+                  stroke="var(--color-surface, #020617)"
                   strokeWidth="1.2"
                   style={{ cursor: "pointer", pointerEvents: "all" }}
                   onMouseEnter={() => setHover(p)}

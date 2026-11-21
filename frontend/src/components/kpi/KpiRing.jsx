@@ -37,7 +37,7 @@ function KpiRing({
             cy="60"
             r={radius}
             fill="transparent"
-            stroke="rgba(255,255,255,0.05)"
+            stroke="var(--color-border, rgba(255,255,255,0.08))"
             strokeWidth={strokeWidth}
           />
 
@@ -96,9 +96,9 @@ export default KpiRing;
 
 const styles = {
   card: {
-    background: "linear-gradient(180deg, #020617, #020617)",
-    boxShadow:
-      "inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 6px -1px rgba(0,0,0,0.1)",
+    background: "var(--color-surface, #020617)",
+    border: "var(--color-card-border, none)",
+    boxShadow: "var(--color-card-shadow, none)",
     borderRadius: "16px",
     padding: "10px 16px",
     display: "flex",
@@ -133,7 +133,7 @@ const styles = {
   percent: {
     fontSize: "1.8rem",
     fontWeight: 800,
-    color: "var(--text-primary)",
+    color: "var(--color-text-title, var(--color-text, #f8fafc))",
     lineHeight: 1,
   },
 
@@ -149,7 +149,7 @@ const styles = {
   label: {
     fontSize: "0.7rem",
     fontWeight: 800,
-    color: "var(--text-muted)",
+    color: "var(--color-text-muted, #94a3b8)",
     letterSpacing: "0.08em",
     textTransform: "uppercase",
     marginTop: "6px",

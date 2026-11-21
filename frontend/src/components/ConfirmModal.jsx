@@ -44,8 +44,8 @@ export default function ConfirmModal({
           transform: "translate(-50%, -50%)",
           width: "90%",
           maxWidth: "400px",
-          background: "#020617",
-          border: "1px solid rgba(255,255,255,0.08)",
+          background: "var(--color-surface, #020617)",
+          border: "1px solid var(--color-border, rgba(255,255,255,0.08))",
           borderRadius: "18px",
           padding: "24px 28px",
           zIndex: 99999,
@@ -54,10 +54,10 @@ export default function ConfirmModal({
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <h3 style={{ margin: "0 0 8px 0", fontSize: "19px", fontWeight: 800, color: "#f8fafc", letterSpacing: "-0.01em" }}>
+        <h3 style={{ margin: "0 0 8px 0", fontSize: "19px", fontWeight: 800, color: "var(--color-text-title, #f8fafc)", letterSpacing: "-0.01em" }}>
           {title}
         </h3>
-        <p style={{ margin: "0 0 28px 0", fontSize: "15px", color: "#94a3b8", lineHeight: 1.6 }}>
+        <p style={{ margin: "0 0 28px 0", fontSize: "15px", color: "var(--color-text-muted, #94a3b8)", lineHeight: 1.6 }}>
           {message}
         </p>
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
@@ -66,16 +66,16 @@ export default function ConfirmModal({
             style={{
               padding: "10px 18px",
               borderRadius: "10px",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid var(--color-border, rgba(255,255,255,0.1))",
               background: "transparent",
-              color: "#cbd5e1",
+              color: "var(--color-text, #cbd5e1)",
               fontSize: "14px",
               fontWeight: 600,
               cursor: "pointer",
               transition: "all 0.15s ease",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.06)"; e.currentTarget.style.color = "#f1f5f9"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#cbd5e1"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--color-surface-2, rgba(255,255,255,0.06))"; e.currentTarget.style.color = "var(--color-text-title, #f1f5f9)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--color-text, #cbd5e1)"; }}
           >
             Cancel
           </button>

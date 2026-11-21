@@ -333,8 +333,9 @@ const styles = {
     height: "415px",
     borderRadius: "18px",
     padding: "16px",
-    background: "#020617",
-    boxShadow: "0 12px 30px rgba(0,0,0,0.45)",
+    background: "var(--color-surface, #020617)",
+    border: "var(--color-card-border, none)",
+    boxShadow: "var(--color-card-shadow, 0 12px 30px rgba(0,0,0,0.45))",
     display: "flex",
     flexDirection: "column",
   },
@@ -347,9 +348,10 @@ const styles = {
   },
 
   title: {
-    color: "#93c5fd",
+    color: "var(--color-accent, #38bdf8)",
     letterSpacing: "1px",
     fontSize: "14px",
+    fontWeight: 800,
     margin: 0,
   },
 
@@ -361,13 +363,13 @@ const styles = {
 
   savingDot: {
     fontSize: "10px",
-    color: "#93c5fd",
+    color: "var(--color-accent, #38bdf8)",
     animation: "pulse 1s infinite",
   },
 
   counter: {
     fontSize: "11px",
-    color: "#64748b",
+    color: "var(--color-text-muted, #64748b)",
   },
 
   errorBar: {
@@ -387,11 +389,11 @@ const styles = {
 
   input: {
     flex: 1,
-    background: "#1A2031",
-    border: "1px solid #1e293b",
+    background: "var(--color-input-bg, #1A2031)",
+    border: "1px solid var(--color-input-border, #1e293b)",
     borderRadius: "10px",
     padding: "8px 10px",
-    color: "#e5e7eb",
+    color: "var(--color-text, #e5e7eb)",
     outline: "none",
     fontSize: "13px",
   },
@@ -416,7 +418,7 @@ const styles = {
   empty: {
     textAlign: "center",
     fontSize: "12px",
-    color: "#475569",
+    color: "var(--color-text-muted, #64748b)",
     marginTop: "24px",
   },
 
@@ -432,13 +434,13 @@ const styles = {
   itemText: {
     flex: 1,
     fontSize: "13px",
-    color: "#e5e7eb",
+    color: "var(--color-text, #e5e7eb)",
   },
 
   deleteBtn: {
     border: "none",
     background: "transparent",
-    color: "#64748b",
+    color: "var(--color-text-muted, #64748b)",
     cursor: "pointer",
     fontSize: "14px",
   },

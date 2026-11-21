@@ -20,15 +20,15 @@ function pct(n, d) { return d > 0 ? Math.round((n / d) * 100) : 0; }
 function KpiCard({ value, label, sub, accent }) {
   return (
     <div style={{
-      background: '#020617',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--color-surface, #020617)',
+      border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
       borderRadius: '12px',
       padding: '18px 16px',
       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
       position: 'relative', overflow: 'hidden',
     }}>
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: accent }} />
-      <div style={{ fontSize: '26px', fontWeight: 800, color: '#f8fafc', lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--color-text, #f8fafc)', lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: '11px', color: accent, fontWeight: 600 }}>{sub}</div>}
       <div style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', letterSpacing: '0.07em', textTransform: 'uppercase', textAlign: 'center' }}>{label}</div>
     </div>
@@ -106,7 +106,7 @@ export default function MonthlyView({ habits = [] }) {
       margin: [20, 20, 20, 20],
       filename: `habit-tracker-month-${monthStart.format('YYYY-MM')}.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0b101e' },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: 'var(--color-bg, #0b101e)' },
       jsPDF: { unit: 'px', format: [w + 40, h + 40], orientation: w > h ? 'landscape' : 'portrait' }
     };
     html2pdf().set(opt).from(elem).save();
@@ -122,8 +122,8 @@ export default function MonthlyView({ habits = [] }) {
 
   /* ─── styles ─────────────────────────────────────────────────── */
   const card = {
-    background: '#020617',
-    border: '1px solid rgba(255,255,255,0.06)',
+    background: 'var(--color-surface, #020617)',
+    border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
     borderRadius: '14px',
     padding: '20px 24px',
   };
@@ -131,7 +131,7 @@ export default function MonthlyView({ habits = [] }) {
   /* ─── empty state ─────────────────────────────────────────────── */
   if (habits.length === 0) {
     return (
-      <div style={{ flex: 1, padding: '40px', color: '#f8fafc', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+      <div style={{ flex: 1, padding: '40px', color: 'var(--color-text, #f8fafc)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
         <div style={{ fontSize: '48px' }}>📆</div>
         <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 700 }}>No habits to show</h3>
         <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>Add habits on the Dashboard to see your monthly view.</p>
@@ -140,7 +140,7 @@ export default function MonthlyView({ habits = [] }) {
   }
 
   return (
-    <div ref={reportRef} style={{ flex: 1, overflowY: 'auto', padding: '32px', color: '#f8fafc', boxSizing: 'border-box' }}>
+    <div ref={reportRef} style={{ flex: 1, overflowY: 'auto', padding: '32px', color: 'var(--color-text, #f8fafc)', boxSizing: 'border-box' }}>
 
       {/* ── PAGE HEADER + NAVIGATION ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
@@ -168,7 +168,7 @@ export default function MonthlyView({ habits = [] }) {
           <div style={{
             ...navBtn,
             padding: '6px 16px', fontSize: '13px', fontWeight: 700,
-            color: '#f8fafc',
+            color: 'var(--color-text, #f8fafc)',
             cursor: 'default', pointerEvents: 'none'
           }}>
             {monthStart.format('MMMM YYYY')}
@@ -201,7 +201,7 @@ export default function MonthlyView({ habits = [] }) {
           {/* download pdf */}
           <button
             onClick={handleDownloadPDF}
-            style={{ ...navBtn, padding: '6px 12px', fontSize: '12px', fontWeight: 600, marginLeft: '8px', color: '#f8fafc', background: 'rgba(255,255,255,0.1)' }}
+            style={{ ...navBtn, padding: '6px 12px', fontSize: '12px', fontWeight: 600, marginLeft: '8px', color: 'var(--color-text, #f8fafc)', background: 'rgba(255,255,255,0.1)' }}
             title="Download PDF Report"
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
@@ -269,7 +269,7 @@ export default function MonthlyView({ habits = [] }) {
             />
             <Tooltip
               cursor={{ stroke: 'rgba(255,255,255,0.05)', strokeWidth: 2, strokeDasharray: '4 4' }}
-              contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#f8fafc', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
+              contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: 'var(--color-text, #f8fafc)', padding: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.5)' }}
               formatter={(value, name, props) => [`${value}% (${props.payload.count}/${habits.length})`, 'Completed']}
               labelStyle={{ fontWeight: 800, marginBottom: '6px', color: '#94a3b8' }}
             />

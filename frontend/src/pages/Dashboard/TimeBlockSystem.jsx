@@ -66,7 +66,7 @@ export default function TimeBlockSystem({ timeBlocks, onUpdateTimeBlocks, onMigr
         
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
           {/* Pomodoro */}
-          <div style={{ display: "flex", alignItems: "center", background: "#020617", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "4px 6px" }}>
+          <div style={{ display: "flex", alignItems: "center", background: "var(--color-surface, #020617)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px", padding: "4px 6px" }}>
             <span style={{ color: isRunning ? "#ef4444" : "#f1f5f9", fontWeight: 700, fontSize: "14px", padding: "0 12px", fontFamily: "monospace" }}>{m}:{s}</span>
             <button onClick={toggleTimer} style={{ background: isRunning ? "rgba(239, 68, 68, 0.2)" : "rgba(16, 185, 129, 0.2)", border: "none", color: isRunning ? "#ef4444" : "#10b981", borderRadius: "14px", padding: "4px 12px", cursor: "pointer", fontSize: "12px", fontWeight: 700 }}>
               {isRunning ? "PAUSE" : "FOCUS"}
@@ -95,10 +95,10 @@ export default function TimeBlockSystem({ timeBlocks, onUpdateTimeBlocks, onMigr
               <div style={{ padding: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
                 {list.length === 0 && <div style={{ fontSize: "12px", color: "#475569", textAlign: "center", padding: "12px" }}>No tasks planned for {block.label.toLowerCase()}.</div>}
                 {list.map(task => (
-                  <div key={task.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px", background: task.active ? "rgba(16, 185, 129, 0.05)" : "#020617", border: `1px solid ${task.active ? "#10b981" : "rgba(255,255,255,0.05)"}`, borderRadius: "8px", transition: "all 0.2s ease" }}>
+                  <div key={task.id} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px", background: task.active ? "rgba(16, 185, 129, 0.05)" : "var(--color-surface, #020617)", border: `1px solid ${task.active ? "#10b981" : "var(--color-border, rgba(255,255,255,0.05))"}`, borderRadius: "8px", transition: "all 0.2s ease" }}>
                     <input type="checkbox" checked={task.done} onChange={e => handleUpdateTask(block.key, task.id, "done", e.target.checked)} style={{ cursor: "pointer" }} />
-                    <input placeholder="Task description..." value={task.text} onChange={e => handleUpdateTask(block.key, task.id, "text", e.target.value)} style={{ flex: 1, background: "transparent", border: "none", color: task.done ? "#64748b" : "#f1f5f9", textDecoration: task.done ? "line-through" : "none", fontSize: "13px", outline: "none" }} />
-                    <select value={task.category} onChange={e => handleUpdateTask(block.key, task.id, "category", e.target.value)} style={{ background: "rgba(255,255,255,0.05)", border: "none", color: "#94a3b8", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", outline: "none" }}>
+                    <input placeholder="Task description..." value={task.text} onChange={e => handleUpdateTask(block.key, task.id, "text", e.target.value)} style={{ flex: 1, background: "transparent", border: "none", color: task.done ? "var(--color-text-muted, #64748b)" : "var(--color-text, #f1f5f9)", textDecoration: task.done ? "line-through" : "none", fontSize: "13px", outline: "none" }} />
+                    <select value={task.category} onChange={e => handleUpdateTask(block.key, task.id, "category", e.target.value)} style={{ background: "var(--color-surface-2, rgba(255,255,255,0.05))", border: "1px solid var(--color-border, transparent)", color: "var(--color-text-muted, #94a3b8)", padding: "4px 8px", borderRadius: "4px", fontSize: "12px", outline: "none" }}>
                       {categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                     <button onClick={() => handleUpdateTask(block.key, task.id, "active", !task.active)} style={{ background: "transparent", border: "none", color: task.active ? "#10b981" : "#475569", cursor: "pointer", fontSize: "14px" }} title="Set Active">🎯</button>

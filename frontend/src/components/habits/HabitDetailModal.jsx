@@ -81,10 +81,10 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
     }}>
       <div style={{
-        background: '#020617', borderRadius: '20px', padding: '32px',
-        width: '520px', maxWidth: '92vw', border: '1px solid rgba(255,255,255,0.1)',
+        background: 'var(--color-surface, #020617)', borderRadius: '20px', padding: '32px',
+        width: '520px', maxWidth: '92vw', border: '1px solid var(--color-border, rgba(255,255,255,0.1))',
         boxShadow: '0 25px 50px -12px rgba(0,0,0,0.6)',
-        position: 'relative', color: '#f8fafc',
+        position: 'relative', color: 'var(--color-text, #f8fafc)',
         fontFamily: "'Inter', sans-serif",
       }}>
         {/* Close button */}
@@ -130,29 +130,29 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
         )}
 
         {/* Header */}
-        <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px 0', color: '#60a5fa', paddingRight: '40px' }}>{habit.title}</h2>
-        <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: '#64748b', marginBottom: '24px', flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--color-accent, #60a5fa)', paddingRight: '40px' }}>{habit.title}</h2>
+        <div style={{ display: 'flex', gap: '12px', fontSize: '13px', color: 'var(--color-text-muted, #64748b)', marginBottom: '24px', flexWrap: 'wrap' }}>
           {habit.category && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#60a5fa', display: 'inline-block' }} />
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-accent, #60a5fa)', display: 'inline-block' }} />
               {habit.category}
             </div>
           )}
-          <div>Started: <strong style={{ color: '#94a3b8' }}>{startedOn}</strong></div>
+          <div>Started: <strong style={{ color: 'var(--color-text, #94a3b8)' }}>{startedOn}</strong></div>
         </div>
 
         {/* Stats row */}
         <div className="resp-grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           <div style={{ background: 'rgba(251,146,60,0.08)', padding: '14px 12px', borderRadius: '12px', border: '1px solid rgba(251,146,60,0.15)', textAlign: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Streak</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted, #64748b)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Streak</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#fb923c' }}>🔥 {streak}</div>
           </div>
           <div style={{ background: 'rgba(52,211,153,0.08)', padding: '14px 12px', borderRadius: '12px', border: '1px solid rgba(52,211,153,0.15)', textAlign: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Completed</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted, #64748b)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Completed</div>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#34d399' }}>✓ {totalCompleted}</div>
           </div>
           <div style={{ background: 'rgba(96,165,250,0.08)', padding: '14px 12px', borderRadius: '12px', border: '1px solid rgba(96,165,250,0.15)', textAlign: 'center' }}>
-            <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Status</div>
+            <div style={{ fontSize: '11px', color: 'var(--color-text-muted, #64748b)', fontWeight: 700, textTransform: 'uppercase', marginBottom: '6px' }}>Status</div>
             <div style={{ fontSize: '14px', fontWeight: 700, color: isArchived ? '#fb923c' : isPaused ? '#c4b5fd' : '#34d399', marginTop: '4px' }}>
               {isArchived ? 'Frozen' : isPaused ? 'Paused' : 'Active'}
             </div>
@@ -160,8 +160,8 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
         </div>
 
         {/* Journal Note */}
-        <div style={{ marginBottom: '24px', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px' }}>
-          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', color: '#94a3b8' }}>
+        <div style={{ marginBottom: '24px', borderTop: '1px solid var(--color-border, rgba(255,255,255,0.07))', paddingTop: '20px' }}>
+          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', color: 'var(--color-text-muted, #94a3b8)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               Journal note
@@ -172,15 +172,14 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
               max={todayStr}
               onChange={(e) => setSelectedNoteDate(e.target.value)}
               style={{
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                color: '#f1f5f9',
+                background: 'var(--color-input-bg, rgba(255,255,255,0.05))',
+                border: '1px solid var(--color-input-border, rgba(255,255,255,0.1))',
+                color: 'var(--color-text, #f1f5f9)',
                 borderRadius: '6px',
                 padding: '4px 8px',
                 fontSize: '12px',
                 fontFamily: 'inherit',
                 outline: 'none',
-                colorScheme: 'dark'
               }}
             />
           </div>
@@ -191,18 +190,19 @@ export default function HabitDetailModal({ habit, monthDates, onClose, isFutureD
             onBlur={(e) => updateNote(habit._id, selectedNoteDate, e.target.value)}
             style={{
               width: '100%', boxSizing: 'border-box', height: '80px',
-              background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '10px', padding: '12px', color: '#f1f5f9',
+              background: 'var(--color-input-bg, rgba(255,255,255,0.04))',
+              border: '1px solid var(--color-input-border, rgba(255,255,255,0.08))',
+              borderRadius: '10px', padding: '12px', color: 'var(--color-text, #f1f5f9)',
               fontFamily: 'inherit', fontSize: '13px', resize: 'none', outline: 'none',
               transition: 'border 0.2s',
             }}
-            onFocus={e => e.target.style.borderColor = 'rgba(96,165,250,0.4)'}
-            onBlurCapture={e => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+            onFocus={e => e.target.style.borderColor = 'var(--color-accent, rgba(96,165,250,0.4))'}
+            onBlurCapture={e => e.target.style.borderColor = 'var(--color-input-border, rgba(255,255,255,0.08))'}
           />
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '20px', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', borderTop: '1px solid var(--color-border, rgba(255,255,255,0.07))', paddingTop: '20px', gap: '12px' }}>
           
           {/* Archive / Unarchive */}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

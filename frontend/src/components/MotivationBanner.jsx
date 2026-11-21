@@ -122,7 +122,7 @@ function MotivationBanner({ habits }) {
         {/* Text */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#38bdf8", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--color-accent, #0284c7)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Coach Aria · Daily Motivation
             </span>
           </div>
@@ -135,7 +135,7 @@ function MotivationBanner({ habits }) {
             }} />
           ) : (
             <p style={{
-              margin: 0, fontSize: "14px", color: "#cbd5e1", lineHeight: "1.55", fontWeight: 500,
+              margin: 0, fontSize: "14px", color: "var(--color-text, #cbd5e1)", lineHeight: "1.55", fontWeight: 500,
               fontStyle: "italic",
             }}>
               {data?.message || "Loading your daily motivation..."}

@@ -47,11 +47,12 @@ function HabitProgressColumn({ habits, currentMonth }) {
         position: "relative",
         width: "100%",
         minWidth: 0,
-        background: "#020617",
+        background: "var(--color-surface, #020617)",
         borderRadius: "16px",
         overflow: "hidden",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04)",
-        color: "#e5e7eb",
+        border: "var(--color-card-border, none)",
+        boxShadow: "var(--color-card-shadow, none)",
+        color: "var(--color-text, #e5e7eb)",
       }}
     >
       {/* HEADER */}
@@ -61,12 +62,12 @@ function HabitProgressColumn({ habits, currentMonth }) {
           fontSize: "15px",
           fontWeight: 800,
           letterSpacing: "0.14em",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.08))",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           height: "77px",
-          color: "#93c5fd",
+          color: "var(--color-accent, #38bdf8)",
         }}
       >
         PROGRESS BAR
@@ -81,8 +82,8 @@ function HabitProgressColumn({ habits, currentMonth }) {
           gap: "8px",
           padding: "0 12px",
           fontSize: "11px",
-          color: "#9ca3af",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
+          color: "var(--color-text-muted, #9ca3af)",
+          borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.08))",
         }}
       >
         <div style={{ width: "18px" }}>NO.</div>
@@ -102,7 +103,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
             alignItems: "center",
             gap: "8px",
             padding: "0 12px",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.05))",
             fontSize: "12px",
           }}
         >
@@ -116,7 +117,7 @@ function HabitProgressColumn({ habits, currentMonth }) {
             style={{
               flex: 1,
               height: "6px",
-              background: "rgba(255,255,255,0.12)",
+              background: "var(--color-surface-2, rgba(255,255,255,0.12))",
               borderRadius: "999px",
               overflow: "hidden",
             }}

@@ -250,7 +250,7 @@ export default function NotesView({ habits = [], updateNote }) {
         <div style={{
           display: "flex", alignItems: "center", padding: "0 16px",
           borderRadius: "10px", background: "rgba(255,255,255,0.04)",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid var(--color-border, rgba(255,255,255,0.08))",
           fontSize: "13px", fontWeight: 600, color: "#64748b",
           whiteSpace: "nowrap",
         }}>
@@ -318,7 +318,7 @@ export default function NotesView({ habits = [], updateNote }) {
                   key={entry.key}
                   className="note-card"
                   style={{
-                    background: "#020617",
+                    background: "var(--color-surface, #020617)",
                     border: "1px solid rgba(255,255,255,0.07)",
                     borderRadius: "14px",
                     padding: "18px 20px",

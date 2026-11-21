@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTheme } from "../../context/ThemeContext";
 import ConfirmModal from "../../components/ConfirmModal";
 
 const DEFAULT_CATEGORIES = [
@@ -25,6 +26,7 @@ function saveCategories(cats) {
 const EMOJI_OPTIONS = ["🏃","💼","🧘","📚","🧹","📌","🎯","💪","🧠","🎨","🌿","🏋️","✍️","🎵","🍎","💧","🚀","⭐","🔥","🌙"];
 
 export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilterChange, habits = [], editHabit, deleteHabit, onHabitClick }) {
+  const { themeMode, activePreset, isCustom, customPrimary, presets, quickColors, setPreset, setThemeMode, setCustomPrimary, setIsThemeModalOpen } = useTheme();
   const [categories, setCategories] = useState(loadCategories);
   const [newCatName, setNewCatName] = useState("");
   const [newCatEmoji, setNewCatEmoji] = useState("🎯");
@@ -137,32 +139,33 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
   }
 
   const cardStyle = {
-    background: "#020617",
-    border: "1px solid rgba(255,255,255,0.07)",
+    background: "var(--color-surface, #020617)",
+    border: "1px solid var(--color-border, rgba(255,255,255,0.07))",
     borderRadius: "16px",
     padding: "24px",
     marginBottom: "24px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
   };
 
   const sectionTitle = {
     fontSize: "16px",
     fontWeight: 700,
-    color: "#f1f5f9",
+    color: "var(--color-text, #f1f5f9)",
     marginBottom: "6px",
   };
 
   const sectionSubtitle = {
     fontSize: "13px",
-    color: "#64748b",
+    color: "var(--color-text-muted, #64748b)",
     marginBottom: "20px",
   };
 
   const inputStyle = {
     padding: "10px 14px",
     borderRadius: "10px",
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.05)",
-    color: "#f1f5f9",
+    border: "1px solid var(--color-border, rgba(255,255,255,0.1))",
+    background: "var(--color-input-bg, rgba(255,255,255,0.05))",
+    color: "var(--color-text, #f1f5f9)",
     fontSize: "14px",
     fontFamily: "'Inter', sans-serif",
     outline: "none",
@@ -180,10 +183,10 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
     >
       {/* Page Header */}
       <div style={{ marginBottom: "32px" }}>
-        <h1 style={{ fontSize: "24px", fontWeight: 800, color: "#f1f5f9", margin: 0 }}>
+        <h1 style={{ fontSize: "24px", fontWeight: 800, color: "var(--color-text, #f1f5f9)", margin: 0 }}>
           Settings
         </h1>
-        <p style={{ fontSize: "14px", color: "#64748b", marginTop: "6px" }}>
+        <p style={{ fontSize: "14px", color: "var(--color-text-muted, #64748b)", marginTop: "6px" }}>
           Manage your habit categories and preferences
         </p>
       </div>
@@ -210,6 +213,157 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
           ✓ Settings saved
         </div>
       )}
+
+      {/* ── Theme & Appearance ── */}
+      <div style={cardStyle}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
+          <div>
+            <div style={sectionTitle}>Theme & Appearance</div>
+            <div style={sectionSubtitle}>
+              Customize the look of the whole page — choose Light, Dark, Curated Color Presets, or pick Any Color.
+            </div>
+          </div>
+          <button
+            onClick={() => setIsThemeModalOpen(true)}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "10px",
+              border: "none",
+              background: "linear-gradient(135deg, var(--theme-1, #2563eb), var(--theme-2, #38bdf8))",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span>🎨</span> Open Customizer
+          </button>
+        </div>
+
+        {/* Mode Switcher Buttons */}
+        <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+          <button
+            onClick={() => setThemeMode("dark")}
+            style={{
+              flex: 1,
+              padding: "12px",
+              borderRadius: "12px",
+              border: themeMode === "dark" ? "2px solid var(--color-accent, #2563eb)" : "1px solid var(--color-border, rgba(255,255,255,0.1))",
+              background: themeMode === "dark" ? "var(--color-surface-2, rgba(255,255,255,0.08))" : "transparent",
+              color: themeMode === "dark" ? "var(--color-text, #fff)" : "var(--color-text-muted, #94a3b8)",
+              cursor: "pointer",
+              fontWeight: 700,
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span>🌙</span> Dark Mode
+          </button>
+          <button
+            onClick={() => setThemeMode("light")}
+            style={{
+              flex: 1,
+              padding: "12px",
+              borderRadius: "12px",
+              border: themeMode === "light" ? "2px solid var(--color-accent, #2563eb)" : "1px solid var(--color-border, rgba(255,255,255,0.1))",
+              background: themeMode === "light" ? "var(--color-surface-2, rgba(255,255,255,0.08))" : "transparent",
+              color: themeMode === "light" ? "var(--color-text, #0f172a)" : "var(--color-text-muted, #94a3b8)",
+              cursor: "pointer",
+              fontWeight: 700,
+              fontSize: "14px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              transition: "all 0.2s ease",
+            }}
+          >
+            <span>☀️</span> Light Mode
+          </button>
+        </div>
+
+        {/* Preset Cards Mini Grid */}
+        <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-text-muted, #94a3b8)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
+          Curated Color Palettes
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))", gap: "8px", marginBottom: "20px" }}>
+          {presets.slice(0, 8).map((p) => {
+            const isSelected = !isCustom && activePreset === p.id && themeMode === p.mode;
+            return (
+              <div
+                key={p.id}
+                onClick={() => setPreset(p.id)}
+                style={{
+                  padding: "10px",
+                  borderRadius: "10px",
+                  border: isSelected ? "2px solid var(--color-accent, #2563eb)" : "1px solid var(--color-border, rgba(255,255,255,0.08))",
+                  background: isSelected ? "var(--color-surface-2, rgba(255,255,255,0.06))" : "transparent",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <div style={{ width: "16px", height: "16px", borderRadius: "50%", background: p.accent, flexShrink: 0 }} />
+                <span style={{ fontSize: "12px", fontWeight: isSelected ? 700 : 500, color: "var(--color-text, #f1f5f9)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {p.name.split(" ")[0]}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Any Color Swatches */}
+        <div style={{ fontSize: "12px", fontWeight: 700, color: "var(--color-text-muted, #94a3b8)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "10px" }}>
+          Or Pick Any Theme Color
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+          {quickColors.slice(0, 12).map((qc) => (
+            <button
+              key={qc.hex}
+              onClick={() => setCustomPrimary(qc.hex)}
+              title={qc.name}
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "8px",
+                background: qc.hex,
+                border: isCustom && customPrimary.toLowerCase() === qc.hex.toLowerCase() ? "3px solid #fff" : "1px solid rgba(255,255,255,0.2)",
+                cursor: "pointer",
+                transition: "transform 0.15s ease",
+              }}
+            />
+          ))}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginLeft: "4px" }}>
+            <input
+              type="color"
+              value={customPrimary}
+              onChange={(e) => setCustomPrimary(e.target.value)}
+              title="Pick any color"
+              style={{
+                width: "30px",
+                height: "30px",
+                padding: 0,
+                border: "2px solid #fff",
+                borderRadius: "8px",
+                cursor: "pointer",
+                background: "transparent",
+              }}
+            />
+            <span style={{ fontSize: "11px", color: "var(--color-text-muted, #94a3b8)", fontWeight: 600 }}>Custom</span>
+          </div>
+        </div>
+      </div>
 
       {/* ── Default Status Filter ── */}
       <div style={cardStyle}>
@@ -273,7 +427,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
               borderRadius: "8px",
               border: "1px solid rgba(255,255,255,0.1)",
               background: "transparent",
-              color: "#64748b",
+              color: "var(--color-text-muted, #64748b)",
               fontSize: "12px",
               fontWeight: 600,
               cursor: "pointer",
@@ -345,7 +499,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                       borderRadius: "8px",
                       border: "none",
                       background: "transparent",
-                      color: "#64748b",
+                      color: "var(--color-text-muted, #64748b)",
                       fontSize: "12px",
                       cursor: "pointer",
                       fontFamily: "'Inter', sans-serif",
@@ -359,7 +513,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                   <span style={{ fontSize: "18px", flexShrink: 0 }}>
                     {cat.label.split(" ").slice(-1)[0]}
                   </span>
-                  <span style={{ flex: 1, fontSize: "14px", fontWeight: 500, color: "#e2e8f0" }}>
+                  <span style={{ flex: 1, fontSize: "14px", fontWeight: 500, color: "var(--color-text, #e2e8f0)" }}>
                     {cat.label.split(" ").slice(0, -1).join(" ")}
                   </span>
                   <button
@@ -367,7 +521,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                     style={{
                       background: "transparent",
                       border: "none",
-                      color: "#64748b",
+                      color: "var(--color-text-muted, #64748b)",
                       cursor: "pointer",
                       padding: "4px",
                       borderRadius: "6px",
@@ -389,7 +543,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                     style={{
                       background: "transparent",
                       border: "none",
-                      color: "#64748b",
+                      color: "var(--color-text-muted, #64748b)",
                       cursor: "pointer",
                       padding: "4px",
                       borderRadius: "6px",
@@ -423,7 +577,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
             border: "1px dashed rgba(255,255,255,0.1)",
           }}
         >
-          <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          <div style={{ fontSize: "12px", color: "var(--color-text-muted, #64748b)", fontWeight: 600, marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Add New Category
           </div>
           <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -474,7 +628,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
           {displayHabits.length === 0 ? (
-            <div style={{ color: "#64748b", fontSize: "13px", padding: "10px 0" }}>
+            <div style={{ color: "var(--color-text-muted, #64748b)", fontSize: "13px", padding: "10px 0" }}>
               No habits found for this filter.
             </div>
           ) : (
@@ -496,7 +650,7 @@ export default function SettingsView({ defaultStatusFilter, onDefaultStatusFilte
                     )}
                     <span
                       onClick={() => onHabitClick && onHabitClick(habit)}
-                      style={{ fontSize: "14px", fontWeight: 600, color: "#e2e8f0", cursor: "pointer", transition: "color 0.15s" }}
+                      style={{ fontSize: "14px", fontWeight: 600, color: "var(--color-text, #e2e8f0)", cursor: "pointer", transition: "color 0.15s" }}
                       onMouseEnter={(e) => e.currentTarget.style.color = "#60a5fa"}
                       onMouseLeave={(e) => e.currentTarget.style.color = "#e2e8f0"}
                     >

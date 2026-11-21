@@ -225,7 +225,7 @@ export default function PlannerView({ user, habits }) {
           display: flex;
           align-items: center;
           gap: 12px;
-          background: #020617;
+          background: var(--color-surface, #020617);
           border: 1px solid rgba(255,255,255,0.06);
           border-radius: 12px;
           padding: 14px 16px;
@@ -277,7 +277,7 @@ export default function PlannerView({ user, habits }) {
         </div>
 
         {/* TIME NAVIGATOR */}
-        <div style={{ display: "flex", alignItems: "center", gap: "16px", background: "#020617", padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", background: "var(--color-surface, #020617)", padding: "8px 16px", borderRadius: "20px", border: "1px solid rgba(255,255,255,0.06)", boxShadow: "0 4px 12px rgba(0,0,0,0.2)" }}>
           <button className="nav-btn" onClick={handlePrev}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           </button>
@@ -348,7 +348,7 @@ export default function PlannerView({ user, habits }) {
                   { title: "Q3: Delegate (Urgent, Not Important)", color: "#f59e0b" },
                   { title: "Q4: Don't Do (Neither)", color: "#94a3b8" }
                 ].map((quad, index) => (
-                  <div key={index} style={{ background: "#020617", borderRadius: "16px", padding: "16px", border: `1px solid ${quad.color}40`, transition: "transform 0.2s ease, box-shadow 0.2s ease" }}>
+                  <div key={index} style={{ background: "var(--color-surface, #020617)", borderRadius: "16px", padding: "16px", border: `1px solid ${quad.color}40`, transition: "transform 0.2s ease, box-shadow 0.2s ease" }}>
                     <h4 style={{ color: quad.color, margin: "0 0 12px 0", fontSize: "13px", fontWeight: 700, textTransform: "uppercase" }}>{quad.title}</h4>
                     <textarea
                       className="planner-textarea"
@@ -422,7 +422,7 @@ export default function PlannerView({ user, habits }) {
               </h3>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
                 {[0, 1, 2, 3].map(index => (
-                  <div key={index} style={{ background: "#020617", borderRadius: "16px", padding: "20px", border: "1px solid rgba(255,255,255,0.08)", transition: "transform 0.2s ease, box-shadow 0.2s ease", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div key={index} style={{ background: "var(--color-surface, #020617)", borderRadius: "16px", padding: "20px", border: "1px solid rgba(255,255,255,0.08)", transition: "transform 0.2s ease, box-shadow 0.2s ease", display: "flex", flexDirection: "column", gap: "12px" }}>
                     <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#c084fc", fontWeight: 700 }}>
                       <div style={{ width: "28px", height: "28px", borderRadius: "6px", background: "rgba(192, 132, 252, 0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                         {index + 1}

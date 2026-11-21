@@ -222,15 +222,11 @@ function DashboardGrid({
 
       <div
         style={{
-          background: isDark
-            ? "#020617"
-            : "#ffffff",
+          background: "var(--color-surface, #020617)",
           borderRadius: "16px",
           overflow: "hidden",
-          boxShadow: isDark
-            ? "inset 0 0 0 1px rgba(255,255,255,0.06)"
-            : "0 1px 3px rgba(0,0,0,0.08)",
-          border: isDark ? "none" : "1px solid #e5e7eb",
+          boxShadow: "var(--color-card-shadow, none)",
+          border: "var(--color-card-border, none)",
         }}
       >
         {/* INTEGRATED HEADER */}
@@ -242,8 +238,8 @@ function DashboardGrid({
           <div
             className="dash-nav-pill"
             style={{
-              background: isDark ? "rgba(255,255,255,0.03)" : "#f1f5f9",
-              border: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
+              background: "var(--color-surface-2, rgba(255,255,255,0.04))",
+              border: "1px solid var(--color-border, rgba(255,255,255,0.08))",
             }}
           >
             <button
@@ -257,7 +253,7 @@ function DashboardGrid({
             <div
               className="dash-month-label"
               style={{
-                color: isDark ? "#60a5fa" : "#1e40af",
+                color: "var(--color-accent, #60a5fa)",
               }}
             >
               {typeof monthLabel === 'string' && monthLabel.includes(' ') ? (
@@ -315,10 +311,8 @@ function DashboardGrid({
                 fontSize: "10px",
                 fontWeight: 600,
                 letterSpacing: "0.03em",
-                color: isDark ? "#475569" : "#9ca3af",
-                borderBottom: isDark
-                  ? "1px solid rgba(255,255,255,0.06)"
-                  : "1px solid #f1f5f9",
+                color: "var(--color-text-muted, #64748b)",
+                borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.06))",
               }}
             >
               {safeMonthDates.map((date) => (
@@ -358,12 +352,12 @@ function DashboardGrid({
                       fontWeight: isToday ? 800 : 400,
                       color: isToday
                         ? isDark ? "#60a5fa" : "#2563eb"
-                        : isDark ? "#64748b" : "#9ca3af",
+                        : "var(--color-text-muted, #64748b)",
                       background: isToday
                         ? isDark ? "rgba(96,165,250,0.12)" : "#eff6ff"
                         : "transparent",
                       borderBottom: !isToday
-                        ? isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid #f1f5f9"
+                        ? "1px solid var(--color-border, rgba(255,255,255,0.06))"
                         : "none",
                       borderRadius: isToday ? "8px 8px 0 0" : "0",
                       margin: "0",

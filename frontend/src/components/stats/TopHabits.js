@@ -50,14 +50,14 @@ function TopHabits({
       style={{
         height: "100%",
         boxSizing: "border-box",
-        background: "#020617",
+        background: "var(--color-surface, #020617)",
         borderRadius: "16px",
         padding: "14px 20px",
-        color: "#e5e7eb",
+        color: "var(--color-text, #e5e7eb)",
         display: "flex",
         flexDirection: "column",
-        boxShadow:
-          "inset 0 0 0 1px rgba(255,255,255,0.06), 0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+        border: "var(--color-card-border, none)",
+        boxShadow: "var(--color-card-shadow, none)",
       }}
     >
       {/* HEADER */}
@@ -67,7 +67,7 @@ function TopHabits({
           fontSize: "12px",
           letterSpacing: "0.14em",
           fontWeight: 800,
-          color: "white",
+          color: "var(--color-accent, #38bdf8)",
           display: "flex",
           alignItems: "center",
           flexShrink: 0,
@@ -88,7 +88,7 @@ function TopHabits({
         }}
       >
         {topHabits.length === 0 ? (
-          <div style={{ fontSize: "12px", color: "#9ca3af" }}>
+          <div style={{ fontSize: "12px", color: "var(--color-text-muted, #9ca3af)" }}>
             No activity this month
           </div>
         ) : (
@@ -143,7 +143,7 @@ function TopHabits({
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         fontWeight: 600,
-                        color: "var(--text-primary)",
+                        color: "var(--color-text, #f8fafc)",
                       }}
                     >
                       {habit.title}
@@ -164,7 +164,7 @@ function TopHabits({
                 <div
                   style={{
                     height: "7px",
-                    background: "rgba(255,255,255,0.06)",
+                    background: "var(--color-surface-2, rgba(255,255,255,0.08))",
                     borderRadius: "999px",
                     overflow: "hidden",
                   }}

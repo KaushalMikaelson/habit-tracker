@@ -72,7 +72,7 @@ export default function SmartTaskSystem({ tasks, onUpdateTasks }) {
           return (
             <div 
               key={key} 
-              style={{ background: "#020617", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}
+              style={{ background: "var(--color-surface, #020617)", border: "1px solid var(--color-border, rgba(255,255,255,0.06))", borderRadius: "12px", padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}
               onDragOver={e => e.preventDefault()}
               onDrop={e => onDrop(e, key)}
             >

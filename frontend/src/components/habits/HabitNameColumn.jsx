@@ -243,11 +243,11 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
 
       <div
         style={{
-          background: "#020617",
+          background: "var(--color-surface, #020617)",
           borderRadius: "16px",
           overflow: "hidden",
-          color: "#e5e7eb",
-          border: "1px solid rgba(255,255,255,0.05)",
+          color: "var(--color-text, #e5e7eb)",
+          border: "var(--color-card-border, none)",
           boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
         }}
       >
@@ -260,7 +260,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
             alignItems: "center",
             justifyContent: "center",
             gap: "6px",
-            borderBottom: "1px solid rgba(255,255,255,0.06)",
+            borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.06))",
           }}
         >
           <div style={{
@@ -280,7 +280,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
             fontSize: "10px",
             fontWeight: 700,
             letterSpacing: "0.16em",
-            color: "#475569",
+            color: "var(--color-text-muted, #94a3b8)",
             textTransform: "uppercase",
           }}>
             Habits
@@ -293,7 +293,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
             padding: "20px 16px",
             textAlign: "center",
             fontSize: "12px",
-            color: "#334155",
+            color: "var(--color-text-muted, #94a3b8)",
           }}>
             No habits yet
           </div>
@@ -313,7 +313,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
                       justifyContent: "space-between",
                       padding: "0 10px 0 12px",
                       fontSize: "13px",
-                      borderBottom: "1px solid rgba(255,255,255,0.04)",
+                      borderBottom: "1px solid var(--color-border, rgba(255,255,255,0.04))",
                       gap: "6px",
                     }}
                   >
@@ -348,7 +348,7 @@ function HabitNameColumn({ habits, deleteHabit, editHabit, onHabitClick }) {
                             overflowX: "auto",
                             overflowY: "hidden",
                             display: "block",
-                            color: habit.status === 'paused' ? "#c4b5fd" : habit.status === 'archived' ? "#fb923c" : "#cbd5e1",
+                            color: habit.status === 'paused' ? "#a855f7" : habit.status === 'archived' ? "#f97316" : "var(--color-text, #e2e8f0)",
                             fontWeight: 500,
                             cursor: "pointer",
                             fontStyle: habit.status === 'paused' || habit.status === 'archived' ? "italic" : "normal",

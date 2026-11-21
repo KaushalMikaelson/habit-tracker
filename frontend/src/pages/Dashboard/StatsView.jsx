@@ -113,8 +113,8 @@ function habitColor(idx) {
 function StatCard({ value, label, sub, accent = '#34d399' }) {
   return (
     <div style={{
-      background: '#020617',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--color-surface, #020617)',
+      border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
       borderRadius: '14px',
       padding: '24px 20px',
       display: 'flex',
@@ -299,7 +299,7 @@ export default function StatsView({ habits = [] }) {
       <div style={{
         display: 'inline-flex',
         background: 'rgba(255,255,255,0.05)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        border: '1px solid var(--color-border, rgba(255,255,255,0.08))',
         borderRadius: '24px',
         padding: '4px',
         gap: '2px',
@@ -370,7 +370,7 @@ export default function StatsView({ habits = [] }) {
 
         {/* Overall consistency bar */}
         <div style={{
-          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--color-surface, #020617)', border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
           borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
         }}>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '14px' }}>
@@ -396,7 +396,7 @@ export default function StatsView({ habits = [] }) {
         <div className="resp-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           {/* habit consistency list */}
           <div style={{
-            background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
+            background: 'var(--color-surface, #020617)', border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
             borderRadius: '14px', padding: '20px 24px',
           }}>
             <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
@@ -425,7 +425,7 @@ export default function StatsView({ habits = [] }) {
 
           {/* comparison card */}
           <div style={{
-            background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
+            background: 'var(--color-surface, #020617)', border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
             borderRadius: '14px', padding: '20px 24px', display: 'flex',
             flexDirection: 'column', gap: '16px',
           }}>
@@ -480,7 +480,7 @@ export default function StatsView({ habits = [] }) {
           const weekDelta  = h.weeklyPct  - h.prevWeeklyPct;
           return (
             <div key={h._id} style={{
-              background: '#020617',
+              background: 'var(--color-surface, #020617)',
               border: `1px solid rgba(255,255,255,0.06)`,
               borderLeft: `3px solid ${color}`,
               borderRadius: '14px',
@@ -557,7 +557,7 @@ export default function StatsView({ habits = [] }) {
       <>
         {/* heatmap */}
         <div style={{
-          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--color-surface, #020617)', border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
           borderRadius: '14px', padding: '20px 24px', marginBottom: '24px',
           overflowX: 'auto',
         }}>
@@ -665,7 +665,7 @@ export default function StatsView({ habits = [] }) {
 
         {/* daily activity list */}
         <div style={{
-          background: '#020617', border: '1px solid rgba(255,255,255,0.06)',
+          background: 'var(--color-surface, #020617)', border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
           borderRadius: '14px', padding: '20px 24px',
         }}>
           <div style={{ fontSize: '11px', fontWeight: 800, color: '#94a3b8', letterSpacing: '0.08em', marginBottom: '16px' }}>
@@ -736,7 +736,7 @@ function MiniStat({ label, value, color }) {
   return (
     <div style={{
       background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.06)',
+      border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
       borderRadius: '10px',
       padding: '12px',
       textAlign: 'center',
@@ -773,7 +773,7 @@ function HighlightRow({ icon, label, name, value, color }) {
     <div style={{
       display: 'flex', alignItems: 'center',
       background: 'rgba(255,255,255,0.03)',
-      border: '1px solid rgba(255,255,255,0.06)',
+      border: '1px solid var(--color-border, rgba(255,255,255,0.06))',
       borderRadius: '10px', padding: '12px 14px', gap: '12px',
     }}>
       <span style={{ fontSize: '20px' }}>{icon}</span>

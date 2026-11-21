@@ -1,23 +1,35 @@
 /* ===== DESIGN TOKENS ===== */
 :root {
   /* Colors */
-  --color-bg:        #020617;
+  --color-bg:        #0b101e;
   --color-surface:   #020617;
-  --color-surface-2: #1A2031;
+  --color-surface-2: #131b2e;
+  --color-header-bg: rgba(11, 16, 30, 0.88);
+  --color-sidebar-bg:#0b101e;
   --color-border:    rgba(255, 255, 255, 0.08);
-  --color-text:      #f1f5f9;
+  --color-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-text:      #f8fafc;
+  --color-text-title:#ffffff;
+  --color-text-muted:#94a3b8;
   --color-muted:     #94a3b8;
   --color-accent:    #2563eb;
   --color-accent-2:  #38bdf8;
+  --theme-1:         #2563eb;
+  --theme-2:         #38bdf8;
   --color-green:     #22c55e;
   --color-purple:    #a855f7;
   --color-yellow:    #facc15;
   --color-red:       #ef4444;
 
   /* Aliases used by components */
-  --text-primary:    #f1f5f9;
-  --text-muted:      #475569;
+  --text-primary:    var(--color-text, #f8fafc);
+  --text-muted:      var(--color-text-muted, #94a3b8);
   --accent-green:    #22c55e;
+  --color-card-bg:   var(--color-surface, #020617);
+  --color-card-border: none;
+  --color-card-shadow: none;
+  --color-input-bg:  #1A2031;
+  --color-input-border: var(--color-border, rgba(255, 255, 255, 0.1));
 
   /* Radii */
   --radius-sm:  8px;
@@ -56,6 +68,7 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   line-height: 1.5;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -115,6 +128,18 @@ button:active {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255,255,255,0.2);
+}
+
+[data-theme-mode="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme-mode="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.28);
+}
+
+[data-theme-mode="light"] ::placeholder {
+  color: #94a3b8;
 }
 
 .hide-scrollbar::-webkit-scrollbar {

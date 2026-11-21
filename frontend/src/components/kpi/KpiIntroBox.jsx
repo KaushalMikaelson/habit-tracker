@@ -54,9 +54,10 @@ function KpiIntroBox() {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        background: "#020617",
-        boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
-        color: "#e5e7eb",
+        background: "var(--color-surface, #020617)",
+        border: "var(--color-card-border, none)",
+        boxShadow: "var(--color-card-shadow, none)",
+        color: "var(--color-text, #e5e7eb)",
 
         position: "relative",
       }}
@@ -70,14 +71,14 @@ function KpiIntroBox() {
           right: "12px",
           background: "none",
           border: "none",
-          color: "#38bdf8",
+          color: "var(--color-accent, #38bdf8)",
           fontSize: "11px",
           fontWeight: 600,
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           gap: "4px",
-          opacity: 0.8,
+          opacity: 0.9,
         }}
       >
         {!editing && <Edit2 size={12} />}
@@ -88,7 +89,7 @@ function KpiIntroBox() {
       <div
         style={{
           fontSize: "14px",
-          opacity: 0.7,
+          color: "var(--color-text-muted, #94a3b8)",
           marginBottom: "6px",
         }}
       >
@@ -108,6 +109,7 @@ function KpiIntroBox() {
           style={{
             fontSize: "20px",
             fontWeight: 700,
+            color: "var(--color-text-title, #ffffff)",
             marginBottom: "8px",
           }}
         >
@@ -132,7 +134,7 @@ function KpiIntroBox() {
         <div
           style={{
             fontSize: "13px",
-            opacity: 0.6,
+            color: "var(--color-text-muted, #94a3b8)",
             lineHeight: 1.4,
             fontStyle: "italic",
           }}
@@ -146,11 +148,11 @@ function KpiIntroBox() {
 
 const inputStyle = {
   width: "100%",
-  background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(255,255,255,0.12)",
+  background: "var(--color-input-bg, rgba(255,255,255,0.06))",
+  border: "1px solid var(--color-input-border, rgba(255,255,255,0.12))",
   borderRadius: "8px",
   padding: "6px 8px",
-  color: "#f8fafc",
+  color: "var(--color-text, #f8fafc)",
   outline: "none",
   marginBottom: "6px",
 };
